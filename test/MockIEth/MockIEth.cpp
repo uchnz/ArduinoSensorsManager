@@ -3,25 +3,10 @@
 #include <stdint.h>
 
 #include <./../../test/MockIEth/MockIEth.hpp>
-#include <./../../test/MockIMQTT/MockIMQTT.hpp>
-#include <./../../test/MockIDallas/MockIDallas.hpp>
-#include <SensorManager.h>
 
 using ::testing::_;
 using ::testing::Return;
 
-class SensorManagerTest : public ::testing::Test
-{
-protected:
-   void SetUp() override
-   {
-   }
-
-   sensor_manager::MockIEth _eth;
-   sensor_manager::MockIMQTT _mqtt;
-   sensor_manager::MockIDallas _dallas;
-   sensor_manager::SensorManager _mgr{_eth, _mqtt, _dallas};
-};
 // class IEthTest : public SensorManagerTest
 // {
 // };
@@ -32,14 +17,14 @@ protected:
 // {
 // };
 
-// // IEth tests
-// TEST_F(IEthTest, test_ConnectWithDHCP_IsCalledOnce)
-// {
-//    EXPECT_CALL(_eth, connect).Times(1);
-//    uint8_t mac[6] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
+// IEth tests
+TEST_F(IEthTest, test_ConnectWithDHCP_IsCalledOnce)
+{
+   EXPECT_CALL(_eth, connect).Times(1);
+   uint8_t mac[6] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
 
-//    _mgr.connectWithDHCP(mac);
-// }
+   _mgr.connectWithDHCP(mac);
+}
 
 // TEST_F(IEthTest, test_ConnectWithDHCP_CalledWithZeroMAC_ReturnsFalse)
 // {
