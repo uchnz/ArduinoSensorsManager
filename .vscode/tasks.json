@@ -1,0 +1,29 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "C/C++: g++.exe build active file",
+            "command": "C:\\msys64\\mingw64\\bin\\g++.exe",
+            "args": [
+                "-std=c++11",
+                "-O2",
+                "-Wall",
+                "-g",
+                "${file}",
+                "-o",
+                "c:\\Users\\1\\OneDrive - Лига Проектов\\Documents\\PlatformIO\\Projects\\D18b20\\.pio\\build\\desktop\\program.exe"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "isDefault": true,
+                "kind": "build"
+            }
+        }
+    ]
+}

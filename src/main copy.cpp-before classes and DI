@@ -1,0 +1,59 @@
+#include <EthernetConnection.h>
+#include <MQTTConnection.h>
+#include <dallas.h>
+
+unsigned long millisPassed = 0;
+String topics[] = {"/UZV1/temp1", "/UZV2/temp1"};
+uint16_t measureInterval = 3000;
+
+
+//*** HELPERS ***///
+void sendTopicData(String topic, String data)
+{
+  Serial.print("Sending teperature data to topic: ");
+  Serial.print(topic);
+  String sentResult = " -> failed.";
+  if ( MQTT_publishData(topic, data) )
+    sentResult = " -> sent.";
+  Serial.println(sentResult);
+}
+
+void printTemperatureDebugInfo(double temperature, int id)
+{
+  String addr = Dallas_getAddressByID(id);
+  String formatTemperatureString = "Sensor[" + String (id) + "] = " + String(temperature, 2) + ", Address: " + addr; 
+  Serial.println(formatTemperatureString);
+}
+
+void sendTemperaturesToMQTTBroker()
+{
+  int num = Dallas_GetNumberOfSensors();
+  for (int i = 0; i < num; i++) {
+    double t = Dallas_GetTemperatureByID(i);
+    printTemperatureDebugInfo(t, i);
+    sendTopicData(topics[i], String(t, 2));
+  }
+}
+//*** END HELPERS ***///
+
+
+void setup() {
+  Serial.begin(115200);
+  delay(1000);
+  Serial.println("");
+  Ethernet_initializeNetwork();
+  MQTT_initializeMQTTClientCallback();
+  Dallas_initializeDallasTemperatureSensors();
+}
+
+void loop() {
+  MQTT_connect();
+  MQTT_checkForNewMessages();
+
+  if ( abs(millis() - millisPassed) > measureInterval ) {
+    Dallas_RequestTemperatures();
+    sendTemperaturesToMQTTBroker();
+    millisPassed = millis();
+  }
+}
+
