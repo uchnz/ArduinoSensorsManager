@@ -23,5 +23,8 @@
     },
     "gtest-adapter.debugConfig": [
         "Debug"
-    ]
+    ],
+    "files.associations": {
+        "algorithm": "cpp"
+    }
 }

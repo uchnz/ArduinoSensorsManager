@@ -54,7 +54,7 @@ namespace sensor_manager
         return addr;
     }
 
-    void DallasArduino::initSensors()
+    void DallasArduino::init()
     {
         _sensors.begin();
         showNumberOfFoundSensors();

@@ -6,6 +6,8 @@
 #include <SensorManager.h>
 
 String topics[] = {"/UZV1/temp1", "/UZV2/temp1"};
+// char *myStrings[] = {"This is string 1", "This is string 2", "This is string 3",
+//                      "This is string 4", "This is string 5", "This is string 6"};
 
 unsigned long millisPassed = 0;
 uint16_t scanInterval = 3000;
@@ -36,8 +38,8 @@ void sendTemperaturesToMQTTBroker(sensor_manager::SensorManager *mg)
     for (uint8_t i = 0; i < num; i++)
     {
         float t = mg->getTemperatureByID(i);
-        printTemperatureDebugInfo(t, i, mg);
-        sendTopicData(mg, topics[i], String(t, 2));
+        // String str = mg->printTemperatureDebugInfo(t, i);
+        // sendTopicData(mg, topics[i], String(t, 2));
     }
 }
 
@@ -47,7 +49,6 @@ void processDataWithInterval(uint16_t interval, sensor_manager::SensorManager *m
     {
         mg->requestCurrentTemperatures();
         sendTemperaturesToMQTTBroker(mg);
-        // mgr.publishMessageToBroker("/UZV1/temp1", mls.c_str());
         millisPassed = millis();
     }
 }
@@ -67,15 +68,17 @@ void setup()
     delay(1000);         // make a pause after begin() to clearly display further messages
     printf("\n");
 
+    dallas.init();
+    dallas.setSensorsPrecision(9);
+    //    mgr.initDallasSensors();
+    //    mgr.setSensorsPrecision(9);
+
     if (!mgr.connectWithDHCP(arduinoEthernetMAC))
         return;
 
     if (!mgr.initMQTT(MQTTBrokerIP))
         return;
     mgr.setKeepAliveClient(600);
-
-    mgr.initDallasSensors();
-    mgr.setSensorsPrecision(9);
 
     printf("Setup complete.\n\n");
 }

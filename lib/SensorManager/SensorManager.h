@@ -1,6 +1,9 @@
 #pragma once
 
 #include <stdint.h>
+//#include <iostream>
+//#include <StandardCplusplus.h>
+//#include <string>
 
 #include <IEth.h>
 #include <IMQTT.h>
@@ -14,10 +17,14 @@ namespace sensor_manager
         IEth &_eth;
         IMQTT &_clientMQTT;
         IDallas &_dallas;
+        char **_topics;
+        uint8_t _numberOfTopics;
+
         bool isEmptyMAC(uint8_t (&mac)[6]);
 
     public:
         SensorManager(IEth &eth, IMQTT &mqtt, IDallas &dallas);
+        virtual ~SensorManager();
         // IEth
         bool connectWithDHCP(uint8_t (&mac)[6]);
         // IMQTT
@@ -30,12 +37,15 @@ namespace sensor_manager
         bool checkForIncomingMessages();
         bool publishMessageToBroker(char *topic, char *message);
         // IDallas
-        void initDallasSensors();
-        void setSensorsPrecision(int precision);
+        // void initDallasSensors();
+        // void setSensorsPrecision(int precision);
         void requestCurrentTemperatures();
         uint8_t getNumberOfSensors();
         float getTemperatureByID(uint8_t id);
         char *getStringAddressByID(uint8_t id);
         // Business logic
+        // std::string printTemperatureDebugInfo(uint8_t id, float temperature);
+        bool fillTopicsStrings(char **topics, uint8_t totalTopics);
+        char *GetTopicByID(uint8_t id);
     };
 }

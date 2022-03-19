@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <../test/SensorManager_test.h>
+#include <../test/SensorManager/SensorManager_test.h>
 
 using ::testing::_;
 using ::testing::Return;
@@ -9,19 +9,19 @@ class IDallasTest : public SensorManagerTest
 {
 };
 
-TEST_F(IDallasTest, test_InitDallasSensors_Successful)
-{
-    EXPECT_CALL(_dallas, init).Times(1);
+// TEST_F(IDallasTest, test_InitDallasSensors_Successful)
+// {
+//     EXPECT_CALL(_dallas, init).Times(1);
 
-    _mgr.initDallasSensors();
-}
+//     _mgr.initDallasSensors();
+// }
 
-TEST_F(IDallasTest, test_setSensorPrecision_Successful)
-{
-    EXPECT_CALL(_dallas, setSensorsPrecision(_)).Times(1);
+// TEST_F(IDallasTest, test_setSensorPrecision_Successful)
+// {
+//     EXPECT_CALL(_dallas, setSensorsPrecision(_)).Times(1);
 
-    _mgr.setSensorsPrecision(9);
-}
+//     _mgr.setSensorsPrecision(9);
+// }
 
 TEST_F(IDallasTest, test_requestCurrentTemperatures_Successful)
 {
