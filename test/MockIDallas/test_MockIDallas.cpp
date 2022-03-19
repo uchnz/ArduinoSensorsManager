@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+
 #include <../test/SensorManager_test.h>
 
 using ::testing::_;
@@ -10,7 +11,7 @@ class IDallasTest : public SensorManagerTest
 
 TEST_F(IDallasTest, test_InitDallasSensors_Successful)
 {
-    EXPECT_CALL(_dallas, initSensors).Times(1);
+    EXPECT_CALL(_dallas, init).Times(1);
 
     _mgr.initDallasSensors();
 }

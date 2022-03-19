@@ -7,7 +7,7 @@ namespace sensor_manager
     {
     public:
         virtual ~IDallas() = default;
-        virtual void initSensors() = 0;
+        virtual void init() = 0;
         virtual void setSensorsPrecision(int precision) = 0;
         virtual void requestCurrentTemperatures() = 0;
         virtual uint8_t getNumberOfSensors() = 0;

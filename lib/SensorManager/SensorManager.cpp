@@ -83,7 +83,7 @@ namespace sensor_manager
     // IDallas
     void SensorManager::initDallasSensors()
     {
-        _dallas.initSensors();
+        _dallas.init();
     }
 
     void SensorManager::setSensorsPrecision(int precision)

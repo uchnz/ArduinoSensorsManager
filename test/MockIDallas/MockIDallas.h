@@ -7,7 +7,7 @@ namespace sensor_manager
     class MockIDallas : public IDallas
     {
     public:
-        MOCK_METHOD(void, initSensors, (), (override));
+        MOCK_METHOD(void, init, (), (override));
         MOCK_METHOD(void, setSensorsPrecision, (int), (override));
         MOCK_METHOD(void, requestCurrentTemperatures, (), (override));
         MOCK_METHOD(uint8_t, getNumberOfSensors, (), (override));

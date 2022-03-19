@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+
 #include <../test/SensorManager_test.h>
 
 using ::testing::_;
