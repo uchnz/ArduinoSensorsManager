@@ -9,36 +9,36 @@ class IMQTTTest : public SensorManagerTest
 {
 };
 
-TEST_F(IMQTTTest, test_InitMQTT_IsCalledOnce)
-{
-    EXPECT_CALL(_mqtt, begin(_)).Times(1);
-    char MQTTserverIP[] = "10.62.202.14";
+// TEST_F(IMQTTTest, test_InitMQTT_IsCalledOnce)
+// {
+//     EXPECT_CALL(_mqtt, begin(_)).Times(1);
+//     char MQTTserverIP[] = "10.62.202.14";
 
-    _mgr.initMQTT(MQTTserverIP);
-}
+//     _mgr.initMQTT(MQTTserverIP);
+// }
 
-TEST_F(IMQTTTest, test_InitMQTT_CalledWithNull_ReturnsFalse)
-{
-    char *MQTTserverIP = nullptr;
+// TEST_F(IMQTTTest, test_InitMQTT_CalledWithNull_ReturnsFalse)
+// {
+//     char *MQTTserverIP = nullptr;
 
-    ASSERT_FALSE(_mgr.initMQTT(MQTTserverIP));
-}
+//     ASSERT_FALSE(_mgr.initMQTT(MQTTserverIP));
+// }
 
-TEST_F(IMQTTTest, test_InitMQTT_CalledWithCorrectIP_ReturnsTrue)
-{
-    EXPECT_CALL(_mqtt, begin(_)).WillOnce(Return(true));
-    char MQTTserverIP[] = "192.168.1.1";
+// TEST_F(IMQTTTest, test_InitMQTT_CalledWithCorrectIP_ReturnsTrue)
+// {
+//     EXPECT_CALL(_mqtt, begin(_)).WillOnce(Return(true));
+//     char MQTTserverIP[] = "192.168.1.1";
 
-    ASSERT_TRUE(_mgr.initMQTT(MQTTserverIP));
-}
+//     ASSERT_TRUE(_mgr.initMQTT(MQTTserverIP));
+// }
 
-TEST_F(IMQTTTest, test_InitMQTT_CalledWithIncorrectIP_ReturnsFalse)
-{
-    EXPECT_CALL(_mqtt, begin(_)).WillOnce(Return(false));
-    char MQTTserverIP[] = "not ip";
+// TEST_F(IMQTTTest, test_InitMQTT_CalledWithIncorrectIP_ReturnsFalse)
+// {
+//     EXPECT_CALL(_mqtt, begin(_)).WillOnce(Return(false));
+//     char MQTTserverIP[] = "not ip";
 
-    ASSERT_FALSE(_mgr.initMQTT(MQTTserverIP));
-}
+//     ASSERT_FALSE(_mgr.initMQTT(MQTTserverIP));
+// }
 
 TEST_F(IMQTTTest, test_installCallback_IsCalledWithNull_ReturnsFalse)
 {
@@ -55,29 +55,29 @@ TEST_F(IMQTTTest, test_installCallback_IsCalledCorrectly_ReturnsTrue)
     ASSERT_TRUE(_mgr.installCallback(cb));
 }
 
-TEST_F(IMQTTTest, test_setKeepAlive_IsSet)
-{
-    uint16_t keepAlive = 653;
-    EXPECT_CALL(_mqtt, setKeepAlive(::testing::Eq(keepAlive)));
+// TEST_F(IMQTTTest, test_setKeepAlive_IsSet)
+// {
+//     uint16_t keepAlive = 653;
+//     EXPECT_CALL(_mqtt, setKeepAlive(::testing::Eq(keepAlive)));
 
-    _mgr.setKeepAliveClient(keepAlive);
-}
+//     _mgr.setKeepAliveClient(keepAlive);
+// }
 
-TEST_F(IMQTTTest, test_setKeepAlive_IsCalledWithNegativeValue)
-{
-    uint16_t keepAlive = -50;
-    EXPECT_CALL(_mqtt, setKeepAlive(::testing::Eq(keepAlive)));
+// TEST_F(IMQTTTest, test_setKeepAlive_IsCalledWithNegativeValue)
+// {
+//     uint16_t keepAlive = -50;
+//     EXPECT_CALL(_mqtt, setKeepAlive(::testing::Eq(keepAlive)));
 
-    _mgr.setKeepAliveClient(keepAlive);
-}
+//     _mgr.setKeepAliveClient(keepAlive);
+// }
 
-TEST_F(IMQTTTest, test_setKeepAlive_IsCalledWithZeroValue)
-{
-    uint16_t keepAlive = 0;
-    EXPECT_CALL(_mqtt, setKeepAlive(::testing::Eq(keepAlive)));
+// TEST_F(IMQTTTest, test_setKeepAlive_IsCalledWithZeroValue)
+// {
+//     uint16_t keepAlive = 0;
+//     EXPECT_CALL(_mqtt, setKeepAlive(::testing::Eq(keepAlive)));
 
-    _mgr.setKeepAliveClient(keepAlive);
-}
+//     _mgr.setKeepAliveClient(keepAlive);
+// }
 
 // Should I test for bigger that uint16_t type, or it's redundant? If redundant - please delete
 // TEST_F(IMQTTTest, test_setKeepAlive_IsCalledValueGreaterThan65k) {

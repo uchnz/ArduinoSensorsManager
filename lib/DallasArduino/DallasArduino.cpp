@@ -99,6 +99,10 @@ namespace sensor_manager
     {
         DeviceAddress devAddress;
         _sensors.getAddress(devAddress, id);
+
+        // WHAT IF NO SENSOR ADDRESS IS FOUND!!!&???
+        // todo add check here
+
         String address = getAddressString(devAddress);
         char addressConverted[8] = "";
         address.toCharArray(addressConverted, 8);

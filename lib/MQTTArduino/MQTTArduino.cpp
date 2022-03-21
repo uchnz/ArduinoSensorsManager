@@ -11,7 +11,7 @@ namespace sensor_manager
         ip.fromString(srvIP);
         Serial.print("Initializing client with MQTT broker IP: ");
         Serial.println(srvIP);
-        
+
         _clientMQTT.begin(ip, _net);
 
         return true;
@@ -24,10 +24,11 @@ namespace sensor_manager
 
     bool MQTTArduino::connect()
     {
-        if ( _clientMQTT.connected() )
+        if (_clientMQTT.connected())
             return false;
         Serial.print("Connecting to MQTT broker with ID: arduinoID...");
-        while ( !_clientMQTT.connect("arduinoID", "admin", "admin") ) {
+        while (!_clientMQTT.connect("arduinoID", "admin", "admin"))
+        {
             Serial.print(".");
             delay(1000);
         }
@@ -45,14 +46,14 @@ namespace sensor_manager
 
     bool MQTTArduino::loop()
     {
-        return  _clientMQTT.loop();        
+        return _clientMQTT.loop();
     }
 
     bool MQTTArduino::onMessage(MQTTClientCallback cb)
     {
         return false;
     }
-    
+
     bool MQTTArduino::publish(char *topic, char *data)
     {
         return _clientMQTT.publish(topic, data);

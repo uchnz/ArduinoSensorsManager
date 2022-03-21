@@ -24,36 +24,38 @@ namespace sensor_manager
         uint8_t _numberOfSensors;
 
         bool isEmptyMAC(uint8_t (&mac)[6]);
+        void updateAllTemperatures();
+
+        // Dallas private
+        float getTemperatureByID(uint8_t id);
 
     public:
         SensorManager(IEth &eth, IMQTT &mqtt, IDallas &dallas);
         virtual ~SensorManager();
-        // IEth
+
+        // Eth
         bool connectWithDHCP(uint8_t (&mac)[6]);
-        // IMQTT
+
+        // MQTT
         bool initMQTT(char *srvIP);
+        void setKeepAliveClient(uint16_t keepAlive);
         bool installCallback(sensor_manager::MQTTClientCallback cb);
         static void callbackIncommingMessages(char *topic, char *payload);
-        void setKeepAliveClient(uint16_t keepAlive);
         bool connectToMQTT();
         bool connectedToMQTT();
         bool checkForIncomingMessages();
         bool publishMessageToBroker(char *topic, char *message);
-        // IDallas
-        // void initDallasSensors();
-        // void setSensorsPrecision(int precision);
-        void requestCurrentTemperatures();
-        uint8_t getNumberOfSensors();
-        float getTemperatureByID(uint8_t id);
-        char *getStringAddressByID(uint8_t id);
-        bool updateTemperature(uint8_t id);
-        float GetCurrentTemperatureByID(uint8_t id);
+
+        // Dallas
         void initSensors();
-        void updateAllTemperatures();
+        uint8_t getSavedNumberSensors();
+        float GetCurrentTemperatureByID(uint8_t id);
+        void requestCurrentTemperatures();
+        char *getStringAddressByID(uint8_t id);
+
         // Business logic
         // std::string printTemperatureDebugInfo(uint8_t id, float temperature);
         bool fillTopicsStrings(char **topics, uint8_t totalTopics);
         char *GetTopicByID(uint8_t id);
-        float getCurrentTemperature();
     };
 }

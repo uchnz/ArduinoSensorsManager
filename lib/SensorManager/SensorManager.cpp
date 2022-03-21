@@ -119,31 +119,22 @@ namespace sensor_manager
     void SensorManager::requestCurrentTemperatures()
     {
         _dallas.requestCurrentTemperatures();
+        updateAllTemperatures();
     }
 
-    uint8_t SensorManager::getNumberOfSensors()
+    uint8_t SensorManager::getSavedNumberSensors()
     {
-        return _dallas.getNumberOfSensors();
+        return _numberOfSensors;
     }
 
     float SensorManager::getTemperatureByID(uint8_t id)
     {
-        //    return _dallas.getTemperatureByID(id);
-        return _temperatures[id];
+        return _dallas.getTemperatureByID(id);
     }
 
     char *SensorManager::getStringAddressByID(uint8_t id)
     {
         return _dallas.getStringAddressByID(id);
-    }
-
-    bool SensorManager::updateTemperature(uint8_t id)
-    {
-        _currentTemperature = _dallas.getTemperatureByID(0);
-        _temperatures[0] = _dallas.getTemperatureByID(0);
-        _temperatures[1] = _dallas.getTemperatureByID(1);
-
-        return true;
     }
 
     float SensorManager::GetCurrentTemperatureByID(uint8_t id)
@@ -171,10 +162,10 @@ namespace sensor_manager
     }
 
     // Business logic
-    float SensorManager::getCurrentTemperature()
-    {
-        return _currentTemperature;
-    }
+    // float SensorManager::getCurrentTemperature()
+    // {
+    //     return _currentTemperature;
+    // }
 
     // std::string SensorManager::printTemperatureDebugInfo(uint8_t id, float temperature)
     // {

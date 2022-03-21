@@ -1,14 +1,5 @@
 #include <gtest/gtest.h>
-//#include <stdint.h>
 #include <SensorManager/SensorManager_test.h>
-
-TEST_F(SensorManagerTest, test_printTemperatureDebugInfo_ReturnsDebugStringData)
-{
-    // char expected[] = "Sensor[1] = 21.50, Address: 28e4ac0400fe";
-    // std::string actual = _mgr.printTemperatureDebugInfo(1, 21.50);
-
-    // EXPECT_STREQ(actual.c_str(), expected);
-}
 
 TEST_F(SensorManagerTest, test_FillTopicsStringsWithNull_ReturnsFalse)
 {

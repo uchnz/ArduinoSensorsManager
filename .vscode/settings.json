@@ -22,7 +22,7 @@
         ]
     },
     "gtest-adapter.debugConfig": [
-        "Debug"
+        "PIO Debug"
     ],
     "files.associations": {
         "algorithm": "cpp"
