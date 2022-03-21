@@ -70,8 +70,6 @@ void setup()
 
     dallas.init();
     dallas.setSensorsPrecision(9);
-    //    mgr.initDallasSensors();
-    //    mgr.setSensorsPrecision(9);
 
     if (!mgr.connectWithDHCP(arduinoEthernetMAC))
         return;

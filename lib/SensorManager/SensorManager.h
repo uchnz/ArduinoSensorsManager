@@ -19,6 +19,9 @@ namespace sensor_manager
         IDallas &_dallas;
         char **_topics;
         uint8_t _numberOfTopics;
+        float _currentTemperature;
+        float *_temperatures;
+        uint8_t _numberOfSensors;
 
         bool isEmptyMAC(uint8_t (&mac)[6]);
 
@@ -43,9 +46,14 @@ namespace sensor_manager
         uint8_t getNumberOfSensors();
         float getTemperatureByID(uint8_t id);
         char *getStringAddressByID(uint8_t id);
+        bool updateTemperature(uint8_t id);
+        float GetCurrentTemperatureByID(uint8_t id);
+        void initSensors();
+        void updateAllTemperatures();
         // Business logic
         // std::string printTemperatureDebugInfo(uint8_t id, float temperature);
         bool fillTopicsStrings(char **topics, uint8_t totalTopics);
         char *GetTopicByID(uint8_t id);
+        float getCurrentTemperature();
     };
 }

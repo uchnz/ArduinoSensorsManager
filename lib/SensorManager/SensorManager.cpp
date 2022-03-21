@@ -13,6 +13,9 @@ namespace sensor_manager
     {
         _topics = nullptr;
         _numberOfTopics = 0;
+        _currentTemperature = -128;
+        _temperatures = nullptr;
+        _numberOfSensors = 0;
     }
 
     SensorManager::~SensorManager()
@@ -24,6 +27,9 @@ namespace sensor_manager
 
             delete[] _topics;
         }
+
+        if (nullptr != _temperatures)
+            delete[] _temperatures;
     }
 
     bool SensorManager::isEmptyMAC(uint8_t (&mac)[6])
@@ -122,7 +128,8 @@ namespace sensor_manager
 
     float SensorManager::getTemperatureByID(uint8_t id)
     {
-        return _dallas.getTemperatureByID(id);
+        //    return _dallas.getTemperatureByID(id);
+        return _temperatures[id];
     }
 
     char *SensorManager::getStringAddressByID(uint8_t id)
@@ -130,7 +137,45 @@ namespace sensor_manager
         return _dallas.getStringAddressByID(id);
     }
 
+    bool SensorManager::updateTemperature(uint8_t id)
+    {
+        _currentTemperature = _dallas.getTemperatureByID(0);
+        _temperatures[0] = _dallas.getTemperatureByID(0);
+        _temperatures[1] = _dallas.getTemperatureByID(1);
+
+        return true;
+    }
+
+    float SensorManager::GetCurrentTemperatureByID(uint8_t id)
+    {
+        if (id < _numberOfSensors)
+            return _temperatures[id];
+
+        return -128;
+    }
+
+    void SensorManager::initSensors()
+    {
+        uint8_t numberOfSensors = _dallas.getNumberOfSensors();
+        _temperatures = new float[numberOfSensors];
+        for (uint8_t i = 0; i < numberOfSensors; i++)
+            _temperatures[i] = -128;
+
+        _numberOfSensors = numberOfSensors;
+    }
+
+    void SensorManager::updateAllTemperatures()
+    {
+        for (uint8_t i = 0; i < _numberOfSensors; i++)
+            _temperatures[i] = _dallas.getTemperatureByID(i);
+    }
+
     // Business logic
+    float SensorManager::getCurrentTemperature()
+    {
+        return _currentTemperature;
+    }
+
     // std::string SensorManager::printTemperatureDebugInfo(uint8_t id, float temperature)
     // {
     //     char buffer[50] = "";
@@ -139,6 +184,7 @@ namespace sensor_manager
 
     //     return stringToReturn;
     // }
+
     bool SensorManager::fillTopicsStrings(char **topics, uint8_t totalTopics)
     {
         if (nullptr == topics)

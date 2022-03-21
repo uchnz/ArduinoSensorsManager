@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 //#include <stdint.h>
-#include <../test/SensorManager/SensorManager_test.h>
+#include <SensorManager/SensorManager_test.h>
 
 TEST_F(SensorManagerTest, test_printTemperatureDebugInfo_ReturnsDebugStringData)
 {

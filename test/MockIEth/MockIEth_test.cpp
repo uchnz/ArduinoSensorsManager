@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <../test/SensorManager/SensorManager_test.h>
+#include <SensorManager/SensorManager_test.h>
 
 using ::testing::_;
 using ::testing::Return;

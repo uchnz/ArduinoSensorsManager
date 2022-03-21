@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
-#include <./../../test/MockIEth/MockIEth.h>
-#include <./../../test/MockIMQTT/MockIMQTT.h>
-#include <./../../test/MockIDallas/MockIDallas.h>
+#include <MockIEth/MockIEth.h>
+#include <MockIMQTT/MockIMQTT.h>
+#include <MockIDallas/MockIDallas.h>
 #include <SensorManager.h>
 
 using ::testing::_;

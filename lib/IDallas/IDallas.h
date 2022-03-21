@@ -13,5 +13,6 @@ namespace sensor_manager
         virtual uint8_t getNumberOfSensors() = 0;
         virtual float getTemperatureByID(uint8_t id) = 0;
         virtual char *getStringAddressByID(uint8_t id) = 0;
+        virtual bool updateTemperature() = 0;
     };
 }
