@@ -10,7 +10,8 @@
 sensor_manager::EthArduino eth;
 sensor_manager::MQTTArduino mqtt;
 sensor_manager::DallasArduino dallas;
-sensor_manager::SensorManager mgr(eth, mqtt, dallas);
+// sensor_manager::SensorManager mgr(eth, mqtt, dallas);
+sensor_manager::SensorManager mgr(mqtt, dallas);
 byte arduinoEthernetMAC[6] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
 char MQTTBrokerIP[] = "10.62.202.108";
 
@@ -39,6 +40,7 @@ void setup()
 
     mqtt.begin(MQTTBrokerIP);
     mqtt.setKeepAlive(600);
+    mqtt.connect();
 
     printf("Setup complete.\n\n");
 }

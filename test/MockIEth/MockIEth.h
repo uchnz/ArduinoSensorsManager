@@ -7,6 +7,6 @@ namespace sensor_manager
     class MockIEth : public IEth
     {
     public:
-        MOCK_METHOD(bool, connect, (uint8_t(&mac)[6]), (override));
+//        MOCK_METHOD(bool, connect, (uint8_t(&mac)[6]), (override));
     };
 }

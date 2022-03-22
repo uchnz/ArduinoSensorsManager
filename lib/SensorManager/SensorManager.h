@@ -14,7 +14,7 @@ namespace sensor_manager
     class SensorManager
     {
     private:
-        IEth &_eth;
+        //        IEth &_eth;
         IMQTT &_clientMQTT;
         IDallas &_dallas;
         char **_topics;
@@ -30,11 +30,12 @@ namespace sensor_manager
         float getTemperatureByID(uint8_t id);
 
     public:
-        SensorManager(IEth &eth, IMQTT &mqtt, IDallas &dallas);
+        //        SensorManager(IEth &eth, IMQTT &mqtt, IDallas &dallas);
+        SensorManager(IMQTT &mqtt, IDallas &dallas);
         virtual ~SensorManager();
 
         // Eth
-        bool connectWithDHCP(uint8_t (&mac)[6]);
+        //        bool connectWithDHCP(uint8_t (&mac)[6]);
 
         // MQTT
         bool initMQTT(char *srvIP);

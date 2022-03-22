@@ -25,6 +25,13 @@
         "PIO Debug"
     ],
     "files.associations": {
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "array": "cpp",
+        "deque": "cpp",
+        "string": "cpp",
+        "unordered_map": "cpp",
+        "vector": "cpp",
+        "string_view": "cpp",
+        "initializer_list": "cpp"
     }
 }

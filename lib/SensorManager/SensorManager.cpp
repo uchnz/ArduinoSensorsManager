@@ -8,8 +8,10 @@
 
 namespace sensor_manager
 {
-    SensorManager::SensorManager(IEth &eth, IMQTT &mqtt, IDallas &dallas)
-        : _eth(eth), _clientMQTT(mqtt), _dallas(dallas)
+    // SensorManager::SensorManager(IEth &eth, IMQTT &mqtt, IDallas &dallas)
+    //     : _eth(eth), _clientMQTT(mqtt), _dallas(dallas)
+    SensorManager::SensorManager(IMQTT &mqtt, IDallas &dallas)
+        : _clientMQTT(mqtt), _dallas(dallas)
     {
         _topics = nullptr;
         _numberOfTopics = 0;
@@ -32,25 +34,25 @@ namespace sensor_manager
             delete[] _temperatures;
     }
 
-    bool SensorManager::isEmptyMAC(uint8_t (&mac)[6])
-    {
-        bool emptyMAC = true;
-        for (uint8_t i = 0; i < sizeof(mac); i++)
-        {
-            if (0 != mac[i])
-                emptyMAC = false;
-        }
-        return emptyMAC;
-    }
+    // bool SensorManager::isEmptyMAC(uint8_t (&mac)[6])
+    // {
+    //     bool emptyMAC = true;
+    //     for (uint8_t i = 0; i < sizeof(mac); i++)
+    //     {
+    //         if (0 != mac[i])
+    //             emptyMAC = false;
+    //     }
+    //     return emptyMAC;
+    // }
 
     // IEth
-    bool SensorManager::connectWithDHCP(uint8_t (&mac)[6])
-    {
-        if (isEmptyMAC(mac))
-            return false;
+    // bool SensorManager::connectWithDHCP(uint8_t (&mac)[6])
+    // {
+    //     if (isEmptyMAC(mac))
+    //         return false;
 
-        return _eth.connect(mac);
-    }
+    //     return _eth.connect(mac);
+    // }
 
     // IMQTT
     bool SensorManager::initMQTT(char *srvIP)
