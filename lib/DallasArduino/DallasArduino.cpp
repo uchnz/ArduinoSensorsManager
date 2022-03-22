@@ -7,7 +7,6 @@ namespace sensor_manager
 
 #define TEMPERATURE_PRECISION 9
 #define ONE_WIRE_BUS 22
-#define TEMPERATURE_PRECISION 9
 
     DallasArduino::DallasArduino()
     {
@@ -95,7 +94,7 @@ namespace sensor_manager
         return t;
     }
 
-    char *DallasArduino::getStringAddressByID(uint8_t id)
+    void DallasArduino::getStringAddressByID(uint8_t id, char *address)
     {
         DeviceAddress devAddress;
         _sensors.getAddress(devAddress, id);
@@ -103,10 +102,9 @@ namespace sensor_manager
         // WHAT IF NO SENSOR ADDRESS IS FOUND!!!&???
         // todo add check here
 
-        String address = getAddressString(devAddress);
-        char addressConverted[8] = "";
-        address.toCharArray(addressConverted, 8);
+        String addr = getAddressString(devAddress);
+        addr.toCharArray(address, 15);
 
-        return addressConverted;
+        return;
     }
 }

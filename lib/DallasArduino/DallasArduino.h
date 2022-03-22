@@ -24,6 +24,6 @@ namespace sensor_manager
         void requestCurrentTemperatures() override;
         uint8_t getNumberOfSensors() override;
         float getTemperatureByID(uint8_t) override;
-        char *getStringAddressByID(uint8_t id) override;
+        void getStringAddressByID(uint8_t id, char *address) override;
     };
 }

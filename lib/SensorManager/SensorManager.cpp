@@ -132,9 +132,10 @@ namespace sensor_manager
         return _dallas.getTemperatureByID(id);
     }
 
-    char *SensorManager::getStringAddressByID(uint8_t id)
+    //    void SensorManager::getStringAddressByID(uint8_t id, int *address)
+    void SensorManager::getStringAddressByID(uint8_t id, char *address)
     {
-        return _dallas.getStringAddressByID(id);
+        _dallas.getStringAddressByID(id, address);
     }
 
     float SensorManager::GetCurrentTemperatureByID(uint8_t id)
@@ -176,7 +177,7 @@ namespace sensor_manager
     //     return stringToReturn;
     // }
 
-    bool SensorManager::fillTopicsStrings(char **topics, uint8_t totalTopics)
+    bool SensorManager::fillTopicsStrings(const char **topics, uint8_t totalTopics)
     {
         if (nullptr == topics)
             return false;
@@ -195,11 +196,13 @@ namespace sensor_manager
         return true;
     }
 
-    char *SensorManager::GetTopicByID(uint8_t id)
+    void SensorManager::GetTopicByID(uint8_t id, char *topic)
     {
         if (id >= _numberOfTopics)
-            return nullptr;
+            return;
 
-        return _topics[id];
+        uint8_t sizeOfTopicWitEndOfString = strlen(_topics[id]) + 1;
+        memcpy(topic, _topics[id], sizeOfTopicWitEndOfString);
+        return;
     }
 }

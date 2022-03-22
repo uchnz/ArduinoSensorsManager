@@ -1,0 +1,50 @@
+#include <EthernetENC.h>
+#include <MQTT.h>
+
+byte arduinoEthernetMAC[6] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
+char MQTTBrokerIP[] = "10.62.202.106";
+// char MQTTBrokerIP[] = "public.cloud.shiftr.io";
+
+EthernetClient _net;
+MQTTClient _clientMQTT;
+IPAddress ip;
+
+void setup()
+{
+    Serial.begin(115200);
+    while (!Serial)
+        delay(1000);
+
+    Serial.println("\n");
+    Serial.print("Starting setup...");
+
+    Ethernet.begin(arduinoEthernetMAC);
+    Serial.println(F(" ethernet configured via DHCP."));
+    Serial.println(Ethernet.localIP());
+    Serial.println(Ethernet.subnetMask());
+    Serial.println(Ethernet.gatewayIP());
+    Serial.println(Ethernet.dnsServerIP());
+
+    //    ip.fromString(MQTTBrokerIP);
+    //    Serial.println(MQTTBrokerIP);
+    //    _clientMQTT.begin(ip, _net);
+    //    _clientMQTT.begin("public.cloud.shiftr.io", 1883, _net);
+    _clientMQTT.begin("10.62.202.106", 1883, _net);
+
+    Serial.println("Setup complete.\n\n");
+}
+
+void loop()
+{
+    if (!_clientMQTT.connected())
+    {
+        Serial.print("Connecting to MQTT broker with ID: arduinoID...");
+        //        while (!_clientMQTT.connect("mqttx_6e02569d", "public", "public"))
+        while (!_clientMQTT.connect("mqttx_6e02569d", "admin", "admin"))
+        {
+            Serial.print(".");
+            delay(1000);
+        }
+    }
+    Serial.println("connected.");
+}

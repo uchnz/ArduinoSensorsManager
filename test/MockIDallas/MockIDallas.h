@@ -13,6 +13,7 @@ namespace sensor_manager
         MOCK_METHOD(uint8_t, getNumberOfSensors, (), (override));
         MOCK_METHOD(float, getTemperatureByID, (uint8_t), (override));
         //        MOCK_METHOD(bool, updateTemperature, (), (override));
-        MOCK_METHOD(char *, getStringAddressByID, (uint8_t), (override));
+        MOCK_METHOD(void, getStringAddressByID, (uint8_t, char *), (override));
+        // MOCK_METHOD(void, getStringAddressByID, (uint8_t, int *), (override));
     };
 }

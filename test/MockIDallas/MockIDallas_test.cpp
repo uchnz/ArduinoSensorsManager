@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-
 #include <SensorManager/SensorManager_test.h>
 
 using ::testing::_;
@@ -23,24 +22,36 @@ class IDallasTest : public SensorManagerTest
 //     _mgr.setSensorsPrecision(9);
 // }
 
-TEST_F(IDallasTest, test_getAddressByID_ReturnsValidAddress)
+TEST_F(IDallasTest, test_getStringAddressByID_ReturnsValidAddress)
 {
-    char expected[] = "0x020203dfe";
-    EXPECT_CALL(_dallas, getStringAddressByID(_)).Times(1).WillOnce(Return(expected));
+    //    char *expected = new char[10];
+    char expected[] = "0x020203dfe1";
+    EXPECT_CALL(_dallas, getStringAddressByID(_, _)).Times(1).WillOnce(::testing::SaveArgPointee<1>(expected));
+    //    EXPECT_CALL(_dallas, getStringAddressByID(_, _)).Times(1).WillOnce(::testing::SaveArgPointee<1>("qq"));
+    char actual[20] = "";
+    _mgr.getStringAddressByID(0, actual);
 
-    char *actual = _mgr.getStringAddressByID(0);
+    EXPECT_EQ(expected, actual);
 
-    ASSERT_STREQ(expected, actual);
+    // int expected = 17;
+    // EXPECT_CALL(_dallas, getStringAddressByID(_, _)).Times(1).WillOnce(::testing::SetArgPointee<1>(expected));
+    // //    EXPECT_CALL(_dallas, getStringAddressByID(_, _)).Times(1).WillOnce(::testing::SaveArgPointee<1>("qq"));
+    // int *actual = new int[1];
+    // _mgr.getStringAddressByID(0, actual);
+
+    // EXPECT_EQ(expected, *actual);
+    //    ASSERT_STREQ("0x020203dfe", actual);
 }
 
-TEST_F(IDallasTest, test_getAddressByIDWithIncorrectID_ReturnsEmptyString)
+TEST_F(IDallasTest, test_test_getStringAddressByIDWithIncorrectID_ReturnsEmptyString)
 {
-    char expected[] = "";
-    EXPECT_CALL(_dallas, getStringAddressByID(_)).Times(1).WillOnce(Return(expected));
+    // char expected[] = "";
+    // EXPECT_CALL(_dallas, getStringAddressByID(_, _)).Times(1);
 
-    char *actual = _mgr.getStringAddressByID(0);
+    // char actual[20];
+    // _mgr.getStringAddressByID(0, actual);
 
-    ASSERT_STREQ(expected, actual);
+    // ASSERT_STREQ(expected, actual);
 }
 
 TEST_F(IDallasTest, test_getSavedNumberOfSensors_ReturnsValidNumber)

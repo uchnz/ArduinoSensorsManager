@@ -1,0 +1,108 @@
+..#include<EthernetENC.h>
+#include <DallasTemperature.h>
+#include <LibPrintf.h>
+
+    unsigned long millisPassedSinceLastParse = 0;
+#define SCAN_INTERVAL 2000
+
+#define LOW_BORDER 26.1
+#define UPPER_BORDER 27.1
+#define ONE_WIRE_BUS_SENSOR 22
+OneWire _oneWire;
+DallasTemperature _sensor;
+
+//////////////////////////////////////
+//*** SETUP HELPERS DECLARATIONS ***//
+void initSystemParameters();
+void initSensor();
+//*** END DECLARATIONS ***//
+void setup()
+{
+    initSystemParameters();
+    printf("\nStarting setup...\n");
+
+    pinMode(LED_BUILTIN, OUTPUT);
+
+    initSensor();
+
+    printf("Setup complete.\n\n");
+}
+
+//*** SETUP HELPERS ***//
+void initSystemParameters()
+{
+    Serial.begin(115200);
+    printf_init(Serial); // using printf instead of Serial.print is much more agile
+    while (!Serial)      // make a pause to initialize Serial for further output
+        delay(1000);
+}
+
+void initSensor()
+{
+    _oneWire.begin(ONE_WIRE_BUS_SENSOR);
+    _sensor.setOneWire(&_oneWire);
+    _sensor.begin();
+    printf("Sensor on PIN %d activated.\n", ONE_WIRE_BUS_SENSOR);
+}
+//*** END SETUP HELPERS ***//
+/////////////////////////////
+/////////////////////////////
+
+/////////////////////////////////////
+//*** LOOP HELPERS DECLARATIONS ***//
+bool isItTimeToPrintTemperature();
+void readAndAct();
+void actionInBelow();
+void actionInTheMiddle();
+void actionInAbove();
+//*** END DECLARATIONS ***//
+void loop()
+{
+    _sensor.requestTemperatures();
+    readAndAct();
+}
+
+//*** LOOP HELPERS ***//
+void readAndAct()
+{
+    float t = _sensor.getTempCByIndex(0);
+
+    if (t < LOW_BORDER)
+        actionInBelow();
+    else if (t > UPPER_BORDER)
+        actionInAbove();
+    else
+        actionInTheMiddle();
+
+    if (isItTimeToPrintTemperature())
+        printf("Sensor[%d] = %5.2f\n", 0, t);
+}
+
+bool isItTimeToPrintTemperature()
+{
+    if (abs(millis() - millisPassedSinceLastParse) > SCAN_INTERVAL)
+    {
+        millisPassedSinceLastParse = millis();
+        return true;
+    }
+    return false;
+}
+
+void actionInBelow()
+{
+    digitalWrite(LED_BUILTIN, LOW);
+}
+
+void actionInTheMiddle()
+{
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(200);
+    digitalWrite(LED_BUILTIN, HIGH);
+    printf("We are in between now\n");
+}
+
+void actionInAbove()
+{
+    digitalWrite(LED_BUILTIN, HIGH);
+}
+//*** END HELPERS ***//

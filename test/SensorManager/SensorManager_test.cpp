@@ -3,66 +3,78 @@
 
 TEST_F(SensorManagerTest, test_FillTopicsStringsWithNull_ReturnsFalse)
 {
-    char **topics = nullptr;
-    bool expected = _mgr.fillTopicsStrings(topics, 5);
+    const char **topics = nullptr;
+    bool result = _mgr.fillTopicsStrings(topics, 5);
 
-    EXPECT_FALSE(expected);
+    EXPECT_FALSE(result);
+}
+
+TEST_F(SensorManagerTest, test_FillTopicsStringsNumberOfTopicsGreaterThenStrings_ReturnsFalse)
+{
+    // Can't check for: Out Of Boundary!!
+    // Need to refactor code of the function to type safe pointers like string, vector, etc.
+    // But in this project adding STL library to Arduino yeilds to a conflict with MQTT librarary
+    // and code doesn't compile.
 }
 
 TEST_F(SensorManagerTest, test_fillTopicsStringsWithZeroQuantity_ReturnsFalse)
 {
-    char *topics[] = {"/UZV1/temp1\n", "/UZV2/temp1\n"};
-    bool expected = _mgr.fillTopicsStrings(topics, 0);
+    const char *topics[] = {"/UZV1/temp1\n", "/UZV2/temp1\n"};
+    bool result = _mgr.fillTopicsStrings(topics, 0);
 
-    EXPECT_FALSE(expected);
-}
-
-TEST_F(SensorManagerTest, test_fillTopicsStrings_returnsTrue)
-{
-    char *topics[] = {"/UZV1/temp1", "/UZV2/temp1"};
-    bool expected = _mgr.fillTopicsStrings(topics, 2);
-
-    EXPECT_TRUE(expected);
+    EXPECT_FALSE(result);
 }
 
 TEST_F(SensorManagerTest, test_GetTopicOnID_returnsTopic)
 {
-    char *topics[] = {"/UZV1/temp1", "/UZV2/temp1", "Third Topic, the long one"};
-    _mgr.fillTopicsStrings(topics, 3);
+    const char *topics[] = {"/UZV1/temp1", "/UZV2/temp1", "Third Topic, the long one"};
+    bool result = _mgr.fillTopicsStrings(topics, 3);
 
-    char *actual = _mgr.GetTopicByID(0);
+    EXPECT_TRUE(result);
+
+    char actual[100];
+    _mgr.GetTopicByID(0, actual);
     EXPECT_STREQ(actual, topics[0]);
 
-    actual = _mgr.GetTopicByID(1);
+    _mgr.GetTopicByID(1, actual);
     EXPECT_STREQ(actual, topics[1]);
 
-    actual = _mgr.GetTopicByID(2);
+    _mgr.GetTopicByID(2, actual);
     EXPECT_STREQ(actual, topics[2]);
 }
 
-TEST_F(SensorManagerTest, test_GetTopicOnUpperlimit_ReturnsLastItem)
+TEST_F(SensorManagerTest, test_GetTopicOnUpperAndLowerlimits_ReturnsFirstAndLastItems)
 {
-    char *topics[] = {"/UZV1/someaddr", "/UZV2/temp1/topichere"};
-    _mgr.fillTopicsStrings(topics, 2);
+    const char *topics[] = {"/UZV1/someaddr", "/Some topic/ in /the middle///", "more in /the middle", "/UZV2/temp1/topichere"};
+    bool result = _mgr.fillTopicsStrings(topics, 4);
 
-    char *actual = _mgr.GetTopicByID(1);
-    EXPECT_STREQ(actual, topics[1]);
+    EXPECT_TRUE(result);
+
+    char actual[100];
+    _mgr.GetTopicByID(0, actual);
+    EXPECT_STREQ(actual, topics[0]);
+    _mgr.GetTopicByID(3, actual);
+    EXPECT_STREQ(actual, topics[3]);
 }
 
 TEST_F(SensorManagerTest, test_GetTopicAboveUpperlimit_ReturnsNull)
 {
-    char *topics[] = {"/UZV1/someaddr", "/UZV2/temp1/topichere"};
-    _mgr.fillTopicsStrings(topics, 2);
+    const char *topics[] = {"/UZV1/someaddr", "/UZV2/temp1/topichere"};
+    bool result = _mgr.fillTopicsStrings(topics, 2);
 
-    char *actual = _mgr.GetTopicByID(3);
-    EXPECT_STREQ(actual, nullptr);
+    EXPECT_TRUE(result);
+
+    char actual[100] = "";
+    _mgr.GetTopicByID(5, actual);
+    EXPECT_STREQ(actual, "");
 }
 
 TEST_F(SensorManagerTest, test_GetTopicWhenNotFilled_ReturnsNull)
 {
-    char *actual = _mgr.GetTopicByID(0);
-    EXPECT_STREQ(actual, nullptr);
+    char actual[100] = "";
+    _mgr.GetTopicByID(0, actual);
+    EXPECT_STREQ(actual, "");
 
-    actual = _mgr.GetTopicByID(3);
-    EXPECT_STREQ(actual, nullptr);
+    _mgr.GetTopicByID(3, actual);
+    EXPECT_STREQ(actual, "");
 }

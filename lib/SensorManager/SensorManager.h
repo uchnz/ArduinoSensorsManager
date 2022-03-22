@@ -51,11 +51,12 @@ namespace sensor_manager
         uint8_t getSavedNumberSensors();
         float GetCurrentTemperatureByID(uint8_t id);
         void requestCurrentTemperatures();
-        char *getStringAddressByID(uint8_t id);
+        //        void getStringAddressByID(uint8_t id, int *address);
+        void getStringAddressByID(uint8_t id, char *address);
 
         // Business logic
         // std::string printTemperatureDebugInfo(uint8_t id, float temperature);
-        bool fillTopicsStrings(char **topics, uint8_t totalTopics);
-        char *GetTopicByID(uint8_t id);
+        bool fillTopicsStrings(const char **topics, uint8_t totalTopics);
+        void GetTopicByID(uint8_t id, char *topic);
     };
 }
