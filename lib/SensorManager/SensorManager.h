@@ -41,12 +41,12 @@ namespace sensor_manager
         // bool initMQTT(char *srvIP);
         // void setKeepAliveClient(uint16_t keepAlive);
         // bool installCallback(sensor_manager::MQTTClientCallback cb);
-        static void callbackIncommingMessages(String &topic, String &payload);
+        // static void callbackIncommingMessages(String &topic, String &payload);
         // static void callbackIncommingMessages(char *topic, char *payload);
-        bool connectToMQTT();
-        bool connectedToMQTT();
-        bool checkForIncomingMessages();
-        bool publishMessageToBroker(char *topic, char *message);
+        // bool connectToMQTT();
+        // bool connectedToMQTT();
+        // bool checkForIncomingMessages();
+        // bool publishMessageToBroker(char *topic, char *message);
 
         // Dallas
         void initSensors();
@@ -60,6 +60,7 @@ namespace sensor_manager
         // std::string printTemperatureDebugInfo(uint8_t id, float temperature);
         bool fillTopicsStrings(const char **topics, uint8_t totalTopics);
         void GetTopicByID(uint8_t id, char *topic);
+
         bool sendSensorData(const char *dataToSend, const char *addressToSendTo);
         bool receiveManagingData();
     };

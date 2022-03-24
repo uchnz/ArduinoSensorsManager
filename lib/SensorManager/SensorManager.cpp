@@ -3,7 +3,6 @@
 //#include <StandardCplusplus.h>
 //#include <string>
 #include <string.h>
-#include <LibPrintf.h>
 
 #include <SensorManager.h>
 
@@ -75,41 +74,41 @@ namespace sensor_manager
 
     //    void SensorManager::callbackIncommingMessages(char *topic, char *payload)
 
-    void SensorManager::callbackIncommingMessages(String &topic, String &payload)
-    {
-        printf("callback called:%s -> %s.\n ", topic.c_str(), payload.c_str());
-    }
+    // void SensorManager::callbackIncommingMessages(String &topic, String &payload)
+    // {
+    //     printf("callback called:%s -> %s.\n ", topic.c_str(), payload.c_str());
+    // }
 
     // void SensorManager::setKeepAliveClient(uint16_t keepAlive)
     // {
     //     _clientMQTT.setKeepAlive(keepAlive);
     // }
 
-    bool SensorManager::connectToMQTT()
-    {
-        if (connectedToMQTT())
-            return true;
+    // bool SensorManager::connectToMQTT()
+    // {
+    //     if (connectedToMQTT())
+    //         return true;
 
-        return _clientMQTT.connect();
-    }
+    //     return _clientMQTT.connect();
+    // }
 
-    bool SensorManager::connectedToMQTT()
-    {
-        return _clientMQTT.connected();
-    }
+    // bool SensorManager::connectedToMQTT()
+    // {
+    //     return _clientMQTT.connected();
+    // }
 
-    bool SensorManager::checkForIncomingMessages()
-    {
-        return _clientMQTT.loop();
-    }
+    // bool SensorManager::checkForIncomingMessages()
+    // {
+    //     return _clientMQTT.loop();
+    // }
 
-    bool SensorManager::publishMessageToBroker(char *topic, char *message)
-    {
-        if (nullptr == topic || nullptr == message)
-            return false;
+    // bool SensorManager::publishMessageToBroker(char *topic, char *message)
+    // {
+    //     if (nullptr == topic || nullptr == message)
+    //         return false;
 
-        return _clientMQTT.publish(topic, message);
-    }
+    //     return _clientMQTT.publish(topic, message);
+    // }
 
     // IDallas
     // void SensorManager::initDallasSensors()

@@ -89,93 +89,93 @@ class IMQTTTest : public SensorManagerTest
 //    _mgr.setKeepAliveClient(keepAlive);
 // }
 
-TEST_F(IMQTTTest, test_connect_WhenSucceeds_ReturnsTrue)
-{
-    EXPECT_CALL(_mqtt, connect()).Times(1).WillOnce(Return(true));
-    EXPECT_CALL(_mqtt, connected()).Times(1).WillOnce(Return(false));
+// TEST_F(IMQTTTest, test_connect_WhenSucceeds_ReturnsTrue)
+// {
+//     EXPECT_CALL(_mqtt, connect()).Times(1).WillOnce(Return(true));
+//     EXPECT_CALL(_mqtt, connected()).Times(1).WillOnce(Return(false));
 
-    ASSERT_TRUE(_mgr.connectToMQTT());
-}
+//     ASSERT_TRUE(_mgr.connectToMQTT());
+// }
 
-TEST_F(IMQTTTest, test_connect_WhenFails_ReturnsFalse)
-{
-    EXPECT_CALL(_mqtt, connect()).Times(1).WillOnce(Return(false));
-    EXPECT_CALL(_mqtt, connected()).Times(1).WillOnce(Return(false));
+// TEST_F(IMQTTTest, test_connect_WhenFails_ReturnsFalse)
+// {
+//     EXPECT_CALL(_mqtt, connect()).Times(1).WillOnce(Return(false));
+//     EXPECT_CALL(_mqtt, connected()).Times(1).WillOnce(Return(false));
 
-    ASSERT_FALSE(_mgr.connectToMQTT());
-}
+//     ASSERT_FALSE(_mgr.connectToMQTT());
+// }
 
-TEST_F(IMQTTTest, test_connect_WhenPreviouslyConnected_ReturnsTrue)
-{
-    EXPECT_CALL(_mqtt, connect()).Times(0);
-    EXPECT_CALL(_mqtt, connected()).Times(1).WillOnce(Return(true));
+// TEST_F(IMQTTTest, test_connect_WhenPreviouslyConnected_ReturnsTrue)
+// {
+//     EXPECT_CALL(_mqtt, connect()).Times(0);
+//     EXPECT_CALL(_mqtt, connected()).Times(1).WillOnce(Return(true));
 
-    ASSERT_TRUE(_mgr.connectToMQTT());
-}
+//     ASSERT_TRUE(_mgr.connectToMQTT());
+// }
 
-TEST_F(IMQTTTest, test_connected_WhenConnected_ReturnsTrue)
-{
-    EXPECT_CALL(_mqtt, connected()).Times(1).WillOnce(Return(true));
+// TEST_F(IMQTTTest, test_connected_WhenConnected_ReturnsTrue)
+// {
+//     EXPECT_CALL(_mqtt, connected()).Times(1).WillOnce(Return(true));
 
-    ASSERT_TRUE(_mgr.connectedToMQTT());
-}
+//     ASSERT_TRUE(_mgr.connectedToMQTT());
+// }
 
-TEST_F(IMQTTTest, test_connected_WhenDisconnected_ReturnsFalse)
-{
-    EXPECT_CALL(_mqtt, connected()).Times(1).WillOnce(Return(false));
+// TEST_F(IMQTTTest, test_connected_WhenDisconnected_ReturnsFalse)
+// {
+//     EXPECT_CALL(_mqtt, connected()).Times(1).WillOnce(Return(false));
 
-    ASSERT_FALSE(_mgr.connectedToMQTT());
-}
+//     ASSERT_FALSE(_mgr.connectedToMQTT());
+// }
 
-TEST_F(IMQTTTest, test_checkForIncomingMessages_IfNoErrors_ReturnsTrue)
-{
-    EXPECT_CALL(_mqtt, loop()).Times(1).WillOnce(Return(true));
+// TEST_F(IMQTTTest, test_checkForIncomingMessages_IfNoErrors_ReturnsTrue)
+// {
+//     EXPECT_CALL(_mqtt, loop()).Times(1).WillOnce(Return(true));
 
-    ASSERT_TRUE(_mgr.checkForIncomingMessages());
-}
+//     ASSERT_TRUE(_mgr.checkForIncomingMessages());
+// }
 
-TEST_F(IMQTTTest, test_checkForIncomingMessages_IfErrors_ReturnsFalse)
-{
-    EXPECT_CALL(_mqtt, loop()).Times(1).WillOnce(Return(false));
+// TEST_F(IMQTTTest, test_checkForIncomingMessages_IfErrors_ReturnsFalse)
+// {
+//     EXPECT_CALL(_mqtt, loop()).Times(1).WillOnce(Return(false));
 
-    ASSERT_FALSE(_mgr.checkForIncomingMessages());
-}
+//     ASSERT_FALSE(_mgr.checkForIncomingMessages());
+// }
 
-TEST_F(IMQTTTest, test_publishMessageToBroker_OnSucceed_ReturnsTrue)
-{
-    EXPECT_CALL(_mqtt, publish(_, _)).Times(1).WillOnce(Return(true));
-    char topic[] = "/topic1/channel1";
-    char message[] = "1";
+// TEST_F(IMQTTTest, test_publishMessageToBroker_OnSucceed_ReturnsTrue)
+// {
+//     EXPECT_CALL(_mqtt, publish(_, _)).Times(1).WillOnce(Return(true));
+//     char topic[] = "/topic1/channel1";
+//     char message[] = "1";
 
-    ASSERT_TRUE(_mgr.publishMessageToBroker(topic, message));
-}
+//     ASSERT_TRUE(_mgr.publishMessageToBroker(topic, message));
+// }
 
-TEST_F(IMQTTTest, test_publishMessageToBroker_OnFailure_ReturnsFalse)
-{
-    EXPECT_CALL(_mqtt, publish(_, _)).Times(1).WillOnce(Return(false));
-    char topic[] = "/topic1/channel1";
-    char message[] = "1";
+// TEST_F(IMQTTTest, test_publishMessageToBroker_OnFailure_ReturnsFalse)
+// {
+//     EXPECT_CALL(_mqtt, publish(_, _)).Times(1).WillOnce(Return(false));
+//     char topic[] = "/topic1/channel1";
+//     char message[] = "1";
 
-    ASSERT_FALSE(_mgr.publishMessageToBroker(topic, message));
-}
+//     ASSERT_FALSE(_mgr.publishMessageToBroker(topic, message));
+// }
 
-TEST_F(IMQTTTest, test_publishMessageToBroker_IfNullPassed_ReturnsFalse)
-{
-    EXPECT_CALL(_mqtt, publish(_, _)).Times(0);
-    char *topic = nullptr;
-    char *message = nullptr;
+// TEST_F(IMQTTTest, test_publishMessageToBroker_IfNullPassed_ReturnsFalse)
+// {
+//     EXPECT_CALL(_mqtt, publish(_, _)).Times(0);
+//     char *topic = nullptr;
+//     char *message = nullptr;
 
-    ASSERT_FALSE(_mgr.publishMessageToBroker(topic, message));
-}
+//     ASSERT_FALSE(_mgr.publishMessageToBroker(topic, message));
+// }
 
-TEST_F(IMQTTTest, test_subscribeToTopic_IfNullPassed_ReturnsFalse)
-{
-    // EXPECT_CALL(_mqtt, publish(_, _)).Times(0);
-    // char *topic = nullptr;
-    // char *message = nullptr;
+// TEST_F(IMQTTTest, test_subscribeToTopic_IfNullPassed_ReturnsFalse)
+// {
+//     // EXPECT_CALL(_mqtt, publish(_, _)).Times(0);
+//     // char *topic = nullptr;
+//     // char *message = nullptr;
 
-    // ASSERT_FALSE(_mgr.publishMessageToBroker(topic, message));
-}
+//     // ASSERT_FALSE(_mgr.publishMessageToBroker(topic, message));
+// }
 
 TEST_F(IMQTTTest, test_sendSensorData_CallsPublishWithTopicAndMessage_ReturnsTrue)
 {
