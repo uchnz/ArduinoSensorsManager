@@ -14,11 +14,15 @@ namespace sensor_manager
 
     public:
         bool begin(char *srvIP) override;
-        bool onMessage(MQTTClientCallback cb) override;
+        void onMessage(MQTTClientCallback cb) override;
         void setKeepAlive(uint16_t keepAlive) override;
         bool connect() override;
         bool connected() override;
         bool loop() override;
         bool publish(char *topic, char *data) override;
+        void subscribeToTopic(const char *topic) override;
+        bool send(const char *data, const char *topic) override;
+        //        void receive(char *topic, char *data) override;
+        bool receive() override;
     };
 }

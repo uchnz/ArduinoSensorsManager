@@ -3,6 +3,7 @@
 //#include <StandardCplusplus.h>
 //#include <string>
 #include <string.h>
+#include <LibPrintf.h>
 
 #include <SensorManager.h>
 
@@ -55,31 +56,34 @@ namespace sensor_manager
     // }
 
     // IMQTT
-    bool SensorManager::initMQTT(char *srvIP)
-    {
-        if (nullptr == srvIP)
-            return false;
+    // bool SensorManager::initMQTT(char *srvIP)
+    // {
+    //     if (nullptr == srvIP)
+    //         return false;
 
-        return _clientMQTT.begin(srvIP);
+    //     return _clientMQTT.begin(srvIP);
+    // }
+
+    // bool SensorManager::installCallback(sensor_manager::MQTTClientCallback cb)
+    // {
+    //     if (nullptr == cb)
+    //         return false;
+
+    //     _clientMQTT.onMessage(cb);
+    //     return true;
+    // }
+
+    //    void SensorManager::callbackIncommingMessages(char *topic, char *payload)
+
+    void SensorManager::callbackIncommingMessages(String &topic, String &payload)
+    {
+        printf("callback called:%s -> %s.\n ", topic.c_str(), payload.c_str());
     }
 
-    bool SensorManager::installCallback(sensor_manager::MQTTClientCallback cb)
-    {
-        if (nullptr == cb)
-            return false;
-
-        _clientMQTT.onMessage(cb);
-        return true;
-    }
-
-    void SensorManager::callbackIncommingMessages(char *topic, char *payload)
-    {
-    }
-
-    void SensorManager::setKeepAliveClient(uint16_t keepAlive)
-    {
-        _clientMQTT.setKeepAlive(keepAlive);
-    }
+    // void SensorManager::setKeepAliveClient(uint16_t keepAlive)
+    // {
+    //     _clientMQTT.setKeepAlive(keepAlive);
+    // }
 
     bool SensorManager::connectToMQTT()
     {
@@ -206,5 +210,18 @@ namespace sensor_manager
         uint8_t sizeOfTopicWitEndOfString = strlen(_topics[id]) + 1;
         memcpy(topic, _topics[id], sizeOfTopicWitEndOfString);
         return;
+    }
+
+    bool SensorManager::sendSensorData(const char *dataToSend, const char *addressToSendTo)
+    {
+        if ((nullptr != dataToSend) && (nullptr != addressToSendTo))
+            return _clientMQTT.send(dataToSend, addressToSendTo);
+
+        return false;
+    }
+
+    bool SensorManager::receiveManagingData()
+    {
+        return _clientMQTT.receive();
     }
 }

@@ -1,4 +1,3 @@
-
 #include <MQTTArduino.h>
 
 namespace sensor_manager
@@ -49,13 +48,29 @@ namespace sensor_manager
         return _clientMQTT.loop();
     }
 
-    bool MQTTArduino::onMessage(MQTTClientCallback cb)
+    void MQTTArduino::onMessage(MQTTClientCallback cb)
     {
-        return false;
+        _clientMQTT.onMessage(cb);
     }
 
     bool MQTTArduino::publish(char *topic, char *data)
     {
         return _clientMQTT.publish(topic, data);
+    }
+
+    void MQTTArduino::subscribeToTopic(const char *topic)
+    {
+        if (nullptr != topic)
+            _clientMQTT.subscribe(topic);
+    }
+
+    bool MQTTArduino::send(const char *data, const char *topic)
+    {
+        return _clientMQTT.publish(topic, data);
+    }
+
+    bool MQTTArduino::receive()
+    {
+        return _clientMQTT.loop();
     }
 }
