@@ -38,8 +38,6 @@ namespace sensor_manager
     bool MQTTArduino::connected()
     {
         bool status = _clientMQTT.connected();
-        // Serial.print("Connection status (0-disconnected, 1-connected): ");
-        // Serial.println(status);
         return status;
     }
 
@@ -74,3 +72,59 @@ namespace sensor_manager
         return _clientMQTT.loop();
     }
 }
+
+// IMQTT
+// bool SensorManager::initMQTT(char *srvIP)
+// {
+//     if (nullptr == srvIP)
+//         return false;
+
+//     return _clientMQTT.begin(srvIP);
+// }
+
+// bool SensorManager::installCallback(sensor_manager::MQTTClientCallback cb)
+// {
+//     if (nullptr == cb)
+//         return false;
+
+//     _clientMQTT.onMessage(cb);
+//     return true;
+// }
+
+//    void SensorManager::callbackIncommingMessages(char *topic, char *payload)
+
+// void SensorManager::callbackIncommingMessages(String &topic, String &payload)
+// {
+//     printf("callback called:%s -> %s.\n ", topic.c_str(), payload.c_str());
+// }
+
+// void SensorManager::setKeepAliveClient(uint16_t keepAlive)
+// {
+//     _clientMQTT.setKeepAlive(keepAlive);
+// }
+
+// bool SensorManager::connectToMQTT()
+// {
+//     if (connectedToMQTT())
+//         return true;
+
+//     return _clientMQTT.connect();
+// }
+
+// bool SensorManager::connectedToMQTT()
+// {
+//     return _clientMQTT.connected();
+// }
+
+// bool SensorManager::checkForIncomingMessages()
+// {
+//     return _clientMQTT.loop();
+// }
+
+// bool SensorManager::publishMessageToBroker(char *topic, char *message)
+// {
+//     if (nullptr == topic || nullptr == message)
+//         return false;
+
+//     return _clientMQTT.publish(topic, message);
+// }

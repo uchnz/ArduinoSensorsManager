@@ -10,6 +10,8 @@ sensor_manager::DallasArduino dallasModule;
 
 sensor_manager::SensorManager sensorsManager(mqttClientModule, dallasModule);
 
+// sensor_manager::IDallas[2] sensorsArray = {sensor_manager::DallasArduino, sensor_manager::DallasArduino};
+
 void setup()
 {
     initSystemParameters();
@@ -19,7 +21,7 @@ void setup()
     initConnectionToMQTTBroker(mqttClientModule);
     InitDallasSensors(dallasModule);
 
-    sensorsManager.initSensors(); // scanConnectedDevices() is a better name
+    sensorsManager.scanConnectedTemperatureSensors();
     sensorsManager.fillTopicsStrings(topics, 2);
 
     printf("Setup complete.\n\n");
@@ -32,5 +34,10 @@ void loop()
 {
     sensorsManager.receiveManagingData();
 
-    processDataWithInterval(sensorsManager, millisPassedSinceLastParse, scanInterval);
+    if (!isItTimeToParse(millisPassedSinceLastParse, scanInterval))
+        return;
+
+    sensorsManager.processDataWithInterval();
+
+    millisPassedSinceLastParse = millis();
 }

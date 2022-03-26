@@ -11,6 +11,61 @@ class IMQTTTest : public SensorManagerTest
 {
 };
 
+TEST_F(IMQTTTest, test_sendSensorsData_WithNoData_ReturnsFalse)
+{
+    EXPECT_FALSE(_mgr.sendSensorsData());
+}
+
+TEST_F(IMQTTTest, test_sendSensorDataByID_WithNoData_ReturnsFalse)
+{
+    EXPECT_FALSE(_mgr.sendSensorDataByID(0));
+}
+
+// TEST_F(IMQTTTest, test_sendSensorData_CallsPublishWithTopicAndMessage_ReturnsTrue)
+// {
+//     char message[] = "11.3";
+//     char topic[] = "/topic1/channel1";
+//     EXPECT_CALL(_mqtt, send(message, topic)).Times(1).WillOnce(Return(true));
+
+//     ASSERT_TRUE(_mgr.sendSensorsData(message, topic));
+// }
+
+// TEST_F(IMQTTTest, test_sendSensorData_WithNullPointersDoestCallSend_ReturnsFalse)
+// {
+//     EXPECT_CALL(_mqtt, send(_, _)).Times(0);
+
+//     ASSERT_FALSE(_mgr.sendSensorsData(nullptr, nullptr));
+//     ASSERT_FALSE(_mgr.sendSensorsData("some data", nullptr));
+//     ASSERT_FALSE(_mgr.sendSensorsData(nullptr, "some address"));
+// }
+
+// TEST_F(IMQTTTest, test_sendSensorData_WithVadidDataOnFailure_ReturnsFalse)
+// {
+//     char message[] = "11.3";
+//     char topic[] = "/topic1/channel1";
+//     EXPECT_CALL(_mqtt, send(message, topic)).Times(1).WillOnce(Return(false));
+
+//     ASSERT_FALSE(_mgr.sendSensorsData(message, topic));
+// }
+
+TEST_F(IMQTTTest, test_receiveManagingData_CallsCallbackWithValidData_BADTEST)
+{
+    // char message[] = "11.3";
+    // char topic[] = "/topic1/channel1";
+    // MockFunction<void(char *, char *)> mock_function;
+    // EXPECT_CALL(mock_function, Call(message, topic)).Times(1);
+    // ON_CALL(*this, receive).WillByDefault([this]() {
+    //     real_.sensor_manager::SensorManager::callbackIncommingMessages(message, topic);
+    // sensor_manager::SensorManager::callbackIncommingMessages(char *topic, char *payload)
+
+    // WARNING: Currently this test does nothing.
+    // I need to find a way to make receive() call my callback function.
+    // Don't know how to do that yet.
+    EXPECT_CALL(_mqtt, receive()).Times(1).WillOnce(Return(true));
+
+    ASSERT_TRUE(_mgr.receiveManagingData());
+}
+
 // TEST_F(IMQTTTest, test_InitMQTT_IsCalledOnce)
 // {
 //     EXPECT_CALL(_mqtt, begin(_)).Times(1);
@@ -176,48 +231,3 @@ class IMQTTTest : public SensorManagerTest
 
 //     // ASSERT_FALSE(_mgr.publishMessageToBroker(topic, message));
 // }
-
-TEST_F(IMQTTTest, test_sendSensorData_CallsPublishWithTopicAndMessage_ReturnsTrue)
-{
-    char message[] = "11.3";
-    char topic[] = "/topic1/channel1";
-    EXPECT_CALL(_mqtt, send(message, topic)).Times(1).WillOnce(Return(true));
-
-    ASSERT_TRUE(_mgr.sendSensorData(message, topic));
-}
-
-TEST_F(IMQTTTest, test_sendSensorData_WithNullPointersDoestCallSend_ReturnsFalse)
-{
-    EXPECT_CALL(_mqtt, send(_, _)).Times(0);
-
-    ASSERT_FALSE(_mgr.sendSensorData(nullptr, nullptr));
-    ASSERT_FALSE(_mgr.sendSensorData("some data", nullptr));
-    ASSERT_FALSE(_mgr.sendSensorData(nullptr, "some address"));
-}
-
-TEST_F(IMQTTTest, test_sendSensorData_WithVadidDataOnFailure_ReturnsFalse)
-{
-    char message[] = "11.3";
-    char topic[] = "/topic1/channel1";
-    EXPECT_CALL(_mqtt, send(message, topic)).Times(1).WillOnce(Return(false));
-
-    ASSERT_FALSE(_mgr.sendSensorData(message, topic));
-}
-
-TEST_F(IMQTTTest, test_receiveManagingData_CallsCallbackWithValidData_BADTEST)
-{
-    // char message[] = "11.3";
-    // char topic[] = "/topic1/channel1";
-    // MockFunction<void(char *, char *)> mock_function;
-    // EXPECT_CALL(mock_function, Call(message, topic)).Times(1);
-    // ON_CALL(*this, receive).WillByDefault([this]() {
-    //     real_.sensor_manager::SensorManager::callbackIncommingMessages(message, topic);
-    // sensor_manager::SensorManager::callbackIncommingMessages(char *topic, char *payload)
-
-    // WARNING: Currently this test does nothing.
-    // I need to find a way to make receive() call my callback function.
-    // Don't know how to do that yet.
-    EXPECT_CALL(_mqtt, receive()).Times(1).WillOnce(Return(true));
-
-    ASSERT_TRUE(_mgr.receiveManagingData());
-}

@@ -19,11 +19,13 @@ namespace sensor_manager
 
     public:
         DallasArduino();
-        void init();                             // override;
-        void setSensorsPrecision(int precision); // override;
+        void init();
+        void setSensorsPrecision(int precision);
+
+        // IDallas
         void requestCurrentTemperatures() override;
-        uint8_t getNumberOfSensors() override;
+        uint8_t getNumberOfConnectedSensors() override;
         float getTemperatureByID(uint8_t) override;
-        void getStringAddressByID(uint8_t id, char *address) override;
+        // void getStringAddressByID(uint8_t id, char *address) override;
     };
 }

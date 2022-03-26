@@ -7,13 +7,10 @@ namespace sensor_manager
     {
     public:
         virtual ~IDallas() = default;
-        //        virtual void init() = 0;
-        //        virtual void setSensorsPrecision(int precision) = 0;
+
         virtual void requestCurrentTemperatures() = 0;
-        virtual uint8_t getNumberOfSensors() = 0;
+        virtual uint8_t getNumberOfConnectedSensors() = 0;
         virtual float getTemperatureByID(uint8_t id) = 0;
-        //        virtual void getStringAddressByID(uint8_t id, int *address) = 0;
-        virtual void getStringAddressByID(uint8_t id, char *address) = 0;
-        //        virtual bool updateTemperature() = 0;
+        // virtual void getStringAddressByID(uint8_t id, char *address) = 0;
     };
 }

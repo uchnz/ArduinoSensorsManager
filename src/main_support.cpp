@@ -5,7 +5,7 @@ uint8_t mac[6] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
 char MQTTBrokerIP[] = "10.62.202.108";
 const uint8_t sensor_precision = 9;
 const uint16_t MQTT_KeepAlive = 600;
-char topicToReadSettingsFrom[] = "/UZV1/temp1";
+char topicToReadSettingsFrom[] = "/settings";
 
 //*** SETUP HELPERS ***//
 void initSystemParameters()
@@ -41,45 +41,12 @@ void InitDallasSensors(sensor_manager::DallasArduino &dallas)
 /////////////////////////////
 
 //*** LOOP HELPERS ***//
-void processDataWithInterval(sensor_manager::SensorManager &mgr, uint64_t &millisPassedSinceLastParse, const uint16_t scanInterval)
-{
-    if (!isItTimeToParse(millisPassedSinceLastParse, scanInterval))
-        return;
-
-    // mgr.refreshSensorsData();
-    mgr.requestCurrentTemperatures();
-
-    // mgr.sendSensorData();
-    sendData(mgr);
-
-    // displayDebugInfo();
-
-    millisPassedSinceLastParse = millis();
-}
-
 bool isItTimeToParse(uint64_t millisPassedSinceLastParse, const uint16_t scanInterval)
 {
-    if (abs(millis() - millisPassedSinceLastParse) > scanInterval)
+    uint64_t millisNow = millis(); // don't inline millis() into abs() - see Notes and Warnings for abs() in Arduino HELP for details
+    if (abs(millisNow - millisPassedSinceLastParse) > scanInterval)
         return true;
     return false;
-}
-
-void sendData(sensor_manager::SensorManager &mgr)
-{
-    uint8_t numberOfSensors = mgr.getSavedNumberSensors();
-    for (uint8_t i = 0; i < numberOfSensors; i++)
-    {
-        float temp = mgr.GetCurrentTemperatureByID(i);
-        char tempConverted[10];
-        dtostrf(temp, 7, 2, tempConverted);
-        char topic[100];
-        mgr.GetTopicByID(i, topic);
-        mgr.sendSensorData(tempConverted, topic);
-
-        char address[15];
-        mgr.getStringAddressByID(i, address);
-        printf("Sensor[%d] = %.2f, Address: %s, topic: %s\n", i, temp, address, topic);
-    }
 }
 //*** END LOOP HELPERS ***//
 
@@ -89,5 +56,5 @@ void sendData(sensor_manager::SensorManager &mgr)
 
 void callbackIncommingMQTTMessages(String &topic, String &payload)
 {
-    printf("callback called: %s -> %s.\n ", topic.c_str(), payload.c_str());
+    printf("callback called: %s -> %s\n ", topic.c_str(), payload.c_str());
 }

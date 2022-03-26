@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include <SensorManager/SensorManager_test.h>
 
+using ::testing::Return;
+
 TEST_F(SensorManagerTest, test_FillTopicsStringsWithNull_ReturnsFalse)
 {
     const char **topics = nullptr;
@@ -69,7 +71,7 @@ TEST_F(SensorManagerTest, test_GetTopicAboveUpperlimit_ReturnsNull)
     EXPECT_STREQ(actual, "");
 }
 
-TEST_F(SensorManagerTest, test_GetTopicWhenNotFilled_ReturnsNull)
+TEST_F(SensorManagerTest, test_GetTopic_WhenNotFilled_ReturnsNull)
 {
     char actual[100] = "";
     _mgr.GetTopicByID(0, actual);
@@ -77,4 +79,26 @@ TEST_F(SensorManagerTest, test_GetTopicWhenNotFilled_ReturnsNull)
 
     _mgr.GetTopicByID(3, actual);
     EXPECT_STREQ(actual, "");
+}
+
+TEST_F(SensorManagerTest, test_processDataWithInterval_WithErrors_ReturnsFalse)
+{
+    EXPECT_CALL(_dallas, getNumberOfConnectedSensors).Times(1).WillOnce(Return(0));
+
+    _mgr.scanConnectedTemperatureSensors();
+
+    EXPECT_FALSE(_mgr.processDataWithInterval());
+}
+
+TEST_F(SensorManagerTest, test_processDataWithInterval_WithoutErrors_ReturnsTrue)
+{
+    EXPECT_CALL(_dallas, getNumberOfConnectedSensors).Times(1).WillOnce(Return(3));
+    EXPECT_CALL(_dallas, getTemperatureByID).Times(3).WillOnce(Return(111.11)).WillOnce(Return(-10.55)).WillOnce(Return(0));
+    EXPECT_CALL(_dallas, requestCurrentTemperatures).Times(1);
+    EXPECT_CALL(_mqtt, send(_, _)).Times(3).WillOnce(Return(true));
+    const char *topics[] = {"/UZV1/temp1", "/UZV2/temp1", "Third Topic, the long one"};
+    bool result = _mgr.fillTopicsStrings(topics, 3);
+    _mgr.scanConnectedTemperatureSensors();
+
+    EXPECT_TRUE(_mgr.processDataWithInterval());
 }

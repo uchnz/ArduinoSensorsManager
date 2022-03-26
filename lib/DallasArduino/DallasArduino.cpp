@@ -81,7 +81,7 @@ namespace sensor_manager
         Serial.println("DONE");
     }
 
-    uint8_t DallasArduino::getNumberOfSensors()
+    uint8_t DallasArduino::getNumberOfConnectedSensors()
     {
         return _sensors.getDeviceCount();
     }
@@ -94,17 +94,17 @@ namespace sensor_manager
         return t;
     }
 
-    void DallasArduino::getStringAddressByID(uint8_t id, char *address)
-    {
-        DeviceAddress devAddress;
-        _sensors.getAddress(devAddress, id);
+    // void DallasArduino::getStringAddressByID(uint8_t id, char *address)
+    // {
+    //     DeviceAddress devAddress;
+    //     _sensors.getAddress(devAddress, id);
 
-        // WHAT IF NO SENSOR ADDRESS IS FOUND!!!&???
-        // todo add check here
+    //     // WHAT IF NO SENSOR ADDRESS IS FOUND!!!&???
+    //     // todo add check here
 
-        String addr = getAddressString(devAddress);
-        addr.toCharArray(address, 15);
+    //     String addr = getAddressString(devAddress);
+    //     addr.toCharArray(address, 15);
 
-        return;
-    }
+    //     return;
+    // }
 }

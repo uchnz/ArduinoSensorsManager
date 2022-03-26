@@ -14,14 +14,14 @@ namespace sensor_manager
         MQTTClient _clientMQTT;
 
     public:
-        bool begin(char *srvIP); // override;
+        bool begin(char *srvIP);
         void onMessage(MQTTClientCallback cb);
-        void setKeepAlive(uint16_t keepAlive);    // override;
-        bool connect();                           // override;
-        bool connected();                         // override;
-        bool loop();                              // override;
-        bool publish(char *topic, char *data);    // override;
-        void subscribeToTopic(const char *topic); // override;
+        void setKeepAlive(uint16_t keepAlive);
+        bool connect();
+        bool connected();
+        bool loop();
+        bool publish(char *topic, char *data);
+        void subscribeToTopic(const char *topic);
 
         bool send(const char *data, const char *topic) override;
         bool receive() override;

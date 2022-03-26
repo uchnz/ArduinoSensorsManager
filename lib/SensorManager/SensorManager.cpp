@@ -1,23 +1,22 @@
+#ifndef __TESTS__
+#include <LibPrintf.h>
+#endif
+
 #include <stdio.h>
-//#include <iostream>
-//#include <StandardCplusplus.h>
-//#include <string>
 #include <string.h>
 
 #include <SensorManager.h>
 
 namespace sensor_manager
 {
-    // SensorManager::SensorManager(IEth &eth, IMQTT &mqtt, IDallas &dallas)
-    //     : _eth(eth), _clientMQTT(mqtt), _dallas(dallas)
     SensorManager::SensorManager(IMQTT &mqtt, IDallas &dallas)
         : _clientMQTT(mqtt), _dallas(dallas)
     {
         _topics = nullptr;
         _numberOfTopics = 0;
-        _currentTemperature = -128;
         _temperatures = nullptr;
         _numberOfSensors = 0;
+        lastTimeProcessedInMillisecs = 0;
     }
 
     SensorManager::~SensorManager()
@@ -34,97 +33,38 @@ namespace sensor_manager
             delete[] _temperatures;
     }
 
-    // bool SensorManager::isEmptyMAC(uint8_t (&mac)[6])
-    // {
-    //     bool emptyMAC = true;
-    //     for (uint8_t i = 0; i < sizeof(mac); i++)
-    //     {
-    //         if (0 != mac[i])
-    //             emptyMAC = false;
-    //     }
-    //     return emptyMAC;
-    // }
-
-    // IEth
-    // bool SensorManager::connectWithDHCP(uint8_t (&mac)[6])
-    // {
-    //     if (isEmptyMAC(mac))
-    //         return false;
-
-    //     return _eth.connect(mac);
-    // }
-
-    // IMQTT
-    // bool SensorManager::initMQTT(char *srvIP)
-    // {
-    //     if (nullptr == srvIP)
-    //         return false;
-
-    //     return _clientMQTT.begin(srvIP);
-    // }
-
-    // bool SensorManager::installCallback(sensor_manager::MQTTClientCallback cb)
-    // {
-    //     if (nullptr == cb)
-    //         return false;
-
-    //     _clientMQTT.onMessage(cb);
-    //     return true;
-    // }
-
-    //    void SensorManager::callbackIncommingMessages(char *topic, char *payload)
-
-    // void SensorManager::callbackIncommingMessages(String &topic, String &payload)
-    // {
-    //     printf("callback called:%s -> %s.\n ", topic.c_str(), payload.c_str());
-    // }
-
-    // void SensorManager::setKeepAliveClient(uint16_t keepAlive)
-    // {
-    //     _clientMQTT.setKeepAlive(keepAlive);
-    // }
-
-    // bool SensorManager::connectToMQTT()
-    // {
-    //     if (connectedToMQTT())
-    //         return true;
-
-    //     return _clientMQTT.connect();
-    // }
-
-    // bool SensorManager::connectedToMQTT()
-    // {
-    //     return _clientMQTT.connected();
-    // }
-
-    // bool SensorManager::checkForIncomingMessages()
-    // {
-    //     return _clientMQTT.loop();
-    // }
-
-    // bool SensorManager::publishMessageToBroker(char *topic, char *message)
-    // {
-    //     if (nullptr == topic || nullptr == message)
-    //         return false;
-
-    //     return _clientMQTT.publish(topic, message);
-    // }
-
-    // IDallas
-    // void SensorManager::initDallasSensors()
-    // {
-    //     _dallas.init();
-    // }
-
-    // void SensorManager::setSensorsPrecision(int precision)
-    // {
-    //     _dallas.setSensorsPrecision(precision);
-    // }
-
-    void SensorManager::requestCurrentTemperatures()
+    // Private
+    void SensorManager::updateAllTemperatures()
     {
-        _dallas.requestCurrentTemperatures();
-        updateAllTemperatures();
+        for (uint8_t i = 0; i < _numberOfSensors; i++)
+            _temperatures[i] = _dallas.getTemperatureByID(i);
+    }
+
+    // Public
+    // MQTT
+    // bool SensorManager::sendSensorsData(const char *dataToSend, const char *addressToSendTo)
+    // {
+    //     if ((nullptr != dataToSend) && (nullptr != addressToSendTo))
+    //         return _clientMQTT.send(dataToSend, addressToSendTo);
+
+    //     return false;
+    // }
+
+    bool SensorManager::receiveManagingData()
+    {
+        return _clientMQTT.receive();
+    }
+
+    // Dallas
+    void SensorManager::scanConnectedTemperatureSensors()
+    {
+        _numberOfSensors = _dallas.getNumberOfConnectedSensors();
+        if (0 == _numberOfSensors)
+            return;
+
+        _temperatures = new float[_numberOfSensors];
+        for (uint8_t i = 0; i < _numberOfSensors; i++)
+            _temperatures[i] = -128;
     }
 
     uint8_t SensorManager::getSavedNumberSensors()
@@ -132,39 +72,23 @@ namespace sensor_manager
         return _numberOfSensors;
     }
 
-    float SensorManager::getTemperatureByID(uint8_t id)
+    bool SensorManager::refreshSensorsData()
     {
-        return _dallas.getTemperatureByID(id);
+        if (0 == _numberOfSensors)
+            return false;
+
+        _dallas.requestCurrentTemperatures();
+        updateAllTemperatures();
+
+        return true;
     }
 
-    //    void SensorManager::getStringAddressByID(uint8_t id, int *address)
-    void SensorManager::getStringAddressByID(uint8_t id, char *address)
-    {
-        _dallas.getStringAddressByID(id, address);
-    }
-
-    float SensorManager::GetCurrentTemperatureByID(uint8_t id)
+    float SensorManager::getCurrentTemperatureByID(uint8_t id)
     {
         if (id < _numberOfSensors)
             return _temperatures[id];
 
         return -128;
-    }
-
-    void SensorManager::initSensors()
-    {
-        uint8_t numberOfSensors = _dallas.getNumberOfSensors();
-        _temperatures = new float[numberOfSensors];
-        for (uint8_t i = 0; i < numberOfSensors; i++)
-            _temperatures[i] = -128;
-
-        _numberOfSensors = numberOfSensors;
-    }
-
-    void SensorManager::updateAllTemperatures()
-    {
-        for (uint8_t i = 0; i < _numberOfSensors; i++)
-            _temperatures[i] = _dallas.getTemperatureByID(i);
     }
 
     // Business logic
@@ -211,16 +135,35 @@ namespace sensor_manager
         return;
     }
 
-    bool SensorManager::sendSensorData(const char *dataToSend, const char *addressToSendTo)
+    bool SensorManager::processDataWithInterval()
     {
-        if ((nullptr != dataToSend) && (nullptr != addressToSendTo))
-            return _clientMQTT.send(dataToSend, addressToSendTo);
+        if (!refreshSensorsData())
+            return false;
 
+        if (!sendSensorsData())
+            return false;
+
+        return true;
+    }
+
+    bool SensorManager::sendSensorsData()
+    {
+        if (0 == _numberOfSensors)
+            return false;
+
+        for (uint8_t i = 0; i < _numberOfSensors; i++)
+        {
+            char tempConverted[10];
+            sprintf(tempConverted, "%.2f", (double)_temperatures[i]);
+            _clientMQTT.send(tempConverted, _topics[i]);
+        }
+
+        return true;
+    }
+
+    bool SensorManager::sendSensorDataByID(uint8_t id)
+    {
         return false;
     }
 
-    bool SensorManager::receiveManagingData()
-    {
-        return _clientMQTT.receive();
-    }
 }
