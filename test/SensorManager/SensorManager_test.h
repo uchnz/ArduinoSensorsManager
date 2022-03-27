@@ -13,7 +13,19 @@ protected:
    {
    }
 
-   sensor_manager::MockIMQTT _mqtt;
-   sensor_manager::MockIDallas _dallas;
-   sensor_manager::SensorManager _mgr{_mqtt, _dallas};
+   MockIMQTT _mqtt;
+   MockIDallas _dallas;
+   SensorManager _mgr{_mqtt, _dallas};
+};
+
+class SMTest2 : public ::testing::Test
+{
+protected:
+   void SetUp() override
+   {
+   }
+
+   MockIMQTT _mqtt;
+   MockIDallas _dallas;
+   SensorManager _mgr{_mqtt, _dallas};
 };

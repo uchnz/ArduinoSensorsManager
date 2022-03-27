@@ -95,10 +95,100 @@ TEST_F(SensorManagerTest, test_processDataWithInterval_WithoutErrors_ReturnsTrue
     EXPECT_CALL(_dallas, getNumberOfConnectedSensors).Times(1).WillOnce(Return(3));
     EXPECT_CALL(_dallas, getTemperatureByID).Times(3).WillOnce(Return(111.11)).WillOnce(Return(-10.55)).WillOnce(Return(0));
     EXPECT_CALL(_dallas, requestCurrentTemperatures).Times(1);
-    EXPECT_CALL(_mqtt, send(_, _)).Times(3).WillOnce(Return(true));
+    EXPECT_CALL(_mqtt, send(_, _)).Times(3).WillRepeatedly(Return(true));
     const char *topics[] = {"/UZV1/temp1", "/UZV2/temp1", "Third Topic, the long one"};
     bool result = _mgr.fillTopicsStrings(topics, 3);
     _mgr.scanConnectedTemperatureSensors();
 
     EXPECT_TRUE(_mgr.processDataWithInterval());
 }
+
+TEST_F(SMTest2, test_getNumberOfSensorTypesInArray_BeforeInit_ReturnsZero)
+{
+    uint8_t num = _mgr.getTotalNumberOfSensorTypesInArray();
+    EXPECT_EQ(0, num);
+}
+
+TEST_F(SMTest2, test_initSenorsInArray)
+{
+    MockIDallas d1;
+    MockIDallas d2;
+    IDallas *array[2] = {&d1, &d2};
+    _mgr.initSenorsInArray(array, 2);
+
+    uint8_t num = _mgr.getTotalNumberOfSensorTypesInArray();
+    EXPECT_EQ(2, num);
+}
+
+TEST_F(SMTest2, test_getTotalNumberOfSensorTypesInArray_WithoutInit_ReturnsZero)
+{
+    MockIDallas d1;
+    MockIDallas d2;
+    IDallas *array[2] = {&d1, &d2};
+
+    uint8_t num = _mgr.getTotalNumberOfSensorTypesInArray();
+    EXPECT_EQ(0, num);
+}
+
+TEST_F(SMTest2, test_getNumberOfSensorsInArrayByID_ReturnsNumberOfConnectedSensorsOnConnectedPort)
+{
+    MockIDallas d1;
+    MockIDallas d2;
+    MockIDallas d3;
+    EXPECT_CALL(d1, getNumberOfConnectedSensors).Times(1).WillOnce(Return(1));
+    EXPECT_CALL(d2, getNumberOfConnectedSensors).Times(1).WillOnce(Return(3));
+    EXPECT_CALL(d3, getNumberOfConnectedSensors).Times(1).WillOnce(Return(7));
+
+    IDallas *array[3] = {&d1, &d2, &d3};
+    EXPECT_TRUE(_mgr.initSenorsInArray(array, 3));
+
+    uint8_t num = _mgr.getNumberOfSensorsInArrayByID(0);
+    EXPECT_EQ(1, num);
+
+    num = _mgr.getNumberOfSensorsInArrayByID(1);
+    EXPECT_EQ(3, num);
+
+    num = _mgr.getNumberOfSensorsInArrayByID(2);
+    EXPECT_EQ(7, num);
+}
+
+// TEST_F(SMTest2, test_getNumberOfSensorsInArrayByID_WithoutInit_ReturnsZero)
+// {
+//     MockIDallas d1;
+//     EXPECT_CALL(d1, getNumberOfConnectedSensors).Times(0);
+
+//     uint8_t num = _mgr.getNumberOfSensorsInArrayByID(0);
+//     EXPECT_EQ(0, num);
+
+//     num = _mgr.getNumberOfSensorsInArrayByID(1);
+//     EXPECT_EQ(0, num);
+// }
+
+// TEST_F(SMTest2, test_init2DTemperatureArray_WithNullPointer_ReturnFalse)
+// {
+//     MockIDallas d1;
+//     IDallas *array[1] = {&d1};
+
+//     EXPECT_FALSE(_mgr.initSenorsInArray(array, 0));
+
+//     EXPECT_FALSE(_mgr.initSenorsInArray(nullptr, 1));
+// }
+
+// TEST_F(SMTest2, test_init2DTemperatureArray_WithErrorValue_Success)
+// {
+//     MockIDallas d1;
+//     MockIDallas d2;
+//     EXPECT_CALL(d1, getNumberOfConnectedSensors).Times(1).WillOnce(Return(1));
+//     EXPECT_CALL(d2, getNumberOfConnectedSensors).Times(1).WillOnce(Return(2));
+
+//     IDallas *array[2] = {&d1, &d2};
+//     EXPECT_TRUE(_mgr.initSenorsInArray(array, 2));
+
+//     float actual = _mgr.getCurrentTemperatureOfSingleSenorByID(0, 0);
+//     EXPECT_FLOAT_EQ(-128, actual);
+
+//     actual = _mgr.getCurrentTemperatureOfSingleSenorByID(1, 0);
+//     EXPECT_FLOAT_EQ(-128, actual);
+//     actual = _mgr.getCurrentTemperatureOfSingleSenorByID(1, 1);
+//     EXPECT_FLOAT_EQ(-128, actual);
+// }

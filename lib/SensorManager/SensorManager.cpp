@@ -7,8 +7,6 @@
 
 #include <SensorManager.h>
 
-// namespace sensor_manager
-// {
 SensorManager::SensorManager(IMQTT &mqtt, IDallas &dallas)
     : _clientMQTT(mqtt), _dallas(dallas)
 {
@@ -16,7 +14,9 @@ SensorManager::SensorManager(IMQTT &mqtt, IDallas &dallas)
     _numberOfTopics = 0;
     _temperatures = nullptr;
     _numberOfSensors = 0;
-    lastTimeProcessedInMillisecs = 0;
+    _totalNumberOfSensorsInArray = 0;
+    _arrayOfISenosor = nullptr;
+    _2DArrayOfTemperatures = nullptr;
 }
 
 SensorManager::~SensorManager()
@@ -31,6 +31,14 @@ SensorManager::~SensorManager()
 
     if (nullptr != _temperatures)
         delete[] _temperatures;
+
+    if (nullptr != _2DArrayOfTemperatures)
+    {
+        for (uint8_t i = 0; i < _totalNumberOfSensorsInArray; i++)
+            delete[] _2DArrayOfTemperatures[i];
+
+        delete[] _2DArrayOfTemperatures;
+    }
 }
 
 // Private
@@ -70,17 +78,6 @@ void SensorManager::scanConnectedTemperatureSensors()
 uint8_t SensorManager::getSavedNumberSensors()
 {
     return _numberOfSensors;
-}
-
-bool SensorManager::refreshSensorsData()
-{
-    if (0 == _numberOfSensors)
-        return false;
-
-    _dallas.requestCurrentTemperatures();
-    updateAllTemperatures();
-
-    return true;
 }
 
 float SensorManager::getCurrentTemperatureByID(uint8_t id)
@@ -146,6 +143,17 @@ bool SensorManager::processDataWithInterval()
     return true;
 }
 
+bool SensorManager::refreshSensorsData()
+{
+    if (0 == _numberOfSensors)
+        return false;
+
+    _dallas.requestCurrentTemperatures();
+    updateAllTemperatures();
+
+    return true;
+}
+
 bool SensorManager::sendSensorsData()
 {
     if (0 == _numberOfSensors)
@@ -165,4 +173,47 @@ bool SensorManager::sendSensorDataByID(uint8_t id)
 {
     return false;
 }
-// }
+
+uint8_t SensorManager::getTotalNumberOfSensorTypesInArray()
+{
+
+    return _totalNumberOfSensorsInArray;
+}
+
+bool SensorManager::initSenorsInArray(IDallas **arrayOfSensors, uint8_t totalSensors)
+{
+    if ((nullptr == arrayOfSensors) || (0 == totalSensors))
+        return false;
+
+    _arrayOfISenosor = arrayOfSensors;
+    _totalNumberOfSensorsInArray = totalSensors;
+
+    _2DArrayOfTemperatures = new float *[totalSensors];
+    for (uint8_t i = 0; i < totalSensors; i++)
+    {
+        uint8_t num = _arrayOfISenosor[i]->getNumberOfConnectedSensors();
+        _2DArrayOfTemperatures[i] = new float[num];
+        for (uint8_t j = 0; j < num; j++)
+            _2DArrayOfTemperatures[i][j] = -128.0;
+    }
+
+    return true;
+}
+
+float SensorManager::getCurrentTemperatureOfSingleSenorByID(uint8_t addressOfSensorTypeInArray, uint8_t addressOfExactSensor)
+{
+    return _2DArrayOfTemperatures[addressOfSensorTypeInArray][addressOfExactSensor];
+}
+
+uint8_t SensorManager::getNumberOfSensorsInArrayByID(uint8_t id)
+{
+    if (nullptr == _2DArrayOfTemperatures)
+        return 1111;
+
+    if (nullptr == _2DArrayOfTemperatures[id])
+        return 11111;
+
+    size_t numOfSensors = sizeof(_2DArrayOfTemperatures[id]) / sizeof(_2DArrayOfTemperatures[id][0]);
+
+    return numOfSensors;
+}

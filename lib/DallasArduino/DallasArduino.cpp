@@ -5,12 +5,17 @@
 // namespace sensor_manager
 // {
 
-#define TEMPERATURE_PRECISION 9
-#define ONE_WIRE_BUS 22
+#define ONE_WIRE_BUS_DEFAULT_PIN 22
+
+DallasArduino::DallasArduino(uint8_t sensorPIN)
+{
+    _oneWire.begin(sensorPIN);
+    _sensors.setOneWire(&_oneWire);
+}
 
 DallasArduino::DallasArduino()
 {
-    _oneWire.begin(ONE_WIRE_BUS);
+    _oneWire.begin(ONE_WIRE_BUS_DEFAULT_PIN);
     _sensors.setOneWire(&_oneWire);
 }
 

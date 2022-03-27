@@ -6,8 +6,6 @@
 #include <IMQTT.h>
 #include <IDallas.h>
 
-// namespace sensor_manager
-// {
 class SensorManager
 {
 private:
@@ -19,7 +17,9 @@ private:
     float *_temperatures;
     uint8_t _numberOfSensors;
 
-    uint64_t lastTimeProcessedInMillisecs;
+    uint8_t _totalNumberOfSensorsInArray;
+    IDallas **_arrayOfISenosor;
+    float **_2DArrayOfTemperatures;
 
     // Dallas private
     void
@@ -48,5 +48,9 @@ public:
     bool processDataWithInterval();
     bool sendSensorsData();
     bool sendSensorDataByID(uint8_t id);
+
+    uint8_t getTotalNumberOfSensorTypesInArray();
+    uint8_t getNumberOfSensorsInArrayByID(uint8_t id);
+    bool initSenorsInArray(IDallas **arrayOfSensors, uint8_t totalSensors);
+    float getCurrentTemperatureOfSingleSenorByID(uint8_t addressOfSensorTypeInArray, uint8_t addressOfExactSensor);
 };
-// }

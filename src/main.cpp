@@ -6,17 +6,18 @@
 // sensor_manager::MQTTArduino mqttClientModule;
 // const char *topics[] = {"/UZV1/temp1", "/UZV2/temp1"};
 
-// sensor_manager::DallasArduino dallasModule;
+// sensor_manager::DallasArduino dallasModule1;
 
-// sensor_manager::SensorManager sensorsManager(mqttClientModule, dallasModule);
+// sensor_manager::SensorManager sensorsManager(mqttClientModule, dallasModule1);
 EthArduino ethernetModule;
 
 MQTTArduino mqttClientModule;
-const char *topics[] = {"/UZV1/temp1", "/UZV2/temp1"};
+const char *topics[] = {"/UZV1/temp1", "/UZV2/temp1", "/UZV2/temp2"};
 
-DallasArduino dallasModule;
+DallasArduino dallasModule1(22);
+DallasArduino dallasModule2(7);
 
-SensorManager sensorsManager(mqttClientModule, dallasModule);
+SensorManager sensorsManager(mqttClientModule, dallasModule1);
 
 void setup()
 {
@@ -25,10 +26,11 @@ void setup()
 
     initNetworkCard(ethernetModule);
     initConnectionToMQTTBroker(mqttClientModule);
-    InitDallasSensors(dallasModule);
+    InitDallasSensors(dallasModule1);
+    InitDallasSensors(dallasModule2);
 
     sensorsManager.scanConnectedTemperatureSensors();
-    sensorsManager.fillTopicsStrings(topics, 2);
+    sensorsManager.fillTopicsStrings(topics, 3);
 
     printf("Setup complete.\n\n");
 }
