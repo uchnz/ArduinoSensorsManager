@@ -4,26 +4,28 @@
 #include <MQTT.h>
 #include <EthernetENC.h>
 
-namespace sensor_manager
+// namespace sensor_manager
+// {
+
+typedef void (*clientCallbackPtr)(String &topic, String &payload);
+
+class MQTTArduino : public IMQTT
 {
-    typedef void (*MQTTClientCallback)(String &topic, String &payload);
-    class MQTTArduino : public IMQTT
-    {
-    private:
-        EthernetClient _net;
-        MQTTClient _clientMQTT;
+private:
+    EthernetClient _net;
+    MQTTClient _clientMQTT;
 
-    public:
-        bool begin(char *srvIP);
-        void onMessage(MQTTClientCallback cb);
-        void setKeepAlive(uint16_t keepAlive);
-        bool connect();
-        bool connected();
-        bool loop();
-        bool publish(char *topic, char *data);
-        void subscribeToTopic(const char *topic);
+public:
+    bool begin(char *srvIP);
+    void onMessage(clientCallbackPtr cb);
+    void setKeepAlive(uint16_t keepAlive);
+    bool connect();
+    bool connected();
+    bool loop();
+    bool publish(char *topic, char *data);
+    void subscribeToTopic(const char *topic);
 
-        bool send(const char *data, const char *topic) override;
-        bool receive() override;
-    };
-}
+    bool send(const char *data, const char *topic) override;
+    bool receive() override;
+};
+// }

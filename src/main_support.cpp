@@ -16,13 +16,15 @@ void initSystemParameters()
         delay(1000);
 }
 
-void initNetworkCard(sensor_manager::EthArduino &eth)
+// void initNetworkCard(sensor_manager::EthArduino &eth)
+void initNetworkCard(EthArduino &eth)
 {
     if (!eth.connect(mac))
         printf("ERROR: Failed DHCP connection with MAC: %X:%X:%X:%X:%X:%X\n", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5], mac[6]);
 }
 
-void initConnectionToMQTTBroker(sensor_manager::MQTTArduino &mqtt)
+// void initConnectionToMQTTBroker(sensor_manager::MQTTArduino &mqtt)
+void initConnectionToMQTTBroker(MQTTArduino &mqtt)
 {
     mqtt.begin(MQTTBrokerIP);
     mqtt.setKeepAlive(MQTT_KeepAlive);
@@ -31,7 +33,8 @@ void initConnectionToMQTTBroker(sensor_manager::MQTTArduino &mqtt)
     mqtt.subscribeToTopic(topicToReadSettingsFrom);
 }
 
-void InitDallasSensors(sensor_manager::DallasArduino &dallas)
+// void InitDallasSensors(sensor_manager::DallasArduino &dallas)
+void InitDallasSensors(DallasArduino &dallas)
 {
     dallas.init();
     dallas.setSensorsPrecision(sensor_precision);
