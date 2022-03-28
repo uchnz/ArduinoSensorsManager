@@ -17,13 +17,15 @@ private:
     float *_temperatures;
     uint8_t _numberOfSensors;
 
-    uint8_t _totalNumberOfSensorsInArray;
+    uint8_t _totalNumberOfSensorTypesInArray;
     IDallas **_arrayOfISenosor;
     float **_2DArrayOfTemperatures;
+    uint8_t *_numberOfsesorsInArrayCell;
 
     // Dallas private
-    void
-    updateAllTemperatures();
+    void initArrays(IDallas **arrayOfSensors, uint8_t totalSensorTypes);
+    void fillArraysWithInitialValues();
+    void updateAllTemperatures();
 
 public:
     SensorManager(IMQTT &mqtt, IDallas &dallas);
@@ -50,7 +52,9 @@ public:
     bool sendSensorDataByID(uint8_t id);
 
     uint8_t getTotalNumberOfSensorTypesInArray();
-    uint8_t getNumberOfSensorsInArrayByID(uint8_t id);
     bool initSenorsInArray(IDallas **arrayOfSensors, uint8_t totalSensors);
     float getCurrentTemperatureOfSingleSenorByID(uint8_t addressOfSensorTypeInArray, uint8_t addressOfExactSensor);
+    uint8_t getNumberOfSensorsInArrayCellByID(uint8_t id);
+    bool refreshSensorsData2D();
+    bool sendSensorsData2D();
 };
