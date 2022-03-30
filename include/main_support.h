@@ -7,9 +7,6 @@
 
 //*** SETUP HELPERS ***//
 void initSystemParameters();
-// void initNetworkCard(sensor_manager::EthArduino &eth);
-// void initConnectionToMQTTBroker(sensor_manager::MQTTArduino &mqtt);
-// void InitDallasSensors(sensor_manager::DallasArduino &dallas);
 void initNetworkCard(EthArduino &eth);
 void initConnectionToMQTTBroker(MQTTArduino &mqtt);
 void InitDallasSensors(DallasArduino &dallas);

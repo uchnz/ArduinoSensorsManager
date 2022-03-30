@@ -2,12 +2,9 @@
 
 #include <DallasTemperature.h>
 
-#include "IDallas.h"
+#include "ISensor.h"
 
-// namespace sensor_manager
-// {
-
-class DallasArduino : public IDallas
+class DallasArduino : public ISensor
 {
 private:
     OneWire _oneWire;
@@ -23,10 +20,8 @@ public:
     void init();
     void setSensorsPrecision(int precision);
 
-    // IDallas
+    // ISensor
     void requestCurrentTemperatures() override;
     uint8_t getNumberOfConnectedSensors() override;
     float getTemperatureByID(uint8_t) override;
-    // void getStringAddressByID(uint8_t id, char *address) override;
 };
-// }

@@ -2,9 +2,6 @@
 
 #include <DallasArduino.h>
 
-// namespace sensor_manager
-// {
-
 #define ONE_WIRE_BUS_DEFAULT_PIN 22
 
 DallasArduino::DallasArduino(uint8_t sensorPIN)
@@ -98,18 +95,3 @@ float DallasArduino::getTemperatureByID(uint8_t id)
         printf("[ERROR: Device disconnected. Could not read temperature data]\n");
     return t;
 }
-
-// void DallasArduino::getStringAddressByID(uint8_t id, char *address)
-// {
-//     DeviceAddress devAddress;
-//     _sensors.getAddress(devAddress, id);
-
-//     // WHAT IF NO SENSOR ADDRESS IS FOUND!!!&???
-//     // todo add check here
-
-//     String addr = getAddressString(devAddress);
-//     addr.toCharArray(address, 15);
-
-//     return;
-// }
-// }

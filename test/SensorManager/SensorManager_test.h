@@ -14,8 +14,6 @@ protected:
    }
 
    MockIMQTT _mqtt;
-   // MockIDallas _dallas;
-   //   SensorManager _mgr{_mqtt, _dallas};
    SensorManager _mgr{_mqtt};
 };
 
@@ -27,7 +25,5 @@ protected:
    }
 
    MockIMQTT _mqtt;
-   // MockIDallas _dallas;
-   //   SensorManager _mgr{_mqtt, _dallas};
    SensorManager _mgr{_mqtt};
 };

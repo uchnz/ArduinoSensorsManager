@@ -25,6 +25,8 @@ TEST_F(SensorManagerTest, test_fillAddressArray_WithNumberOfAddressesGreaterTota
     // Need to refactor code of the function to type safe pointers like string, vector, etc.
     // But in this project adding STL library to Arduino yeilds to a conflict with MQTT librarary
     // and code doesn't compile.
+    // const char *addresses[] = {"/UZV1/temp1"};
+    // bool result = _mgr.setAddressesToSendMeasurementsTo(addresses, 2);
 }
 
 TEST_F(SensorManagerTest, test_AddressArray_IsFilledCorrectly)
@@ -87,6 +89,18 @@ TEST_F(SMTest2, test_getTotalNumberOfOccupiedPINs_BeforeInit_ReturnsZero)
     EXPECT_EQ(0, num);
 }
 
+TEST_F(SensorManagerTest, test_initMeasurementsArray2D_WithOutOfBoundaryQuantity_ReturnsFalse)
+{
+    // Can't check for: Out Of Boundary!!
+    // Need to refactor code of the function to type safe pointers like string, vector, etc.
+    // But in this project adding STL library to Arduino yeilds to a conflict with MQTT librarary
+    // and code doesn't compile:
+    // MockIDallas d1;
+    // EXPECT_CALL(d1, getNumberOfConnectedSensors).Times(1).WillOnce(Return(1));
+    // IDallas *array[1] = {&d1};
+    // EXPECT_TRUE(_mgr.initSenorsOnAllPINs(array, 2));
+}
+
 TEST_F(SMTest2, test_initMeasurementsArray2D_WithOneSensorOnEveryPIN)
 {
     MockIDallas d1;
@@ -94,7 +108,7 @@ TEST_F(SMTest2, test_initMeasurementsArray2D_WithOneSensorOnEveryPIN)
     EXPECT_CALL(d1, getNumberOfConnectedSensors).Times(1).WillOnce(Return(1));
     EXPECT_CALL(d2, getNumberOfConnectedSensors).Times(1).WillOnce(Return(1));
 
-    IDallas *array[2] = {&d1, &d2};
+    ISensor *array[2] = {&d1, &d2};
     EXPECT_TRUE(_mgr.initSenorsOnAllPINs(array, 2));
 
     uint8_t num = _mgr.getTotalNumberOfOccupiedPINs();
@@ -112,7 +126,7 @@ TEST_F(SMTest2, test_initMeasurementsArray2D_WithManySensorsOnSomePINs)
     EXPECT_CALL(d1, getNumberOfConnectedSensors).Times(1).WillOnce(Return(1));
     EXPECT_CALL(d2, getNumberOfConnectedSensors).Times(1).WillOnce(Return(2));
 
-    IDallas *array[2] = {&d1, &d2};
+    ISensor *array[2] = {&d1, &d2};
     EXPECT_TRUE(_mgr.initSenorsOnAllPINs(array, 2));
 
     uint8_t num = _mgr.getTotalNumberOfOccupiedPINs();
@@ -134,7 +148,7 @@ TEST_F(SMTest2, test_initMeasurementsArray2D_WithOneOfISensorObjectsIsNull)
     EXPECT_CALL(d2, getNumberOfConnectedSensors).Times(0);
     EXPECT_CALL(d3, getNumberOfConnectedSensors).Times(1).WillOnce(Return(2));
 
-    IDallas *array[3] = {&d1, nullptr, &d3};
+    ISensor *array[3] = {&d1, nullptr, &d3};
     EXPECT_TRUE(_mgr.initSenorsOnAllPINs(array, 3));
 
     uint8_t num = _mgr.getTotalNumberOfOccupiedPINs();
@@ -151,7 +165,7 @@ TEST_F(SMTest2, test_initMeasurementsArray2D_WithOneOfObjectsIsNotNull_ReturnsTr
 {
     MockIDallas d1;
     EXPECT_CALL(d1, getNumberOfConnectedSensors).Times(1).WillOnce(Return(2));
-    IDallas *array[4] = {nullptr, nullptr, nullptr, &d1};
+    ISensor *array[4] = {nullptr, nullptr, nullptr, &d1};
     EXPECT_TRUE(_mgr.initSenorsOnAllPINs(array, 4));
 
     uint8_t num = _mgr.getTotalNumberOfOccupiedPINs();
@@ -169,7 +183,7 @@ TEST_F(SMTest2, test_initMeasurementsArray2D_WithOneOfObjectsIsNotNull_ReturnsTr
 TEST_F(SMTest2, test_initMeasurementsArray2D_WithSingleObjectIsNull_ReturnsFalse)
 {
     MockIDallas d1;
-    IDallas *array[1] = {nullptr};
+    ISensor *array[1] = {nullptr};
 
     EXPECT_FALSE(_mgr.initSenorsOnAllPINs(array, 1));
     uint8_t num = _mgr.getTotalNumberOfOccupiedPINs();
@@ -180,7 +194,7 @@ TEST_F(SMTest2, test_initMeasurementsArray2D_WithSensorIDAboveRealQuantity)
 {
     MockIDallas d1;
     EXPECT_CALL(d1, getNumberOfConnectedSensors).Times(1).WillOnce(Return(1));
-    IDallas *array[1] = {&d1};
+    ISensor *array[1] = {&d1};
     _mgr.initSenorsOnAllPINs(array, 1);
 
     float actual = _mgr.getCurrentMeasurementOfOneSenorByID(0);
@@ -199,7 +213,7 @@ TEST_F(SMTest2, test_initMeasurementsArray2D_WithNullObject_ReturnsFalse)
 TEST_F(SMTest2, test_initMeasurementsArray2D_WithZeroObjects_ReturnsFalse)
 {
     MockIDallas d1;
-    IDallas *array[1] = {&d1};
+    ISensor *array[1] = {&d1};
 
     EXPECT_FALSE(_mgr.initSenorsOnAllPINs(array, 0));
     EXPECT_FALSE(_mgr.initSenorsOnAllPINs(nullptr, 0));
@@ -215,7 +229,7 @@ TEST_F(SMTest2, test_getNumberOfSensorsOnPINByID_ReturnsNumberOfConnectedSensors
     EXPECT_CALL(d2, getNumberOfConnectedSensors).Times(1).WillOnce(Return(3));
     EXPECT_CALL(d3, getNumberOfConnectedSensors).Times(1).WillOnce(Return(7));
 
-    IDallas *array[3] = {&d1, &d2, &d3};
+    ISensor *array[3] = {&d1, &d2, &d3};
     _mgr.initSenorsOnAllPINs(array, 3);
 
     uint8_t num = _mgr.getNumberOfSensorsOnPINByID(0);
@@ -254,12 +268,6 @@ TEST_F(SMTest2, test_getNumberOfSensorsOnPINByID_WithNonExistItem_ReturnsZero)
     EXPECT_EQ(0, num);
 }
 
-//--------------------------
-//--------------------------
-// MORE TESTS TO CHECK BELOW
-//--------------------------
-//--------------------------
-
 TEST_F(SMTest2, test_refreshSensorsData2D_WithoutErrors_ReturnsTrue)
 {
     MockIDallas d1;
@@ -275,7 +283,7 @@ TEST_F(SMTest2, test_refreshSensorsData2D_WithoutErrors_ReturnsTrue)
     EXPECT_CALL(d3, requestCurrentTemperatures).Times(1);
     EXPECT_CALL(d3, getTemperatureByID).Times(3).WillOnce(Return(0)).WillOnce(Return(-74.55)).WillOnce(Return(10));
 
-    IDallas *array[3] = {&d1, &d2, &d3};
+    ISensor *array[3] = {&d1, &d2, &d3};
     _mgr.initSenorsOnAllPINs(array, 3);
 
     EXPECT_TRUE(_mgr.refreshSensorsData2D());
@@ -286,13 +294,35 @@ TEST_F(SMTest2, test_refreshSensorsData2D_WithoutInit_ReturnsFalse)
     EXPECT_FALSE(_mgr.refreshSensorsData2D());
 }
 
-TEST_F(SMTest2, test_refreshSensorsData2D_WithZeroArray_ReturnsFalse)
+TEST_F(SMTest2, test_refreshSensorsData2D_WithZeroQuantity_ReturnsFalse)
 {
     MockIDallas d1;
-    IDallas *array[1] = {&d1};
+    ISensor *array[1] = {&d1};
     _mgr.initSenorsOnAllPINs(array, 0);
 
     EXPECT_FALSE(_mgr.refreshSensorsData2D());
+}
+
+TEST_F(SMTest2, test_refreshSensorsData2D_WithArrayOfNulls_ReturnsFalse)
+{
+    ISensor *array[2] = {nullptr, nullptr};
+    _mgr.initSenorsOnAllPINs(array, 2);
+
+    EXPECT_FALSE(_mgr.refreshSensorsData2D());
+}
+
+TEST_F(SMTest2, test_refreshSensorsData2D_WithSensorObjectWithZeroSensors_ReturnsFalse)
+{
+    MockIDallas d1;
+    EXPECT_CALL(d1, getNumberOfConnectedSensors).Times(1).WillOnce(Return(0));
+    EXPECT_CALL(d1, requestCurrentTemperatures).Times(1);
+    EXPECT_CALL(d1, getTemperatureByID).Times(0);
+    ISensor *array[1] = {&d1};
+    _mgr.initSenorsOnAllPINs(array, 1);
+
+    EXPECT_TRUE(_mgr.refreshSensorsData2D());
+
+    _mgr.getCurrentMeasurementOfOneSenorByID(0);
 }
 
 TEST_F(SMTest2, test_sendSensorsData2D_WithCorrectData_ReturnsTrue)
@@ -312,35 +342,49 @@ TEST_F(SMTest2, test_sendSensorsData2D_WithCorrectData_ReturnsTrue)
     EXPECT_CALL(d3, requestCurrentTemperatures).Times(1);
     EXPECT_CALL(d3, getTemperatureByID).Times(3).WillOnce(Return(0)).WillOnce(Return(-74.55)).WillOnce(Return(10));
 
-    IDallas *array[3] = {&d1, &d2, &d3};
+    ISensor *array[3] = {&d1, &d2, &d3};
     _mgr.initSenorsOnAllPINs(array, 3);
 
-    const char *topics[] = {"/UZV1/temp1", "/UZV2/temp1", "Third Topic, the long one"};
-    bool result = _mgr.setAddressesToSendMeasurementsTo(topics, 3);
+    const char *addresses[] = {"/UZV1/temp1", "/UZV2/temp1", "Third Topic, the long one"};
+    bool result = _mgr.setAddressesToSendMeasurementsTo(addresses, 3);
 
     _mgr.refreshSensorsData2D();
 
     EXPECT_TRUE(_mgr.sendSensorsData2D());
 }
 
-// TEST_F(SensorManagerTest, test_processDataWithInterval_WithErrors_ReturnsFalse)
-// {
-//     EXPECT_CALL(_dallas, getNumberOfConnectedSensors).Times(1).WillOnce(Return(0));
+TEST_F(SMTest2, test_sendSensorsData2D_WithFailureUponSending_ReturnsFalse)
+{
+    EXPECT_CALL(_mqtt, send(_, _)).Times(1).WillRepeatedly(Return(false));
 
-//     _mgr.scanConnectedTemperatureSensors();
+    MockIDallas d1;
+    EXPECT_CALL(d1, getNumberOfConnectedSensors).Times(1).WillOnce(Return(1));
 
-//     EXPECT_FALSE(_mgr.processDataWithInterval());
-// }
+    ISensor *array[1] = {&d1};
+    _mgr.initSenorsOnAllPINs(array, 1);
 
-// TEST_F(SensorManagerTest, test_processDataWithInterval_WithoutErrors_ReturnsTrue)
-// {
-//     EXPECT_CALL(_dallas, getNumberOfConnectedSensors).Times(1).WillOnce(Return(3));
-//     EXPECT_CALL(_dallas, getTemperatureByID).Times(3).WillOnce(Return(111.11)).WillOnce(Return(-10.55)).WillOnce(Return(0));
-//     EXPECT_CALL(_dallas, requestCurrentTemperatures).Times(1);
-//     EXPECT_CALL(_mqtt, send(_, _)).Times(3).WillRepeatedly(Return(true));
-//     const char *topics[] = {"/UZV1/temp1", "/UZV2/temp1", "Third Topic, the long one"};
-//     bool result = _mgr.setAddressesToSendMeasurementsTo(topics, 3);
-//     _mgr.scanConnectedTemperatureSensors();
+    const char *addresses[] = {"/UZV1/temp1"};
+    bool result = _mgr.setAddressesToSendMeasurementsTo(addresses, 1);
 
-//     EXPECT_TRUE(_mgr.processDataWithInterval());
-// }
+    EXPECT_FALSE(_mgr.sendSensorsData2D());
+}
+
+TEST_F(SMTest2, test_sendSensorsData2D_WithNullAddress_ReturnsFalse)
+{
+    EXPECT_CALL(_mqtt, send(_, _)).Times(3).WillOnce(Return(true)).WillOnce(Return(false)).WillOnce(Return(true));
+
+    MockIDallas d1;
+    EXPECT_CALL(d1, getNumberOfConnectedSensors).Times(1).WillOnce(Return(1));
+    MockIDallas d2;
+    EXPECT_CALL(d2, getNumberOfConnectedSensors).Times(1).WillOnce(Return(1));
+    MockIDallas d3;
+    EXPECT_CALL(d3, getNumberOfConnectedSensors).Times(1).WillOnce(Return(1));
+
+    ISensor *array[3] = {&d1, &d2, &d3};
+    _mgr.initSenorsOnAllPINs(array, 3);
+
+    const char *addresses[] = {"/UZV1/temp1", nullptr, "3rd addr"};
+    bool result = _mgr.setAddressesToSendMeasurementsTo(addresses, 3);
+
+    EXPECT_FALSE(_mgr.sendSensorsData2D());
+}
