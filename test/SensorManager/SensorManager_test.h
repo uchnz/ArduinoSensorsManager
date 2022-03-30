@@ -14,8 +14,9 @@ protected:
    }
 
    MockIMQTT _mqtt;
-   MockIDallas _dallas;
-   SensorManager _mgr{_mqtt, _dallas};
+   // MockIDallas _dallas;
+   //   SensorManager _mgr{_mqtt, _dallas};
+   SensorManager _mgr{_mqtt};
 };
 
 class SMTest2 : public ::testing::Test
@@ -26,6 +27,7 @@ protected:
    }
 
    MockIMQTT _mqtt;
-   MockIDallas _dallas;
-   SensorManager _mgr{_mqtt, _dallas};
+   // MockIDallas _dallas;
+   //   SensorManager _mgr{_mqtt, _dallas};
+   SensorManager _mgr{_mqtt};
 };

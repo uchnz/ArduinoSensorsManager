@@ -8,84 +8,84 @@ class IDallasTest : public SensorManagerTest
 {
 };
 
-TEST_F(IDallasTest, test_initSensors_InitArrayOfTemperaturesToErrorValue_Success)
-{
-    EXPECT_CALL(_dallas, getNumberOfConnectedSensors).Times(1).WillOnce(Return(5));
-    _mgr.scanConnectedTemperatureSensors();
+// TEST_F(IDallasTest, test_initSensors_InitArrayOfTemperaturesToErrorValue_Success)
+// {
+//     EXPECT_CALL(_dallas, getNumberOfConnectedSensors).Times(1).WillOnce(Return(5));
+//     _mgr.scanConnectedTemperatureSensors();
 
-    uint8_t num = _mgr.getSavedNumberSensors();
-    ASSERT_EQ(num, 5);
+//     uint8_t num = _mgr.getSavedNumberSensors();
+//     ASSERT_EQ(num, 5);
 
-    float actual = _mgr.getCurrentTemperatureByID(0);
-    EXPECT_FLOAT_EQ(-128, actual);
+//     float actual = _mgr.getCurrentTemperatureByID(0);
+//     EXPECT_FLOAT_EQ(-128, actual);
 
-    actual = _mgr.getCurrentTemperatureByID(2);
-    EXPECT_FLOAT_EQ(-128, actual);
+//     actual = _mgr.getCurrentTemperatureByID(2);
+//     EXPECT_FLOAT_EQ(-128, actual);
 
-    actual = _mgr.getCurrentTemperatureByID(4);
-    EXPECT_FLOAT_EQ(-128, actual);
-}
+//     actual = _mgr.getCurrentTemperatureByID(4);
+//     EXPECT_FLOAT_EQ(-128, actual);
+// }
 
-TEST_F(IDallasTest, test_initSensors_WithoutAnySensorsAttached_NothingCreated)
-{
-    EXPECT_CALL(_dallas, getNumberOfConnectedSensors).Times(1).WillOnce(Return(0));
-    _mgr.scanConnectedTemperatureSensors();
+// TEST_F(IDallasTest, test_initSensors_WithoutAnySensorsAttached_NothingCreated)
+// {
+//     EXPECT_CALL(_dallas, getNumberOfConnectedSensors).Times(1).WillOnce(Return(0));
+//     _mgr.scanConnectedTemperatureSensors();
 
-    uint8_t zero = _mgr.getSavedNumberSensors();
-    ASSERT_EQ(zero, 0);
+//     uint8_t zero = _mgr.getSavedNumberSensors();
+//     ASSERT_EQ(zero, 0);
 
-    float actual = _mgr.getCurrentTemperatureByID(0);
-    EXPECT_FLOAT_EQ(-128, actual);
-    actual = _mgr.getCurrentTemperatureByID(1);
-    EXPECT_FLOAT_EQ(-128, actual);
-}
+//     float actual = _mgr.getCurrentTemperatureByID(0);
+//     EXPECT_FLOAT_EQ(-128, actual);
+//     actual = _mgr.getCurrentTemperatureByID(1);
+//     EXPECT_FLOAT_EQ(-128, actual);
+// }
 
-TEST_F(IDallasTest, test_requestSensorsDataBeforeInit_ReturnsZeroAndErrorTemperature)
-{
-    EXPECT_CALL(_dallas, getNumberOfConnectedSensors).Times(0);
+// TEST_F(IDallasTest, test_requestSensorsDataBeforeInit_ReturnsZeroAndErrorTemperature)
+// {
+//     EXPECT_CALL(_dallas, getNumberOfConnectedSensors).Times(0);
 
-    uint8_t actual = _mgr.getSavedNumberSensors();
-    ASSERT_EQ(actual, 0);
+//     uint8_t actual = _mgr.getSavedNumberSensors();
+//     ASSERT_EQ(actual, 0);
 
-    float nothing = _mgr.getCurrentTemperatureByID(0);
-    EXPECT_FLOAT_EQ(-128, nothing);
-}
+//     float nothing = _mgr.getCurrentTemperatureByID(0);
+//     EXPECT_FLOAT_EQ(-128, nothing);
+// }
 
-TEST_F(IDallasTest, test_refreshSensorsData_Success)
-{
-    EXPECT_CALL(_dallas, requestCurrentTemperatures).Times(1);
-    EXPECT_CALL(_dallas, getNumberOfConnectedSensors).Times(1).WillOnce(Return(3));
-    EXPECT_CALL(_dallas, getTemperatureByID).Times(3).WillOnce(Return(11.1)).WillOnce(Return(-0.55)).WillOnce(Return(22));
+// TEST_F(IDallasTest, test_refreshSensorsData_Success)
+// {
+//     EXPECT_CALL(_dallas, requestCurrentTemperatures).Times(1);
+//     EXPECT_CALL(_dallas, getNumberOfConnectedSensors).Times(1).WillOnce(Return(3));
+//     EXPECT_CALL(_dallas, getTemperatureByID).Times(3).WillOnce(Return(11.1)).WillOnce(Return(-0.55)).WillOnce(Return(22));
 
-    _mgr.scanConnectedTemperatureSensors();
+//     _mgr.scanConnectedTemperatureSensors();
 
-    uint8_t num = _mgr.getSavedNumberSensors();
-    ASSERT_EQ(num, 3);
+//     uint8_t num = _mgr.getSavedNumberSensors();
+//     ASSERT_EQ(num, 3);
 
-    EXPECT_TRUE(_mgr.refreshSensorsData());
+//     EXPECT_TRUE(_mgr.refreshSensorsData());
 
-    float actual = _mgr.getCurrentTemperatureByID(0);
-    EXPECT_FLOAT_EQ(11.1, actual);
+//     float actual = _mgr.getCurrentTemperatureByID(0);
+//     EXPECT_FLOAT_EQ(11.1, actual);
 
-    actual = _mgr.getCurrentTemperatureByID(1);
-    EXPECT_FLOAT_EQ(-0.55, actual);
+//     actual = _mgr.getCurrentTemperatureByID(1);
+//     EXPECT_FLOAT_EQ(-0.55, actual);
 
-    actual = _mgr.getCurrentTemperatureByID(2);
-    EXPECT_FLOAT_EQ(22, actual);
-}
+//     actual = _mgr.getCurrentTemperatureByID(2);
+//     EXPECT_FLOAT_EQ(22, actual);
+// }
 
-TEST_F(IDallasTest, test_refreshSensorsData_BeforeInit_ReturnsBeforeCallingRequestFunction)
-{
-    EXPECT_CALL(_dallas, requestCurrentTemperatures).Times(0);
+// TEST_F(IDallasTest, test_refreshSensorsData_BeforeInit_ReturnsBeforeCallingRequestFunction)
+// {
+//     EXPECT_CALL(_dallas, requestCurrentTemperatures).Times(0);
 
-    uint8_t num = _mgr.getSavedNumberSensors();
-    ASSERT_EQ(num, 0);
+//     uint8_t num = _mgr.getSavedNumberSensors();
+//     ASSERT_EQ(num, 0);
 
-    EXPECT_FALSE(_mgr.refreshSensorsData());
+//     EXPECT_FALSE(_mgr.refreshSensorsData());
 
-    float actual = _mgr.getCurrentTemperatureByID(0);
-    EXPECT_FLOAT_EQ(-128, actual);
-}
+//     float actual = _mgr.getCurrentTemperatureByID(0);
+//     EXPECT_FLOAT_EQ(-128, actual);
+// }
 
 // TEST_F(IDallasTest, test_getStringAddressByID_ReturnsValidAddress)
 // {

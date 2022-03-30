@@ -12,13 +12,14 @@
 EthArduino ethernetModule;
 
 MQTTArduino mqttClientModule;
-const char *topics[] = {"/UZV1/temp1", "/UZV2/temp1", "/UZV2/temp2"};
+const char *addressesToSendTo[] = {"/UZV1/temp1", "/UZV2/temp1", "/UZV2/temp2"};
 
 DallasArduino dallasModule1(32);
 DallasArduino dallasModule2(22);
 IDallas *d_array[2] = {&dallasModule1, &dallasModule2};
 
-SensorManager sensorsManager(mqttClientModule, dallasModule1);
+// SensorManager sensorsManager(mqttClientModule, dallasModule1);
+SensorManager sensorsManager(mqttClientModule);
 
 void setup()
 {
@@ -29,10 +30,10 @@ void setup()
     initConnectionToMQTTBroker(mqttClientModule);
     InitDallasSensors(dallasModule1);
     InitDallasSensors(dallasModule2);
-    sensorsManager.initSenorsInArray(d_array, 2);
+    sensorsManager.initSenorsOnAllPINs(d_array, 2);
 
-    sensorsManager.scanConnectedTemperatureSensors();
-    sensorsManager.fillTopicsStrings(topics, 3);
+    // sensorsManager.scanConnectedTemperatureSensors();
+    sensorsManager.setAddressesToSendMeasurementsTo(addressesToSendTo, 3);
 
     printf("Setup complete.\n\n");
 }
@@ -42,7 +43,7 @@ const uint16_t scanInterval = 10000;
 
 void loop()
 {
-    sensorsManager.receiveManagingData();
+    // sensorsManager.receiveManagingData();
 
     if (!isItTimeToParse(millisPassedSinceLastParse, scanInterval))
         return;
