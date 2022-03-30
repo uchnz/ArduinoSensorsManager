@@ -83,7 +83,7 @@ TEST_F(SensorManagerTest, test_GetAddress_WhenArrayIsNotFilled_ReturnsNull)
     EXPECT_STREQ(actual, "");
 }
 
-TEST_F(SMTest2, test_getTotalNumberOfOccupiedPINs_BeforeInit_ReturnsZero)
+TEST_F(SensorManagerTest, test_getTotalNumberOfOccupiedPINs_BeforeInit_ReturnsZero)
 {
     uint8_t num = _mgr.getTotalNumberOfOccupiedPINs();
     EXPECT_EQ(0, num);
@@ -101,7 +101,7 @@ TEST_F(SensorManagerTest, test_initMeasurementsArray2D_WithOutOfBoundaryQuantity
     // EXPECT_TRUE(_mgr.initSenorsOnAllPINs(array, 2));
 }
 
-TEST_F(SMTest2, test_initMeasurementsArray2D_WithOneSensorOnEveryPIN)
+TEST_F(SensorManagerTest, test_initMeasurementsArray2D_WithOneSensorOnEveryPIN)
 {
     MockIDallas d1;
     MockIDallas d2;
@@ -119,7 +119,7 @@ TEST_F(SMTest2, test_initMeasurementsArray2D_WithOneSensorOnEveryPIN)
     EXPECT_FLOAT_EQ(-128, actual);
 }
 
-TEST_F(SMTest2, test_initMeasurementsArray2D_WithManySensorsOnSomePINs)
+TEST_F(SensorManagerTest, test_initMeasurementsArray2D_WithManySensorsOnSomePINs)
 {
     MockIDallas d1;
     MockIDallas d2;
@@ -139,7 +139,7 @@ TEST_F(SMTest2, test_initMeasurementsArray2D_WithManySensorsOnSomePINs)
     EXPECT_FLOAT_EQ(-128, actual);
 }
 
-TEST_F(SMTest2, test_initMeasurementsArray2D_WithOneOfISensorObjectsIsNull)
+TEST_F(SensorManagerTest, test_initMeasurementsArray2D_WithOneOfISensorObjectsIsNull)
 {
     MockIDallas d1;
     MockIDallas d2;
@@ -161,7 +161,7 @@ TEST_F(SMTest2, test_initMeasurementsArray2D_WithOneOfISensorObjectsIsNull)
     EXPECT_FLOAT_EQ(-128, actual);
 }
 
-TEST_F(SMTest2, test_initMeasurementsArray2D_WithOneOfObjectsIsNotNull_ReturnsTrue)
+TEST_F(SensorManagerTest, test_initMeasurementsArray2D_WithOneOfObjectsIsNotNull_ReturnsTrue)
 {
     MockIDallas d1;
     EXPECT_CALL(d1, getNumberOfConnectedSensors).Times(1).WillOnce(Return(2));
@@ -180,7 +180,7 @@ TEST_F(SMTest2, test_initMeasurementsArray2D_WithOneOfObjectsIsNotNull_ReturnsTr
     EXPECT_FLOAT_EQ(-128, actual);
 }
 
-TEST_F(SMTest2, test_initMeasurementsArray2D_WithSingleObjectIsNull_ReturnsFalse)
+TEST_F(SensorManagerTest, test_initMeasurementsArray2D_WithSingleObjectIsNull_ReturnsFalse)
 {
     MockIDallas d1;
     ISensor *array[1] = {nullptr};
@@ -190,7 +190,7 @@ TEST_F(SMTest2, test_initMeasurementsArray2D_WithSingleObjectIsNull_ReturnsFalse
     EXPECT_EQ(0, num);
 }
 
-TEST_F(SMTest2, test_initMeasurementsArray2D_WithSensorIDAboveRealQuantity)
+TEST_F(SensorManagerTest, test_initMeasurementsArray2D_WithSensorIDAboveRealQuantity)
 {
     MockIDallas d1;
     EXPECT_CALL(d1, getNumberOfConnectedSensors).Times(1).WillOnce(Return(1));
@@ -203,14 +203,14 @@ TEST_F(SMTest2, test_initMeasurementsArray2D_WithSensorIDAboveRealQuantity)
     EXPECT_FLOAT_EQ(-128, actual);
 }
 
-TEST_F(SMTest2, test_initMeasurementsArray2D_WithNullObject_ReturnsFalse)
+TEST_F(SensorManagerTest, test_initMeasurementsArray2D_WithNullObject_ReturnsFalse)
 {
     EXPECT_FALSE(_mgr.initSenorsOnAllPINs(nullptr, 1));
     uint8_t num = _mgr.getTotalNumberOfOccupiedPINs();
     EXPECT_EQ(0, num);
 }
 
-TEST_F(SMTest2, test_initMeasurementsArray2D_WithZeroObjects_ReturnsFalse)
+TEST_F(SensorManagerTest, test_initMeasurementsArray2D_WithZeroObjects_ReturnsFalse)
 {
     MockIDallas d1;
     ISensor *array[1] = {&d1};
@@ -220,7 +220,7 @@ TEST_F(SMTest2, test_initMeasurementsArray2D_WithZeroObjects_ReturnsFalse)
     EXPECT_FALSE(_mgr.initSenorsOnAllPINs({nullptr}, 0));
 }
 
-TEST_F(SMTest2, test_getNumberOfSensorsOnPINByID_ReturnsNumberOfConnectedSensorsOnPIN)
+TEST_F(SensorManagerTest, test_getNumberOfSensorsOnPINByID_ReturnsNumberOfConnectedSensorsOnPIN)
 {
     MockIDallas d1;
     MockIDallas d2;
@@ -240,7 +240,7 @@ TEST_F(SMTest2, test_getNumberOfSensorsOnPINByID_ReturnsNumberOfConnectedSensors
     EXPECT_EQ(7, num);
 }
 
-TEST_F(SMTest2, test_getNumberOfSensorsOnPINByID_WithoutInit_ReturnsZero)
+TEST_F(SensorManagerTest, test_getNumberOfSensorsOnPINByID_WithoutInit_ReturnsZero)
 {
     MockIDallas d1;
     EXPECT_CALL(d1, getNumberOfConnectedSensors).Times(0);
@@ -249,7 +249,7 @@ TEST_F(SMTest2, test_getNumberOfSensorsOnPINByID_WithoutInit_ReturnsZero)
     EXPECT_EQ(0, num);
 }
 
-TEST_F(SMTest2, test_getNumberOfSensorsOnPINByID_WithOneNullObject_ReturnsZero)
+TEST_F(SensorManagerTest, test_getNumberOfSensorsOnPINByID_WithOneNullObject_ReturnsZero)
 {
     MockIDallas d1;
     EXPECT_CALL(d1, getNumberOfConnectedSensors).Times(0);
@@ -259,7 +259,7 @@ TEST_F(SMTest2, test_getNumberOfSensorsOnPINByID_WithOneNullObject_ReturnsZero)
     EXPECT_EQ(0, num);
 }
 
-TEST_F(SMTest2, test_getNumberOfSensorsOnPINByID_WithNonExistItem_ReturnsZero)
+TEST_F(SensorManagerTest, test_getNumberOfSensorsOnPINByID_WithNonExistItem_ReturnsZero)
 {
     MockIDallas d1;
     EXPECT_CALL(d1, getNumberOfConnectedSensors).Times(0);
@@ -268,7 +268,7 @@ TEST_F(SMTest2, test_getNumberOfSensorsOnPINByID_WithNonExistItem_ReturnsZero)
     EXPECT_EQ(0, num);
 }
 
-TEST_F(SMTest2, test_refreshSensorsData2D_WithoutErrors_ReturnsTrue)
+TEST_F(SensorManagerTest, test_refreshSensorsData2D_WithoutErrors_ReturnsTrue)
 {
     MockIDallas d1;
     EXPECT_CALL(d1, getNumberOfConnectedSensors).Times(1).WillOnce(Return(1));
@@ -289,12 +289,12 @@ TEST_F(SMTest2, test_refreshSensorsData2D_WithoutErrors_ReturnsTrue)
     EXPECT_TRUE(_mgr.refreshSensorsData2D());
 }
 
-TEST_F(SMTest2, test_refreshSensorsData2D_WithoutInit_ReturnsFalse)
+TEST_F(SensorManagerTest, test_refreshSensorsData2D_WithoutInit_ReturnsFalse)
 {
     EXPECT_FALSE(_mgr.refreshSensorsData2D());
 }
 
-TEST_F(SMTest2, test_refreshSensorsData2D_WithZeroQuantity_ReturnsFalse)
+TEST_F(SensorManagerTest, test_refreshSensorsData2D_WithZeroQuantity_ReturnsFalse)
 {
     MockIDallas d1;
     ISensor *array[1] = {&d1};
@@ -303,7 +303,7 @@ TEST_F(SMTest2, test_refreshSensorsData2D_WithZeroQuantity_ReturnsFalse)
     EXPECT_FALSE(_mgr.refreshSensorsData2D());
 }
 
-TEST_F(SMTest2, test_refreshSensorsData2D_WithArrayOfNulls_ReturnsFalse)
+TEST_F(SensorManagerTest, test_refreshSensorsData2D_WithArrayOfNulls_ReturnsFalse)
 {
     ISensor *array[2] = {nullptr, nullptr};
     _mgr.initSenorsOnAllPINs(array, 2);
@@ -311,7 +311,7 @@ TEST_F(SMTest2, test_refreshSensorsData2D_WithArrayOfNulls_ReturnsFalse)
     EXPECT_FALSE(_mgr.refreshSensorsData2D());
 }
 
-TEST_F(SMTest2, test_refreshSensorsData2D_WithSensorObjectWithZeroSensors_ReturnsFalse)
+TEST_F(SensorManagerTest, test_refreshSensorsData2D_WithSensorObjectWithZeroSensors_ReturnsFalse)
 {
     MockIDallas d1;
     EXPECT_CALL(d1, getNumberOfConnectedSensors).Times(1).WillOnce(Return(0));
@@ -325,7 +325,7 @@ TEST_F(SMTest2, test_refreshSensorsData2D_WithSensorObjectWithZeroSensors_Return
     _mgr.getCurrentMeasurementOfOneSenorByID(0);
 }
 
-TEST_F(SMTest2, test_sendSensorsData2D_WithCorrectData_ReturnsTrue)
+TEST_F(SensorManagerTest, test_sendSensorsData2D_WithCorrectData_ReturnsTrue)
 {
     EXPECT_CALL(_mqtt, send(_, _)).Times(6).WillRepeatedly(Return(true));
 
@@ -353,7 +353,7 @@ TEST_F(SMTest2, test_sendSensorsData2D_WithCorrectData_ReturnsTrue)
     EXPECT_TRUE(_mgr.sendSensorsData2D());
 }
 
-TEST_F(SMTest2, test_sendSensorsData2D_WithFailureUponSending_ReturnsFalse)
+TEST_F(SensorManagerTest, test_sendSensorsData2D_WithFailureUponSending_ReturnsFalse)
 {
     EXPECT_CALL(_mqtt, send(_, _)).Times(1).WillRepeatedly(Return(false));
 
@@ -369,7 +369,7 @@ TEST_F(SMTest2, test_sendSensorsData2D_WithFailureUponSending_ReturnsFalse)
     EXPECT_FALSE(_mgr.sendSensorsData2D());
 }
 
-TEST_F(SMTest2, test_sendSensorsData2D_WithNullAddress_ReturnsFalse)
+TEST_F(SensorManagerTest, test_sendSensorsData2D_WithNullAddress_ReturnsFalse)
 {
     EXPECT_CALL(_mqtt, send(_, _)).Times(3).WillOnce(Return(true)).WillOnce(Return(false)).WillOnce(Return(true));
 

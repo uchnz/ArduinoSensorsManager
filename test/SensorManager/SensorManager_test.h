@@ -1,23 +1,28 @@
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
-#include <MockIMQTT/MockIMQTT.h>
-#include <MockIDallas/MockIDallas.h>
+#include <ISensor.h>
+#include <IMQTT.h>
 #include <SensorManager.h>
 
 using ::testing::_;
 
-class SensorManagerTest : public ::testing::Test
+class MockIDallas : public ISensor
 {
-protected:
-   void SetUp() override
-   {
-   }
-
-   MockIMQTT _mqtt;
-   SensorManager _mgr{_mqtt};
+public:
+   MOCK_METHOD(void, requestCurrentTemperatures, (), (override));
+   MOCK_METHOD(uint8_t, getNumberOfConnectedSensors, (), (override));
+   MOCK_METHOD(float, getTemperatureByID, (uint8_t), (override));
 };
 
-class SMTest2 : public ::testing::Test
+class MockIMQTT : public IMQTT
+{
+public:
+   MOCK_METHOD(bool, send, (const char *, const char *), (override));
+   MOCK_METHOD(bool, receive, (), (override));
+};
+
+class SensorManagerTest : public ::testing::Test
 {
 protected:
    void SetUp() override
