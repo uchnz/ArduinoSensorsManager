@@ -21,7 +21,7 @@ public:
     void setSensorsPrecision(int precision);
 
     // ISensor
-    void requestCurrentTemperatures() override;
+    void requestCurrentMeasurement() override;
     uint8_t getNumberOfConnectedSensors() override;
-    float getTemperatureByID(uint8_t) override;
+    float getCurrentMeasurementByID(uint8_t) override;
 };

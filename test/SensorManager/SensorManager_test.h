@@ -10,9 +10,9 @@ using ::testing::_;
 class MockIDallas : public ISensor
 {
 public:
-   MOCK_METHOD(void, requestCurrentTemperatures, (), (override));
+   MOCK_METHOD(void, requestCurrentMeasurement, (), (override));
    MOCK_METHOD(uint8_t, getNumberOfConnectedSensors, (), (override));
-   MOCK_METHOD(float, getTemperatureByID, (uint8_t), (override));
+   MOCK_METHOD(float, getCurrentMeasurementByID, (uint8_t), (override));
 };
 
 class MockIMQTT : public IMQTT

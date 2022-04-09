@@ -21,9 +21,6 @@
             }
         ]
     },
-    "gtest-adapter.debugConfig": [
-        "PIO Debug"
-    ],
     "files.associations": {
         "algorithm": "cpp",
         "array": "cpp",
@@ -32,6 +29,8 @@
         "unordered_map": "cpp",
         "vector": "cpp",
         "string_view": "cpp",
-        "initializer_list": "cpp"
-    }
+        "initializer_list": "cpp",
+        "*.tcc": "cpp"
+    },
+    "gtest-adapter.debugConfig": "PIO Debug"
 }

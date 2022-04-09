@@ -4,9 +4,6 @@
 #include <MQTT.h>
 #include <EthernetENC.h>
 
-// namespace sensor_manager
-// {
-
 typedef void (*clientCallbackPtr)(String &topic, String &payload);
 
 class MQTTArduino : public IMQTT
@@ -28,4 +25,3 @@ public:
     bool send(const char *data, const char *topic) override;
     bool receive() override;
 };
-// }

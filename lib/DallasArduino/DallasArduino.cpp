@@ -76,7 +76,7 @@ void DallasArduino::setSensorsPrecision(int precision)
     }
 }
 
-void DallasArduino::requestCurrentTemperatures()
+void DallasArduino::requestCurrentMeasurement()
 {
     Serial.print("Requesting temperatures...");
     _sensors.requestTemperatures();
@@ -88,7 +88,7 @@ uint8_t DallasArduino::getNumberOfConnectedSensors()
     return _sensors.getDeviceCount();
 }
 
-float DallasArduino::getTemperatureByID(uint8_t id)
+float DallasArduino::getCurrentMeasurementByID(uint8_t id)
 {
     float t = _sensors.getTempCByIndex(id);
     if (DEVICE_DISCONNECTED_C == t)

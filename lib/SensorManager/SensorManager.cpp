@@ -156,9 +156,9 @@ bool SensorManager::refreshSensorsData2D()
 
     for (uint8_t i = 0; i < _totalNumberOfOccupiedPINsByISensorObjects; i++)
     {
-        _ISenosorObjectsManagingArray2D[i]->requestCurrentTemperatures();
+        _ISenosorObjectsManagingArray2D[i]->requestCurrentMeasurement();
         for (uint8_t j = 0; j < _numberOfSensorsOnPINsArray[i]; j++)
-            _measurementsArray2D[i][j] = _ISenosorObjectsManagingArray2D[i]->getTemperatureByID(j);
+            _measurementsArray2D[i][j] = _ISenosorObjectsManagingArray2D[i]->getCurrentMeasurementByID(j);
     }
     return true;
 }

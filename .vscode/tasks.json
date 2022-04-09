@@ -3,25 +3,39 @@
     "tasks": [
         {
             "type": "shell",
-            "label": "C/C++: g++.exe build active file",
-            "command": "C:\\msys64\\mingw64\\bin\\g++.exe",
+            "label": "test MQ7COArduino_test",
+            "command": "pio",
             "args": [
-                "-std=c++11",
-                "-O2",
-                "-Wall",
-                "-g",
-                "${file}",
-                "-o",
-                "c:\\Users\\1\\OneDrive - Лига Проектов\\Documents\\PlatformIO\\Projects\\D18b20\\.pio\\build\\desktop\\program.exe"
+                "test",
+                "-e",
+                "native",
+                "-f",
+                "MQ7COArduino_test"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
             },
-            "problemMatcher": [
-                "$gcc"
-            ],
             "group": {
-                "isDefault": true,
+                "isDefault": false,
+                "kind": "build"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "test SensorManager",
+            "command": "pio",
+            "args": [
+                "test",
+                "-e",
+                "native",
+                "-f",
+                "SensorManager"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "isDefault": false,
                 "kind": "build"
             }
         }

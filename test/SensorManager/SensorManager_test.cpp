@@ -272,16 +272,16 @@ TEST_F(SensorManagerTest, test_refreshSensorsData2D_WithoutErrors_ReturnsTrue)
 {
     MockIDallas d1;
     EXPECT_CALL(d1, getNumberOfConnectedSensors).Times(1).WillOnce(Return(1));
-    EXPECT_CALL(d1, requestCurrentTemperatures).Times(1);
-    EXPECT_CALL(d1, getTemperatureByID).Times(1).WillOnce(Return(11.11));
+    EXPECT_CALL(d1, requestCurrentMeasurement).Times(1);
+    EXPECT_CALL(d1, getCurrentMeasurementByID).Times(1).WillOnce(Return(11.11));
     MockIDallas d2;
     EXPECT_CALL(d2, getNumberOfConnectedSensors).Times(1).WillOnce(Return(2));
-    EXPECT_CALL(d2, requestCurrentTemperatures).Times(1);
-    EXPECT_CALL(d2, getTemperatureByID).Times(2).WillOnce(Return(-07.11)).WillOnce(Return(10.55));
+    EXPECT_CALL(d2, requestCurrentMeasurement).Times(1);
+    EXPECT_CALL(d2, getCurrentMeasurementByID).Times(2).WillOnce(Return(-07.11)).WillOnce(Return(10.55));
     MockIDallas d3;
     EXPECT_CALL(d3, getNumberOfConnectedSensors).Times(1).WillOnce(Return(3));
-    EXPECT_CALL(d3, requestCurrentTemperatures).Times(1);
-    EXPECT_CALL(d3, getTemperatureByID).Times(3).WillOnce(Return(0)).WillOnce(Return(-74.55)).WillOnce(Return(10));
+    EXPECT_CALL(d3, requestCurrentMeasurement).Times(1);
+    EXPECT_CALL(d3, getCurrentMeasurementByID).Times(3).WillOnce(Return(0)).WillOnce(Return(-74.55)).WillOnce(Return(10));
 
     ISensor *array[3] = {&d1, &d2, &d3};
     _mgr.initSenorsOnAllPINs(array, 3);
@@ -315,8 +315,8 @@ TEST_F(SensorManagerTest, test_refreshSensorsData2D_WithSensorObjectWithZeroSens
 {
     MockIDallas d1;
     EXPECT_CALL(d1, getNumberOfConnectedSensors).Times(1).WillOnce(Return(0));
-    EXPECT_CALL(d1, requestCurrentTemperatures).Times(1);
-    EXPECT_CALL(d1, getTemperatureByID).Times(0);
+    EXPECT_CALL(d1, requestCurrentMeasurement).Times(1);
+    EXPECT_CALL(d1, getCurrentMeasurementByID).Times(0);
     ISensor *array[1] = {&d1};
     _mgr.initSenorsOnAllPINs(array, 1);
 
@@ -331,16 +331,16 @@ TEST_F(SensorManagerTest, test_sendSensorsData2D_WithCorrectData_ReturnsTrue)
 
     MockIDallas d1;
     EXPECT_CALL(d1, getNumberOfConnectedSensors).Times(1).WillOnce(Return(1));
-    EXPECT_CALL(d1, requestCurrentTemperatures).Times(1);
-    EXPECT_CALL(d1, getTemperatureByID).Times(1).WillOnce(Return(11.11));
+    EXPECT_CALL(d1, requestCurrentMeasurement).Times(1);
+    EXPECT_CALL(d1, getCurrentMeasurementByID).Times(1).WillOnce(Return(11.11));
     MockIDallas d2;
     EXPECT_CALL(d2, getNumberOfConnectedSensors).Times(1).WillOnce(Return(2));
-    EXPECT_CALL(d2, requestCurrentTemperatures).Times(1);
-    EXPECT_CALL(d2, getTemperatureByID).Times(2).WillOnce(Return(-07.11)).WillOnce(Return(10.55));
+    EXPECT_CALL(d2, requestCurrentMeasurement).Times(1);
+    EXPECT_CALL(d2, getCurrentMeasurementByID).Times(2).WillOnce(Return(-07.11)).WillOnce(Return(10.55));
     MockIDallas d3;
     EXPECT_CALL(d3, getNumberOfConnectedSensors).Times(1).WillOnce(Return(3));
-    EXPECT_CALL(d3, requestCurrentTemperatures).Times(1);
-    EXPECT_CALL(d3, getTemperatureByID).Times(3).WillOnce(Return(0)).WillOnce(Return(-74.55)).WillOnce(Return(10));
+    EXPECT_CALL(d3, requestCurrentMeasurement).Times(1);
+    EXPECT_CALL(d3, getCurrentMeasurementByID).Times(3).WillOnce(Return(0)).WillOnce(Return(-74.55)).WillOnce(Return(10));
 
     ISensor *array[3] = {&d1, &d2, &d3};
     _mgr.initSenorsOnAllPINs(array, 3);
