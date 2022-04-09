@@ -233,9 +233,18 @@ TEST_F(MQ7COArduinoTest, test_isInReadingPhase_whenLowVoltage_AfterCoolingDown_R
     EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(1231 + 60000));
     EXPECT_TRUE(mq7co.isPhaseCompleted());
 
-    EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(1231 + 61000));
+    EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(1231 + 60010));
+    bool result = mq7co.readMeasurement();
     EXPECT_TRUE(mq7co.isInReadingPhase());
+    EXPECT_FALSE(mq7co.isInCoolingPhase());
+    EXPECT_FALSE(mq7co.isInHeatingPhase());
+    EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(1231 + 60010 + 15000));
     EXPECT_FALSE(mq7co.isPhaseCompleted());
+
+    result = mq7co.readMeasurement();
+    EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(1231 + 60010 + 30000));
+    EXPECT_TRUE(mq7co.isInReadingPhase());
+    EXPECT_TRUE(mq7co.isPhaseCompleted());
 
     releaseArduinoMock();
 }

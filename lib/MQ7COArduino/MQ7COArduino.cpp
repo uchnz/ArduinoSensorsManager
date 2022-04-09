@@ -77,11 +77,14 @@ bool MQ7COArduino::isPhaseCompleted()
     uint32_t now = millis();
     uint32_t delta = now - _phaseStartedMls;
 
+    if (_heatingPhaseRunning)
+        return isOutsideMillisInterval(HEATING_INTERVAL, delta);
+
     if (_coolingPhaseRunning)
         return isOutsideMillisInterval(COOLING_INTERVAL, delta);
 
-    if (_heatingPhaseRunning)
-        return isOutsideMillisInterval(HEATING_INTERVAL, delta);
+    if (_readingPhaseRunning)
+        return isOutsideMillisInterval(READING_INTERVAL, delta);
 
     return false;
 }
@@ -99,6 +102,20 @@ bool MQ7COArduino::isInCoolingPhase()
 bool MQ7COArduino::isInReadingPhase()
 {
     return _readingPhaseRunning;
+}
+
+bool MQ7COArduino::readMeasurement()
+{
+    if (_readingPhaseRunning)
+        return false; // implement readings here
+
+    _phaseStartedMls = millis();
+
+    _coolingPhaseRunning = _heatingPhaseRunning = false;
+    _readingPhaseRunning = true;
+
+    // implement readings here
+    return false;
 }
 
 uint8_t MQ7COArduino::getNumberOfConnectedSensors()

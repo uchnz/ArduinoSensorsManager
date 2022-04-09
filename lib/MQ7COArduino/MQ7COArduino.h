@@ -40,6 +40,7 @@ public:
     bool isInHeatingPhase();
     bool isInCoolingPhase();
     bool isInReadingPhase();
+    bool readMeasurement();
 
     bool setHeaterVoltage(VOLTAGE voltage);
 
