@@ -1,23 +1,28 @@
 #include <MQ7COArduino.h>
 #include <Arduino.h>
 
-MQ7COArduino::MQ7COArduino()
-{
-    changeSignalAndHeaterPINs(0, 0);
-}
-
-MQ7COArduino::MQ7COArduino(uint8_t signalPIN, uint8_t signalHeaterPIN)
-{
-    changeSignalAndHeaterPINs(signalPIN, signalHeaterPIN);
-}
-
 void MQ7COArduino::changeSignalAndHeaterPINs(uint8_t signalPIN, uint8_t signalHeaterPIN)
 {
     _signalPIN = signalPIN;
     _signalHeaterPIN = signalHeaterPIN;
-    _initCompleted = false;
+    _sensorInitCompleted = false;
     _phaseStartedMls = 0;
-    _coolingPhaseRunning = _heatingPhaseRunning = _readingPhaseRunning = false;
+    _currentPhase = NONE;
+    _currentSavingItemInArray = 0;
+    _averageofAllMeasuredValues = -1;
+    _previusReadingMillis = 0;
+    _nextReadIntervalMillis = 3000;
+
+    for (uint8_t i = 0; i < 10; i++)
+        _valueArray[i] = -1;
+}
+MQ7COArduino::MQ7COArduino()
+{
+    changeSignalAndHeaterPINs(0, 0);
+}
+MQ7COArduino::MQ7COArduino(uint8_t signalPIN, uint8_t signalHeaterPIN)
+{
+    changeSignalAndHeaterPINs(signalPIN, signalHeaterPIN);
 }
 
 bool MQ7COArduino::init()
@@ -27,95 +32,82 @@ bool MQ7COArduino::init()
 
     pinMode(_signalPIN, OUTPUT);
     pinMode(_signalHeaterPIN, OUTPUT);
-    _initCompleted = true;
+    _sensorInitCompleted = true;
 
     return true;
 }
 
-void MQ7COArduino::requestCurrentMeasurement()
+void MQ7COArduino::setHeatingVoltageForPhase(PHASES phase)
 {
+    analogWrite(_signalHeaterPIN, phase == HEATING ? HIGH_5_0 : LOW_1_4);
 }
-
-bool MQ7COArduino::requestNewMeasurement()
+bool MQ7COArduino::setPhase(PHASES phase)
 {
-    if (_initCompleted)
-        return true;
-
-    return false;
-}
-
-void MQ7COArduino::setHeaterPhase(VOLTAGE voltage)
-{
-    _phaseStartedMls = millis();
-    _coolingPhaseRunning = _heatingPhaseRunning = _readingPhaseRunning = false;
-
-    if (HIGH_5_0 == voltage)
-        _heatingPhaseRunning = true;
-
-    if (LOW_1_4 == voltage)
-        _coolingPhaseRunning = true;
-}
-
-bool MQ7COArduino::setHeaterVoltage(VOLTAGE voltage)
-{
-    if (!_initCompleted)
+    if (!_sensorInitCompleted)
         return false;
 
-    analogWrite(_signalHeaterPIN, voltage);
-    setHeaterPhase(voltage);
+    _phaseStartedMls = millis();
+    _currentPhase = phase;
+    setHeatingVoltageForPhase(phase);
 
     return true;
 }
 
-bool MQ7COArduino::isOutsideMillisInterval(CYCLE_INTERVALS interval, uint32_t delta)
+bool MQ7COArduino::isOutsideMillisInterval(PHASES phase, uint32_t delta)
 {
-    return interval <= delta;
+    return phase <= delta;
 }
-
-bool MQ7COArduino::isPhaseCompleted()
+bool MQ7COArduino::isPhaseCompleted(PHASES phase)
 {
     uint32_t now = millis();
     uint32_t delta = now - _phaseStartedMls;
 
-    if (_heatingPhaseRunning)
-        return isOutsideMillisInterval(HEATING_INTERVAL, delta);
+    return isOutsideMillisInterval(phase, delta);
+}
 
-    if (_coolingPhaseRunning)
-        return isOutsideMillisInterval(COOLING_INTERVAL, delta);
+bool MQ7COArduino::isInPhase(PHASES phase)
+{
+    return _currentPhase == phase;
+}
 
-    if (_readingPhaseRunning)
-        return isOutsideMillisInterval(READING_INTERVAL, delta);
+bool MQ7COArduino::isReadyToReadNextMeasurement(uint32_t now)
+{
+    if (now - _previusReadingMillis >= _nextReadIntervalMillis)
+        return true;
 
     return false;
 }
-
-bool MQ7COArduino::isInHeatingPhase()
+bool MQ7COArduino::readNextMeasurement()
 {
-    return _heatingPhaseRunning;
+    if (READING != _currentPhase)
+        return false;
+
+    uint32_t now = millis();
+    if (!isReadyToReadNextMeasurement(now))
+        return false;
+
+    _valueArray[_currentSavingItemInArray++] = analogRead(_signalPIN);
+    _previusReadingMillis = now;
+
+    return true;
 }
 
-bool MQ7COArduino::isInCoolingPhase()
+int MQ7COArduino::calculateAverageOfAllMeasurements()
 {
-    return _coolingPhaseRunning;
+    int sumOfMeasurements = 0;
+    for (uint8_t i = 0; i < 10; i++)
+        sumOfMeasurements += _valueArray[i];
+
+    return sumOfMeasurements / 10;
 }
-
-bool MQ7COArduino::isInReadingPhase()
+bool MQ7COArduino::saveAverageMeasurement()
 {
-    return _readingPhaseRunning;
-}
+    if (!isPhaseCompleted(READING))
+        return false;
 
-bool MQ7COArduino::readMeasurement()
-{
-    if (_readingPhaseRunning)
-        return false; // implement readings here
+    _averageofAllMeasuredValues = calculateAverageOfAllMeasurements();
 
-    _phaseStartedMls = millis();
-
-    _coolingPhaseRunning = _heatingPhaseRunning = false;
-    _readingPhaseRunning = true;
-
-    // implement readings here
-    return false;
+    return true;
 }
 
 uint8_t MQ7COArduino::getNumberOfConnectedSensors()
@@ -125,5 +117,29 @@ uint8_t MQ7COArduino::getNumberOfConnectedSensors()
 
 float MQ7COArduino::getCurrentMeasurementByID(uint8_t id)
 {
-    return analogRead(_signalPIN);
+    return _averageofAllMeasuredValues;
+}
+
+void MQ7COArduino::requestCurrentMeasurement()
+{
+    if (isInPhase(HEATING))
+    {
+        if (!isPhaseCompleted(HEATING))
+            return;
+        setPhase(COOLING);
+    }
+    if (isInPhase(COOLING))
+    {
+        if (!isPhaseCompleted(COOLING))
+            return;
+        setPhase(READING);
+    }
+    if (isInPhase(READING))
+    {
+        readNextMeasurement();
+        if (!isPhaseCompleted(READING))
+            return;
+        saveAverageMeasurement();
+    }
+    setPhase(HEATING);
 }

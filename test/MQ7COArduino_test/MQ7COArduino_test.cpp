@@ -4,9 +4,10 @@
 #include <MQ7COArduino.h>
 
 using ::testing::_;
+using ::testing::AtLeast;
 using ::testing::Return;
 
-TEST_F(MQ7COArduinoTest, test_init_SetsPinsToOUT_SuccessReturnsTrue)
+TEST_F(MQ7COArduinoTest, testinitcallsPinModetoSetPinsToOUTReturnsTrue)
 {
     ArduinoMock *arduinoMock = arduinoMockInstance();
     EXPECT_CALL(*arduinoMock, pinMode(_, OUTPUT)).Times(2);
@@ -16,7 +17,7 @@ TEST_F(MQ7COArduinoTest, test_init_SetsPinsToOUT_SuccessReturnsTrue)
     releaseArduinoMock();
 }
 
-TEST_F(MQ7COArduinoTest, test_initWithTheSamePortSignalAndHeater_FailureReturnsFalse)
+TEST_F(MQ7COArduinoTest, test_init_WithTheSamePortSignalAndHeater_FailureReturnsFalse)
 {
     MQ7COArduino mq7co;
     EXPECT_FALSE(mq7co.init());
@@ -25,7 +26,7 @@ TEST_F(MQ7COArduinoTest, test_initWithTheSamePortSignalAndHeater_FailureReturnsF
     EXPECT_FALSE(mq7.init());
 }
 
-TEST_F(MQ7COArduinoTest, test_setDifferentSignalAndHeaterPINs_allowsSuccessfulInit)
+TEST_F(MQ7COArduinoTest, test_setDifferentSignalAndHeaterPINs_allowsInitReturnTrue)
 {
     ArduinoMock *arduinoMock = arduinoMockInstance();
     EXPECT_CALL(*arduinoMock, pinMode(_, OUTPUT)).Times(2);
@@ -46,49 +47,7 @@ TEST_F(MQ7COArduinoTest, test_setSameSignalAndHeaterPINs_failsInit)
     EXPECT_FALSE(mq7co.init());
 }
 
-TEST_F(MQ7COArduinoTest, test_setHighAndLowVoltageForHeater)
-{
-    ArduinoMock *arduinoMock = arduinoMockInstance();
-    EXPECT_CALL(*arduinoMock, pinMode(_, OUTPUT)).Times(2);
-    MQ7COArduino mq7co(1, 2);
-    mq7co.init();
-
-    EXPECT_CALL(*arduinoMock, millis).Times(2).WillRepeatedly(Return(0));
-    EXPECT_CALL(*arduinoMock, analogWrite(2, HIGH_5_0)).Times(1);
-    EXPECT_TRUE(mq7co.setHeaterVoltage(HIGH_5_0));
-    EXPECT_CALL(*arduinoMock, analogWrite(2, LOW_1_4)).Times(1);
-    EXPECT_TRUE(mq7co.setHeaterVoltage(LOW_1_4));
-    releaseArduinoMock();
-}
-
-TEST_F(MQ7COArduinoTest, test_setHighAndLowVoltageForHeater_failsWithoutInit)
-{
-    MQ7COArduino mq7co(1, 2);
-
-    EXPECT_FALSE(mq7co.setHeaterVoltage(HIGH_5_0));
-    EXPECT_FALSE(mq7co.setHeaterVoltage(LOW_1_4));
-}
-
-TEST_F(MQ7COArduinoTest, test_setHighAndLowVoltageForHeater_failsAfterPINsChange_WithoutInit)
-{
-    ArduinoMock *arduinoMock = arduinoMockInstance();
-    EXPECT_CALL(*arduinoMock, pinMode(_, OUTPUT)).Times(2);
-    MQ7COArduino mq7co(1, 2);
-    mq7co.init();
-
-    EXPECT_CALL(*arduinoMock, millis).Times(2).WillRepeatedly(Return(0));
-    EXPECT_CALL(*arduinoMock, analogWrite(2, HIGH_5_0)).Times(1);
-    EXPECT_TRUE(mq7co.setHeaterVoltage(HIGH_5_0));
-    EXPECT_CALL(*arduinoMock, analogWrite(2, LOW_1_4)).Times(1);
-    EXPECT_TRUE(mq7co.setHeaterVoltage(LOW_1_4));
-
-    mq7co.changeSignalAndHeaterPINs(4, 1);
-    EXPECT_FALSE(mq7co.setHeaterVoltage(HIGH_5_0));
-    EXPECT_FALSE(mq7co.setHeaterVoltage(LOW_1_4));
-    releaseArduinoMock();
-}
-
-TEST_F(MQ7COArduinoTest, test_isInHeatingPhase_WhenHeating_ReturnsTrue)
+TEST_F(MQ7COArduinoTest, test_changeOfPhase_ChangesVoltageAndState)
 {
     ArduinoMock *arduinoMock = arduinoMockInstance();
     EXPECT_CALL(*arduinoMock, pinMode(_, OUTPUT)).Times(2);
@@ -97,209 +56,249 @@ TEST_F(MQ7COArduinoTest, test_isInHeatingPhase_WhenHeating_ReturnsTrue)
 
     EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(1231));
     EXPECT_CALL(*arduinoMock, analogWrite(2, HIGH_5_0)).Times(1);
-    mq7co.setHeaterVoltage(HIGH_5_0);
+    mq7co.setPhase(HEATING);
+    EXPECT_TRUE(mq7co.isInPhase(HEATING));
+    EXPECT_FALSE(mq7co.isInPhase(COOLING));
+    EXPECT_FALSE(mq7co.isInPhase(READING));
 
-    EXPECT_TRUE(mq7co.isInHeatingPhase());
-    EXPECT_FALSE(mq7co.isInCoolingPhase());
-    EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(1231 + 30000));
-    EXPECT_FALSE(mq7co.isPhaseCompleted());
+    EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(7772));
+    EXPECT_CALL(*arduinoMock, analogWrite(2, LOW_1_4)).Times(1);
+    mq7co.setPhase(COOLING);
+    EXPECT_FALSE(mq7co.isInPhase(HEATING));
+    EXPECT_TRUE(mq7co.isInPhase(COOLING));
+    EXPECT_FALSE(mq7co.isInPhase(READING));
+
+    EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(12031));
+    EXPECT_CALL(*arduinoMock, analogWrite(2, LOW_1_4)).Times(1);
+    mq7co.setPhase(READING);
+    EXPECT_FALSE(mq7co.isInPhase(HEATING));
+    EXPECT_FALSE(mq7co.isInPhase(COOLING));
+    EXPECT_TRUE(mq7co.isInPhase(READING));
     releaseArduinoMock();
 }
 
-TEST_F(MQ7COArduinoTest, test_isPhaseCompleted_whenHeatingCompleted_ReturnsTrue)
+TEST_F(MQ7COArduinoTest, test_changeOfPhase_withoutInitFails)
+{
+    MQ7COArduino mq7co(1, 2);
+
+    EXPECT_FALSE(mq7co.setPhase(HEATING));
+    EXPECT_FALSE(mq7co.setPhase(COOLING));
+    EXPECT_FALSE(mq7co.setPhase(READING));
+}
+
+TEST_F(MQ7COArduinoTest, test_isPhaseCompleted_afterInvervalCompletes_ReturnsTrue)
 {
     ArduinoMock *arduinoMock = arduinoMockInstance();
     EXPECT_CALL(*arduinoMock, pinMode(_, OUTPUT)).Times(2);
     MQ7COArduino mq7co(1, 2);
     mq7co.init();
 
+    uint32_t startIntervalMillis = 1223;
+    uint32_t milldeIntervalMillis = 10000;
+    EXPECT_CALL(*arduinoMock, millis).Times(2).WillOnce(Return(startIntervalMillis)).WillOnce(Return(startIntervalMillis + milldeIntervalMillis));
     EXPECT_CALL(*arduinoMock, analogWrite(2, HIGH_5_0)).Times(1);
-    EXPECT_CALL(*arduinoMock, millis).Times(2).WillOnce(Return(1231)).WillOnce(Return(1231 + 30000));
-    mq7co.setHeaterVoltage(HIGH_5_0);
-    EXPECT_TRUE(mq7co.isInHeatingPhase());
-    EXPECT_FALSE(mq7co.isInCoolingPhase());
-    EXPECT_FALSE(mq7co.isPhaseCompleted());
+    mq7co.setPhase(HEATING);
+    EXPECT_FALSE(mq7co.isPhaseCompleted(HEATING));
+    uint32_t endIntervalMillis = 60000;
+    EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(startIntervalMillis + endIntervalMillis));
+    EXPECT_TRUE(mq7co.isPhaseCompleted(HEATING));
 
-    EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(1231 + 30000 + 30000));
-    EXPECT_TRUE(mq7co.isInHeatingPhase());
-    EXPECT_FALSE(mq7co.isInCoolingPhase());
-    EXPECT_TRUE(mq7co.isPhaseCompleted());
+    startIntervalMillis = 107878;
+    milldeIntervalMillis = 35000;
+    EXPECT_CALL(*arduinoMock, millis).Times(2).WillOnce(Return(startIntervalMillis)).WillOnce(Return(startIntervalMillis + milldeIntervalMillis));
+    EXPECT_CALL(*arduinoMock, analogWrite(2, LOW_1_4)).Times(1);
+    mq7co.setPhase(COOLING);
+    EXPECT_FALSE(mq7co.isPhaseCompleted(COOLING));
+    endIntervalMillis = 60000;
+    EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(startIntervalMillis + endIntervalMillis));
+    EXPECT_TRUE(mq7co.isPhaseCompleted(COOLING));
+
+    startIntervalMillis = 71251878;
+    milldeIntervalMillis = 28000;
+    EXPECT_CALL(*arduinoMock, millis).Times(2).WillOnce(Return(startIntervalMillis)).WillOnce(Return(startIntervalMillis + milldeIntervalMillis));
+    EXPECT_CALL(*arduinoMock, analogWrite(2, LOW_1_4)).Times(1);
+    mq7co.setPhase(READING);
+    EXPECT_FALSE(mq7co.isPhaseCompleted(READING));
+    endIntervalMillis = 30000;
+    EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(startIntervalMillis + endIntervalMillis));
+    EXPECT_TRUE(mq7co.isPhaseCompleted(READING));
     releaseArduinoMock();
 }
 
-TEST_F(MQ7COArduinoTest, test_isPhaseCompleted_whenHeatingCompleted_ReturnsTrue_OnMillisOverflow)
+TEST_F(MQ7COArduinoTest, test_isPhaseCompleted_OnMillisOverflow_ReturnsTrue)
 {
     ArduinoMock *arduinoMock = arduinoMockInstance();
     EXPECT_CALL(*arduinoMock, pinMode(_, OUTPUT)).Times(2);
-    EXPECT_CALL(*arduinoMock, analogWrite(2, HIGH_5_0)).Times(1);
     MQ7COArduino mq7co(1, 2);
     mq7co.init();
 
     uint32_t superLargeStartMillis = UINT32_MAX - 1000;
     uint32_t interimMillisAfterOverflowUINT = 29000;
     EXPECT_CALL(*arduinoMock, millis).Times(2).WillOnce(Return(superLargeStartMillis)).WillOnce(Return(interimMillisAfterOverflowUINT));
-    mq7co.setHeaterVoltage(HIGH_5_0);
-    EXPECT_TRUE(mq7co.isInHeatingPhase());
-    EXPECT_FALSE(mq7co.isInCoolingPhase());
-    EXPECT_FALSE(mq7co.isPhaseCompleted());
+    EXPECT_CALL(*arduinoMock, analogWrite(2, HIGH_5_0)).Times(1);
+    mq7co.setPhase(HEATING);
+    EXPECT_TRUE(mq7co.isInPhase(HEATING));
+    EXPECT_FALSE(mq7co.isInPhase(COOLING));
+    EXPECT_FALSE(mq7co.isPhaseCompleted(HEATING));
 
     interimMillisAfterOverflowUINT = 59000;
     EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(interimMillisAfterOverflowUINT));
-    EXPECT_TRUE(mq7co.isInHeatingPhase());
-    EXPECT_FALSE(mq7co.isInCoolingPhase());
-    EXPECT_TRUE(mq7co.isPhaseCompleted());
+    EXPECT_TRUE(mq7co.isInPhase(HEATING));
+    EXPECT_FALSE(mq7co.isInPhase(COOLING));
+    EXPECT_TRUE(mq7co.isPhaseCompleted(HEATING));
     releaseArduinoMock();
 }
 
-TEST_F(MQ7COArduinoTest, test_isPhaseCompleted_whenCoolingCompleted_ReturnsTrue_OnMillisOverflow_atUINT32Boundary)
+TEST_F(MQ7COArduinoTest, test_isPhaseCompleted_OnMillisOverflow_atUINT32Boundary_ReturnsTrue)
 {
     ArduinoMock *arduinoMock = arduinoMockInstance();
     EXPECT_CALL(*arduinoMock, pinMode(_, OUTPUT)).Times(2);
-    EXPECT_CALL(*arduinoMock, analogWrite(2, LOW_1_4)).Times(1);
     MQ7COArduino mq7co(1, 2);
     mq7co.init();
 
     uint32_t superLargeStartMillis = UINT32_MAX;
     uint32_t interimMillisAfterOverflowUINT = 59998;
     EXPECT_CALL(*arduinoMock, millis).Times(2).WillOnce(Return(superLargeStartMillis)).WillOnce(Return(interimMillisAfterOverflowUINT));
-    mq7co.setHeaterVoltage(LOW_1_4);
-    EXPECT_TRUE(mq7co.isInCoolingPhase());
-    EXPECT_FALSE(mq7co.isInHeatingPhase());
-    EXPECT_FALSE(mq7co.isPhaseCompleted());
+    EXPECT_CALL(*arduinoMock, analogWrite(2, LOW_1_4)).Times(1);
+    mq7co.setPhase(COOLING);
+    EXPECT_TRUE(mq7co.isInPhase(COOLING));
+    EXPECT_FALSE(mq7co.isInPhase(HEATING));
+    EXPECT_FALSE(mq7co.isPhaseCompleted(COOLING));
 
     interimMillisAfterOverflowUINT = 59999;
     EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(interimMillisAfterOverflowUINT));
-    EXPECT_TRUE(mq7co.isInCoolingPhase());
-    EXPECT_FALSE(mq7co.isInHeatingPhase());
-    EXPECT_TRUE(mq7co.isPhaseCompleted());
+    EXPECT_TRUE(mq7co.isInPhase(COOLING));
+    EXPECT_FALSE(mq7co.isInPhase(HEATING));
+    EXPECT_TRUE(mq7co.isPhaseCompleted(COOLING));
     releaseArduinoMock();
 }
 
-TEST_F(MQ7COArduinoTest, test_isInCoolingPhase_WhenCooling_ReturnsTrue)
+TEST_F(MQ7COArduinoTest, test_readSensorValue_outsideReadingPhase_ReturnsFalse)
 {
     ArduinoMock *arduinoMock = arduinoMockInstance();
     EXPECT_CALL(*arduinoMock, pinMode(_, OUTPUT)).Times(2);
     MQ7COArduino mq7co(1, 2);
     mq7co.init();
 
-    EXPECT_CALL(*arduinoMock, analogWrite(2, LOW_1_4)).Times(1);
     EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(1231));
-    mq7co.setHeaterVoltage(LOW_1_4);
+    EXPECT_CALL(*arduinoMock, analogWrite(2, HIGH_5_0)).Times(1);
+    mq7co.setPhase(HEATING);
+    EXPECT_TRUE(mq7co.isInPhase(HEATING));
+    EXPECT_FALSE(mq7co.isInPhase(READING));
+    EXPECT_FALSE(mq7co.readNextMeasurement());
 
-    EXPECT_TRUE(mq7co.isInCoolingPhase());
-    EXPECT_FALSE(mq7co.isInHeatingPhase());
-    EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(1231 + 59500));
-    EXPECT_FALSE(mq7co.isPhaseCompleted());
-    releaseArduinoMock();
-}
-
-TEST_F(MQ7COArduinoTest, test_isPhaseCompleted_whenCoolingCompleted_ReturnsTrue)
-{
-    ArduinoMock *arduinoMock = arduinoMockInstance();
-    EXPECT_CALL(*arduinoMock, pinMode(_, OUTPUT)).Times(2);
-    MQ7COArduino mq7co(1, 2);
-    mq7co.init();
-
-    EXPECT_CALL(*arduinoMock, analogWrite(2, LOW_1_4)).Times(1);
-    EXPECT_CALL(*arduinoMock, millis).Times(2).WillOnce(Return(1231)).WillOnce(Return(1231 + 30000));
-    mq7co.setHeaterVoltage(LOW_1_4);
-    EXPECT_TRUE(mq7co.isInCoolingPhase());
-    EXPECT_FALSE(mq7co.isInHeatingPhase());
-    EXPECT_FALSE(mq7co.isPhaseCompleted());
-
-    EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(1231 + 30000 + 30000));
-    EXPECT_TRUE(mq7co.isInCoolingPhase());
-    EXPECT_FALSE(mq7co.isInHeatingPhase());
-    EXPECT_TRUE(mq7co.isPhaseCompleted());
-    releaseArduinoMock();
-}
-
-TEST_F(MQ7COArduinoTest, test_isInReadingPhase_whenLowVoltage_AfterCoolingDown_ReturnsTrue)
-{
-    ArduinoMock *arduinoMock = arduinoMockInstance();
-    EXPECT_CALL(*arduinoMock, pinMode(_, OUTPUT)).Times(2);
-    MQ7COArduino mq7co(1, 2);
-    mq7co.init();
-
-    EXPECT_CALL(*arduinoMock, analogWrite(2, LOW_1_4)).Times(1);
     EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(1231));
-    mq7co.setHeaterVoltage(LOW_1_4);
-
-    EXPECT_TRUE(mq7co.isInCoolingPhase());
-    EXPECT_FALSE(mq7co.isInHeatingPhase());
-    EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(1231 + 37500));
-    EXPECT_FALSE(mq7co.isPhaseCompleted());
-
-    EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(1231 + 60000));
-    EXPECT_TRUE(mq7co.isPhaseCompleted());
-
-    EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(1231 + 60010));
-    bool result = mq7co.readMeasurement();
-    EXPECT_TRUE(mq7co.isInReadingPhase());
-    EXPECT_FALSE(mq7co.isInCoolingPhase());
-    EXPECT_FALSE(mq7co.isInHeatingPhase());
-    EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(1231 + 60010 + 15000));
-    EXPECT_FALSE(mq7co.isPhaseCompleted());
-
-    result = mq7co.readMeasurement();
-    EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(1231 + 60010 + 30000));
-    EXPECT_TRUE(mq7co.isInReadingPhase());
-    EXPECT_TRUE(mq7co.isPhaseCompleted());
-
+    EXPECT_CALL(*arduinoMock, analogWrite(2, LOW_1_4)).Times(1);
+    mq7co.setPhase(COOLING);
+    EXPECT_TRUE(mq7co.isInPhase(COOLING));
+    EXPECT_FALSE(mq7co.isInPhase(READING));
+    EXPECT_FALSE(mq7co.readNextMeasurement());
     releaseArduinoMock();
 }
 
-// TEST_F(MQ7COArduinoTest, test_requestNewMeasurement_AfterInit_ReturnsTrue)
-// {
-//     ArduinoMock *arduinoMock = arduinoMockInstance();
-//     EXPECT_CALL(*arduinoMock, pinMode(_, OUTPUT)).Times(2);
-//     EXPECT_CALL(*arduinoMock, analogWrite(2, HIGH_5_0)).Times(1);
-//     EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(6000));
+TEST_F(MQ7COArduinoTest, test_readSensorValue_inReadingPhase_savesValues)
+{
+    ArduinoMock *arduinoMock = arduinoMockInstance();
+    EXPECT_CALL(*arduinoMock, pinMode(_, OUTPUT)).Times(2);
+    MQ7COArduino mq7co(1, 2);
+    mq7co.init();
 
-//     MQ7COArduino mq7co(1, 2);
-//     mq7co.init();
+    EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(1231));
+    EXPECT_CALL(*arduinoMock, analogWrite(2, LOW_1_4)).Times(1);
+    mq7co.setPhase(READING);
+    EXPECT_TRUE(mq7co.isInPhase(READING));
 
-//     EXPECT_TRUE(mq7co.requestNewMeasurement());
-//     bool result = mq7co.isInHeatingPhase();
-//     EXPECT_TRUE(result);
-//     EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(6000 + 60000));
-//     mq7co.requestNewMeasurement();
-//     result = mq7co.isPhaseCompleted(HEATING_INTERVAL);
-//     EXPECT_TRUE(result);
-//     EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(6000 + 60000 + 90000));
-//     mq7co.requestNewMeasurement();
-//     result = mq7co.isPhaseCompleted(COOLING_INTERVAL);
-//     EXPECT_TRUE(result);
-//     EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(6000 + 60000 + 90000 + 45000));
-//     mq7co.requestNewMeasurement();
-//     result = mq7co.isPhaseCompleted(READING_INTERVAL);
-//     EXPECT_TRUE(result);
+    EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(7500));
+    EXPECT_CALL(*arduinoMock, analogRead(1)).Times(1).WillOnce(Return(155));
+    EXPECT_TRUE(mq7co.readNextMeasurement());
+    releaseArduinoMock();
+}
 
-//     releaseArduinoMock();
-// }
+TEST_F(MQ7COArduinoTest, test_readSensorValue_afterReadingPhase_savesAverageValue)
+{
+    ArduinoMock *arduinoMock = arduinoMockInstance();
+    EXPECT_CALL(*arduinoMock, pinMode(_, OUTPUT)).Times(2);
+    MQ7COArduino mq7co(1, 2);
+    mq7co.init();
 
-// TEST_F(MQ7COArduinoTest, test_requestNewMeasurement_WithoutInit_ReturnsFalse)
-// {
-//     MQ7COArduino mq7co(1, 2);
-//     EXPECT_FALSE(mq7co.requestNewMeasurement());
+    uint32_t startIntervalMillis = 12300;
+    EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(startIntervalMillis));
+    EXPECT_CALL(*arduinoMock, analogWrite(2, LOW_1_4)).Times(1);
+    mq7co.setPhase(READING);
+    uint32_t incrementIntervalMillis = 0;
+    uint16_t nextLoopMillis = 3000;
+    for (int i = 0; i < 10; i++)
+    {
+        EXPECT_CALL(*arduinoMock, analogRead(1)).Times(1).WillOnce(Return(155 + i));
+        EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(startIntervalMillis + incrementIntervalMillis));
+        EXPECT_TRUE(mq7co.readNextMeasurement());
+        EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(startIntervalMillis + incrementIntervalMillis));
+        EXPECT_FALSE(mq7co.saveAverageMeasurement());
+        EXPECT_EQ(mq7co.getCurrentMeasurementByID(), -1);
+        incrementIntervalMillis += nextLoopMillis;
+    }
+    EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(startIntervalMillis + incrementIntervalMillis));
+    EXPECT_TRUE(mq7co.saveAverageMeasurement());
+    EXPECT_EQ(mq7co.getCurrentMeasurementByID(), 159);
+    releaseArduinoMock();
+}
 
-//     MQ7COArduino mq7;
-//     mq7.init();
-//     EXPECT_FALSE(mq7.requestNewMeasurement());
-// }
+TEST_F(MQ7COArduinoTest, test_readSensorValue_ifReadingInterval_IsLessThan3sec_skipReading)
+{
+    ArduinoMock *arduinoMock = arduinoMockInstance();
+    EXPECT_CALL(*arduinoMock, pinMode(_, OUTPUT)).Times(2);
+    MQ7COArduino mq7co(1, 2);
+    mq7co.init();
 
-// TEST_F(MQ7COArduinoTest, test_requestNewMeasurement_AfterPINsChangeWithoutInit_ReturnsFalse)
-// {
-//     ArduinoMock *arduinoMock = arduinoMockInstance();
-//     EXPECT_CALL(*arduinoMock, pinMode(_, OUTPUT)).Times(2);
+    uint32_t startIntervalMillis = 8500;
+    EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(startIntervalMillis));
+    EXPECT_CALL(*arduinoMock, analogWrite(2, LOW_1_4)).Times(1);
+    mq7co.setPhase(READING);
+    uint32_t incrementIntervalMillis = 0;
+    uint16_t nextLoopMillis = 1000;
+    for (int i = 0; i < 30; i++)
+    {
+        EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(startIntervalMillis + incrementIntervalMillis));
+        EXPECT_CALL(*arduinoMock, analogRead(1)).Times(AtLeast(0)).WillRepeatedly(Return(155 + i));
+        mq7co.readNextMeasurement();
+        EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(startIntervalMillis + incrementIntervalMillis));
+        EXPECT_FALSE(mq7co.saveAverageMeasurement());
+        EXPECT_EQ(mq7co.getCurrentMeasurementByID(), -1);
+        incrementIntervalMillis += nextLoopMillis;
+    }
+    EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(startIntervalMillis + incrementIntervalMillis));
+    EXPECT_TRUE(mq7co.saveAverageMeasurement());
+    EXPECT_EQ(mq7co.getCurrentMeasurementByID(), 168);
+    releaseArduinoMock();
+}
 
-//     MQ7COArduino mq7co(1, 2);
-//     mq7co.init();
-//     EXPECT_TRUE(mq7co.requestNewMeasurement());
+TEST_F(MQ7COArduinoTest, test_getCurrentMeasurementByID_WithoutInit_ReturnsMinusOne)
+{
+    MQ7COArduino mq7co(1, 2);
+    EXPECT_EQ(mq7co.getCurrentMeasurementByID(), -1);
+}
 
-//     mq7co.changeSignalAndHeaterPINs(7, 14);
-//     EXPECT_CALL(*arduinoMock, pinMode(_, OUTPUT)).Times(0);
-//     EXPECT_FALSE(mq7co.requestNewMeasurement());
+TEST_F(MQ7COArduinoTest, test_fullCycle_savesAverage)
+{
+    ArduinoMock *arduinoMock = arduinoMockInstance();
+    EXPECT_CALL(*arduinoMock, pinMode(_, OUTPUT)).Times(2);
+    MQ7COArduino mq7co(1, 2);
+    mq7co.init();
+    uint32_t startIntervalMillis = 8500;
+    EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(startIntervalMillis));
+    EXPECT_CALL(*arduinoMock, analogWrite(2, HIGH_5_0)).Times(AtLeast(1));
+    mq7co.setPhase(HEATING);
 
-//     releaseArduinoMock();
-// }
+    EXPECT_CALL(*arduinoMock, analogWrite(2, LOW_1_4)).Times(2);
+    uint32_t incrementIntervalMillis = 0;
+    uint16_t nextLoopMillis = 3000;
+    for (int i = 0; i < 60; i++)
+    {
+        EXPECT_CALL(*arduinoMock, millis).Times(AtLeast(0)).WillRepeatedly(Return(startIntervalMillis + incrementIntervalMillis));
+        EXPECT_CALL(*arduinoMock, analogRead(1)).Times(AtLeast(0)).WillRepeatedly(Return(155 + i));
+        mq7co.requestCurrentMeasurement();
+        incrementIntervalMillis += nextLoopMillis;
+    }
+    EXPECT_EQ(mq7co.getCurrentMeasurementByID(), 199);
+    releaseArduinoMock();
+}

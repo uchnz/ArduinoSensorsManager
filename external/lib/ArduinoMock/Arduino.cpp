@@ -28,13 +28,14 @@ void analogWrite(uint8_t pin, uint8_t value)
     arduinoMock->analogWrite(pin, value);
 }
 
+int analogRead(uint8_t pin)
+{
+    assert(arduinoMock != NULL);
+    return arduinoMock->analogRead(pin);
+}
+
 uint32_t millis()
 {
     assert(arduinoMock != NULL);
     return arduinoMock->millis();
-}
-
-int analogRead(uint8_t)
-{
-    return -1;
 }

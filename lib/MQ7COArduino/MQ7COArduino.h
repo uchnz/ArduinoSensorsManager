@@ -7,11 +7,13 @@ enum VOLTAGE
     HIGH_5_0 = 255,
     LOW_1_4 = 72
 };
-enum CYCLE_INTERVALS
+
+enum PHASES
 {
-    HEATING_INTERVAL = 60000,
-    COOLING_INTERVAL = 60000,
-    READING_INTERVAL = 30000
+    NONE = 0,
+    HEATING = 59999, // phases should be different in milliseconds, otherwise
+    COOLING = 60000, // comparing different phases won't work for isInPhase()
+    READING = 30000
 };
 
 class MQ7COArduino : public ISensor
@@ -19,14 +21,19 @@ class MQ7COArduino : public ISensor
 private:
     uint8_t _signalPIN;
     uint8_t _signalHeaterPIN;
-    bool _initCompleted;
+    bool _sensorInitCompleted;
     uint32_t _phaseStartedMls;
-    bool _heatingPhaseRunning;
-    bool _coolingPhaseRunning;
-    bool _readingPhaseRunning;
+    PHASES _currentPhase;
+    int _valueArray[10];
+    uint8_t _currentSavingItemInArray;
+    uint32_t _previusReadingMillis;
+    int _averageofAllMeasuredValues;
+    uint32_t _nextReadIntervalMillis;
 
-    void setHeaterPhase(VOLTAGE voltage);
-    bool isOutsideMillisInterval(CYCLE_INTERVALS interval, uint32_t delta);
+    bool isOutsideMillisInterval(PHASES phase, uint32_t delta);
+    void setHeatingVoltageForPhase(PHASES phase);
+    bool isReadyToReadNextMeasurement(uint32_t now);
+    int calculateAverageOfAllMeasurements();
 
 public:
     MQ7COArduino();
@@ -34,16 +41,13 @@ public:
     void changeSignalAndHeaterPINs(uint8_t signalPIN, uint8_t signalHeaterPIN);
     bool init();
 
+    bool isPhaseCompleted(PHASES phase);
+    bool isInPhase(PHASES phase);
+    bool setPhase(PHASES phase);
+    bool readNextMeasurement();
+    bool saveAverageMeasurement();
+
     void requestCurrentMeasurement() override;
-    bool requestNewMeasurement();
-    bool isPhaseCompleted();
-    bool isInHeatingPhase();
-    bool isInCoolingPhase();
-    bool isInReadingPhase();
-    bool readMeasurement();
-
-    bool setHeaterVoltage(VOLTAGE voltage);
-
     uint8_t getNumberOfConnectedSensors() override;
     float getCurrentMeasurementByID(uint8_t id = 0) override;
 };

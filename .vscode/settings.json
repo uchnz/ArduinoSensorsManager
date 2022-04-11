@@ -41,5 +41,7 @@
         "utility": "cpp",
         "variant": "cpp"
     },
-    "gtest-adapter.debugConfig": "PIO Debug"
+    "gtest-adapter.debugConfig": [
+        "PIO Debug"
+    ]
 }
