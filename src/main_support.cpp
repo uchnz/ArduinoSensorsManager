@@ -58,9 +58,10 @@ void initFloatArduinoSensor(FloatArduino &fl)
 //*** LOOP HELPERS ***//
 bool isItTimeToParse(uint64_t millisPassedSinceLastParse, const uint16_t scanInterval)
 {
-    uint64_t millisNow = millis(); // don't inline millis() into abs() - see Notes and Warnings for abs() in Arduino HELP for details
-    if (abs(millisNow - millisPassedSinceLastParse) > scanInterval)
+    uint64_t millisNow = millis();
+    if ((millisNow - millisPassedSinceLastParse) > scanInterval)
         return true;
+
     return false;
 }
 //*** END LOOP HELPERS ***//

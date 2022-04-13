@@ -28,7 +28,7 @@ void setup()
     InitDallasSensor(dallasModule1);
     InitDallasSensor(dallasModule2);
     moisureR1.init();
-    mq7co.init();
+    InitMQ7COSensor(mq7co);
     rd.init();
     sensorsManager.initSenorsOnAllPINs(d_array, totalSensorPorts);
     sensorsManager.setAddressesToSendMeasurementsTo(addressesToSendTo, totalSensorPorts);
@@ -38,51 +38,16 @@ void setup()
 
 uint64_t millisPassedSinceLastParse = 0;
 const uint16_t scanInterval = 3000;
+uint64_t i = 0;
 void loop()
 {
-    printf("Heating Started on: %ld", millis());
-    analogWrite(7, 255);
-    for (uint8_t i = 0; i < 60; i++)
-    {
-        printf(".");
-        delay(1000);
-    }
-    printf("\nHeating ended on: %ld\n", millis());
+    mq7co.requestCurrentMeasurement();
+    if (!isItTimeToParse(millisPassedSinceLastParse, scanInterval))
+        return;
 
-    printf("Cooling Started on: %ld", millis());
-    analogWrite(7, 72);
-    for (uint8_t i = 0; i < 45; i++)
-    {
-        printf(".");
-        delay(1000);
-    }
-    printf("\nCooling in the middle...: %ld\n", millis());
-
-    printf("Start reading sensor data: ");
-    uint16_t num = mq7co.getCurrentMeasurementByID();
-    for (uint8_t i = 0; i < 9; i++)
-    {
-        uint16_t nextVal = mq7co.getCurrentMeasurementByID();
-        printf("(%d)", nextVal);
-        num += nextVal;
-        delay(4500);
-    }
-    printf("\nStop reading sensor data\n");
-    printf("Sum of 9 measurements = %d\n", num);
-    printf("Current average mq7 = %d\n", num / 10);
-    printf("Colling ended on: %ld\n\n", millis());
-
-    // num = rd.getCurrentMeasurementByID();
-    // printf("current rd = %.0f\n", num);
-    // num = floatSensor.getCurrentMeasurementByID();
-    // printf("current float = %.0f\n", num);
-    // delay(1000);
-
-    // if (!isItTimeToParse(millisPassedSinceLastParse, scanInterval))
-    //     return;
+    printf("mq7: %2f\n", mq7co.getCurrentMeasurementByID());
 
     // sensorsManager.refreshSensorsData2D();
     // sensorsManager.sendSensorsData2D();
-
-    // millisPassedSinceLastParse = millis();
+    millisPassedSinceLastParse = millis();
 }

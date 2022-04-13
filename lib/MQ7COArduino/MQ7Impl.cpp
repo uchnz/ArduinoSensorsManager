@@ -1,5 +1,4 @@
 #include <MQ7Impl.h>
-#include <Arduino.h>
 
 MQ7Impl::MQ7Impl()
 {
