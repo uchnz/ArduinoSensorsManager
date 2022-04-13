@@ -8,16 +8,15 @@ enum VOLTAGE
     LOW_1_4 = 72
 };
 
-enum PHASES
-{
-    NONE = 0,
-    HEATING = 59999, // phases should be different in milliseconds, otherwise
-    COOLING = 60000, // comparing different phases won't work for isInPhase()
-    READING = 30000
-};
+// enum PHASES
+// {
+//     NONE = 0,
+//     HEATING = 59999, // phases should be different in milliseconds, otherwise
+//     COOLING = 60000, // comparing different phases won't work for isInPhase()
+//     READING = 30000
+// };
 
 #define NUMBER_OF_MEASUREMENTS 10
-#define READING_INTERVAL 3000
 #define UNINITIALIZED_MEASUREMENT_VALUE -1
 #define NUMBER_OF_SENSORS_ON_BUS 1
 
@@ -38,9 +37,10 @@ private:
     int _averageOfAllMeasuredValues;
 
     // bool isOutsideMillisInterval(PHASES phase, uint32_t delta);
-    void setHeaterVoltageForPhase(PHASES phase);
+    // void setHeaterVoltageForPhase(PHASES phase);
+    void setHeaterVoltageForPhase(VOLTAGE voltage);
     // bool isReadyToReadNextMeasurement(uint32_t now);
-    int calculateAverageOfAllMeasurements();
+    // int calculateAverageOfAllMeasurements();
     void readNextMeasurement_new();
     void saveAverageMeasurement();
 

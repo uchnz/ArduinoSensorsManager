@@ -1,66 +1,67 @@
 #include <MQ7COArduino.h>
 #include <Arduino.h>
+#include <MQ7Impl.h>
 
-class MQ7Impl
-{
-private:
-    uint32_t _phaseStartedMls;
-    PHASES _currentPhase;
-    uint32_t _previusReadingMillis;
+// class MQ7Impl
+// {
+// private:
+//     uint32_t _phaseStartedMls;
+//     PHASES _currentPhase;
+//     uint32_t _previusReadingMillis;
 
-    bool isOutsideMillisInterval(PHASES phase, uint32_t delta);
+//     bool isOutsideMillisInterval(PHASES phase, uint32_t delta);
 
-public:
-    MQ7Impl();
+// public:
+//     MQ7Impl();
 
-    bool setPhase(PHASES phase);
-    bool isInPhase(PHASES phase);
-    bool isPhaseCompleted(PHASES phase);
-    bool isTimeToReadMeasurement();
-};
+//     bool setPhase(PHASES phase);
+//     bool isInPhase(PHASES phase);
+//     bool isPhaseCompleted(PHASES phase);
+//     bool isTimeToReadMeasurement();
+// };
 
-MQ7Impl::MQ7Impl()
-{
-    _phaseStartedMls = 0;
-    _currentPhase = NONE;
-    _previusReadingMillis = 0;
-}
+// MQ7Impl::MQ7Impl()
+// {
+//     _phaseStartedMls = 0;
+//     _currentPhase = NONE;
+//     _previusReadingMillis = 0;
+// }
 
-bool MQ7Impl::setPhase(PHASES phase)
-{
-    _phaseStartedMls = millis();
-    _currentPhase = phase;
+// bool MQ7Impl::setPhase(PHASES phase)
+// {
+//     _phaseStartedMls = millis();
+//     _currentPhase = phase;
 
-    return true;
-}
+//     return true;
+// }
 
-bool MQ7Impl::isInPhase(PHASES phase)
-{
-    return _currentPhase == phase;
-}
+// bool MQ7Impl::isInPhase(PHASES phase)
+// {
+//     return _currentPhase == phase;
+// }
 
-bool MQ7Impl::isOutsideMillisInterval(PHASES phase, uint32_t delta)
-{
-    return phase <= delta;
-}
-bool MQ7Impl::isPhaseCompleted(PHASES phase)
-{
-    uint32_t now = millis();
-    uint32_t delta = now - _phaseStartedMls;
+// bool MQ7Impl::isOutsideMillisInterval(PHASES phase, uint32_t delta)
+// {
+//     return phase <= delta;
+// }
+// bool MQ7Impl::isPhaseCompleted(PHASES phase)
+// {
+//     uint32_t now = millis();
+//     uint32_t delta = now - _phaseStartedMls;
 
-    return isOutsideMillisInterval(phase, delta);
-}
+//     return isOutsideMillisInterval(phase, delta);
+// }
 
-bool MQ7Impl::isTimeToReadMeasurement()
-{
-    uint32_t now = millis();
-    if (now - _previusReadingMillis < READING_INTERVAL)
-        return false;
+// bool MQ7Impl::isTimeToReadMeasurement()
+// {
+//     uint32_t now = millis();
+//     if (now - _previusReadingMillis < READING_INTERVAL)
+//         return false;
 
-    _previusReadingMillis = now;
+//     _previusReadingMillis = now;
 
-    return true;
-}
+//     return true;
+// }
 
 ///////////////////////////////////
 
@@ -103,7 +104,8 @@ bool MQ7COArduino::init_new()
     pinMode(_signalHeaterPIN, OUTPUT);
     _sensorInitCompleted = true;
     _pimpl->setPhase(HEATING);
-    setHeaterVoltageForPhase(HEATING);
+    setHeaterVoltageForPhase(HIGH_5_0);
+    // setHeaterVoltageForPhase(HEATING);
 
     return true;
 }
@@ -123,9 +125,12 @@ bool MQ7COArduino::init_new()
 // {
 //     analogWrite(_signalHeaterPIN, phase == HEATING ? HIGH_5_0 : LOW_1_4);
 // }
-void MQ7COArduino::setHeaterVoltageForPhase(PHASES phase)
+
+// void MQ7COArduino::setHeaterVoltageForPhase(PHASES phase)
+void MQ7COArduino::setHeaterVoltageForPhase(VOLTAGE voltage)
 {
-    analogWrite(_signalHeaterPIN, phase == HEATING ? HIGH_5_0 : LOW_1_4);
+    analogWrite(_signalHeaterPIN, voltage);
+    // analogWrite(_signalHeaterPIN, phase == HEATING ? HIGH_5_0 : LOW_1_4);
 }
 // bool MQ7COArduino::setPhase(PHASES phase)
 // {
@@ -251,7 +256,8 @@ void MQ7COArduino::requestCurrentMeasurement_new()
         if (!_pimpl->isPhaseCompleted(HEATING))
             return;
         _pimpl->setPhase(COOLING);
-        setHeaterVoltageForPhase(COOLING);
+        //        setHeaterVoltageForPhase(COOLING);
+        setHeaterVoltageForPhase(LOW_1_4);
     }
     if (_pimpl->isInPhase(COOLING))
     {
@@ -269,5 +275,6 @@ void MQ7COArduino::requestCurrentMeasurement_new()
         saveAverageMeasurement();
     }
     _pimpl->setPhase(HEATING);
-    setHeaterVoltageForPhase(HEATING);
+    // setHeaterVoltageForPhase(HEATING);
+    setHeaterVoltageForPhase(HIGH_5_0);
 }

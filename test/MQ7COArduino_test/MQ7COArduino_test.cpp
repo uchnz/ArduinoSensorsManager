@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include <MQ7COArduino.h>
 #include <MQ7COArduino.cpp>
+#include <MQ7Impl.h>
 
 using ::testing::_;
 using ::testing::AtLeast;
