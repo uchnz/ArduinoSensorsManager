@@ -15,10 +15,10 @@ class ArduinoMock
 public:
     ArduinoMock(){};
 
-    MOCK_METHOD2(pinMode, void(uint8_t, uint8_t));
-    MOCK_METHOD2(analogWrite, void(uint8_t, uint8_t));
-    MOCK_METHOD1(analogRead, int(uint8_t));
-    MOCK_METHOD0(millis, uint32_t());
+    MOCK_METHOD(void, pinMode, (uint8_t, uint8_t));
+    MOCK_METHOD(void, analogWrite, (uint8_t, uint8_t));
+    MOCK_METHOD(int, analogRead, (uint8_t));
+    MOCK_METHOD(uint32_t, millis, ());
 };
 
 ArduinoMock *arduinoMockInstance();

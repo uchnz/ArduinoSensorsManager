@@ -7,3 +7,7 @@ protected:
     {
     }
 };
+
+class MockMQ7Impl : public ::testing::Test
+{
+};
