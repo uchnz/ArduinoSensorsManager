@@ -7,10 +7,10 @@ void MQ7COArduino::changeSignalAndHeaterPINs(uint8_t signalPIN, uint8_t signalHe
     _signalHeaterPIN = signalHeaterPIN;
     _sensorInitCompleted = false;
     _currentSavingItemInArray = 0;
-    _averageOfAllMeasuredValues = UNINITIALIZED_MEASUREMENT_VALUE;
+    _averageOfAllMeasuredValues = mq7co_nm::UNINITIALIZED_MEASUREMENT_VALUE;
 
-    for (uint8_t i = 0; i < NUMBER_OF_MEASUREMENTS; i++)
-        _valueArray[i] = UNINITIALIZED_MEASUREMENT_VALUE;
+    for (uint8_t i = 0; i < mq7co_nm::NUMBER_OF_MEASUREMENTS; i++)
+        _valueArray[i] = mq7co_nm::UNINITIALIZED_MEASUREMENT_VALUE;
 }
 
 MQ7COArduino::~MQ7COArduino()
@@ -28,7 +28,7 @@ MQ7COArduino::MQ7COArduino(uint8_t signalPIN, uint8_t signalHeaterPIN)
     changeSignalAndHeaterPINs(signalPIN, signalHeaterPIN);
 }
 
-bool MQ7COArduino::init()
+bool MQ7COArduino::init(uint16_t ReadInterval)
 {
     if (_signalPIN == _signalHeaterPIN)
         return false;
@@ -36,19 +36,20 @@ bool MQ7COArduino::init()
     pinMode(_signalPIN, OUTPUT);
     pinMode(_signalHeaterPIN, OUTPUT);
     _sensorInitCompleted = true;
-    _pimpl->setPhase(HEATING);
-    setHeaterVoltageForPhase(HIGH_5_0);
+    _pimpl->resetOnInit(ReadInterval);
+    _pimpl->setPhase(mq7impl::HEATING);
+    setHeaterVoltageForPhase(mq7co_nm::HIGH_5_0);
 
     return true;
 }
-void MQ7COArduino::setHeaterVoltageForPhase(VOLTAGE voltage)
+void MQ7COArduino::setHeaterVoltageForPhase(mq7co_nm::VOLTAGE voltage)
 {
     analogWrite(_signalHeaterPIN, voltage);
 }
 
 void MQ7COArduino::readNextMeasurement()
 {
-    if (_currentSavingItemInArray < NUMBER_OF_MEASUREMENTS)
+    if (_currentSavingItemInArray < mq7co_nm::NUMBER_OF_MEASUREMENTS)
         _valueArray[_currentSavingItemInArray++] = analogRead(_signalPIN);
 }
 
@@ -67,7 +68,7 @@ void MQ7COArduino::saveAverageMeasurement()
 
 uint8_t MQ7COArduino::getNumberOfConnectedSensors()
 {
-    return NUMBER_OF_SENSORS_ON_BUS;
+    return mq7co_nm::NUMBER_OF_SENSORS_ON_BUS;
 }
 
 float MQ7COArduino::getCurrentMeasurementByID(uint8_t id)
@@ -80,29 +81,29 @@ void MQ7COArduino::requestCurrentMeasurement()
     if (!_sensorInitCompleted)
         return;
 
-    if (_pimpl->isInPhase(HEATING))
+    if (_pimpl->isInPhase(mq7impl::HEATING))
     {
-        if (!_pimpl->isPhaseCompleted(HEATING))
+        if (!_pimpl->isPhaseCompleted(mq7impl::HEATING))
             return;
-        _pimpl->setPhase(COOLING);
-        setHeaterVoltageForPhase(LOW_1_4);
+        _pimpl->setPhase(mq7impl::COOLING);
+        setHeaterVoltageForPhase(mq7co_nm::LOW_1_4);
     }
-    if (_pimpl->isInPhase(COOLING))
+    if (_pimpl->isInPhase(mq7impl::COOLING))
     {
-        if (!_pimpl->isPhaseCompleted(COOLING))
+        if (!_pimpl->isPhaseCompleted(mq7impl::COOLING))
             return;
-        _pimpl->setPhase(READING);
+        _pimpl->setPhase(mq7impl::READING);
     }
-    if (_pimpl->isInPhase(READING))
+    if (_pimpl->isInPhase(mq7impl::READING))
     {
         if (!_pimpl->isTimeToReadMeasurement())
             return;
         readNextMeasurement();
-        if (!_pimpl->isPhaseCompleted(READING))
+        if (!_pimpl->isPhaseCompleted(mq7impl::READING))
             return;
         saveAverageMeasurement();
         resetArrayCounter();
     }
-    _pimpl->setPhase(HEATING);
-    setHeaterVoltageForPhase(HIGH_5_0);
+    _pimpl->setPhase(mq7impl::HEATING);
+    setHeaterVoltageForPhase(mq7co_nm::HIGH_5_0);
 }

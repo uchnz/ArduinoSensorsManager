@@ -3,9 +3,10 @@
 #include <EthArduino.h>
 #include <MQTTArduino.h>
 #include <DallasArduino.h>
-#include <MoisureRArduino.h>
+// #include <MoisureRArduino.h>
+#include <SASArduino.h>
 #include <MQ7COArduino.h>
-#include <RaindropsArduino.h>
+// #include <RaindropsArduino.h>
 #include <FloatArduino.h>
 #include <SensorManager.h>
 
@@ -14,9 +15,10 @@ void initSystemParameters();
 void initNetworkCard(EthArduino &eth);
 void initConnectionToMQTTBroker(MQTTArduino &mqtt);
 void InitDallasSensor(DallasArduino &dallas);
-void InitMoisureRSensor(MoisureRArduino &moisure);
+// void InitMoisureRSensor(MoisureRArduino &moisure);
+void InitSASSensor(SASArduino &moisure);
 void InitMQ7COSensor(MQ7COArduino &mq7co);
-void initRaindropsSensor(RaindropsArduino &rd);
+// void initRaindropsSensor(RaindropsArduino &rd);
 void initFloatArduinoSensor(FloatArduino &fl);
 
 //*** LOOP HELPERS ***//

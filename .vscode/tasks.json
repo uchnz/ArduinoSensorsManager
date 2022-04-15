@@ -3,6 +3,25 @@
     "tasks": [
         {
             "type": "shell",
+            "label": "test MoisureRArduino_test",
+            "command": "pio",
+            "args": [
+                "test",
+                "-e",
+                "native",
+                "-f",
+                "MoisureRArduino_test"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "isDefault": false,
+                "kind": "build"
+            }
+        },
+        {
+            "type": "shell",
             "label": "test MQ7COArduino_test",
             "command": "pio",
             "args": [

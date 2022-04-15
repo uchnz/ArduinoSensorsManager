@@ -9,11 +9,12 @@ using ::testing::Return;
 TEST_F(MQ7COArduinoTest, test_Init_CallsPinMode_toSetPinsToOUT_ReturnsTrue)
 {
     ArduinoMock *arduinoMock = arduinoMockInstance();
-    EXPECT_CALL(*arduinoMock, pinMode(_, OUTPUT)).Times(2);
+    EXPECT_CALL(*arduinoMock, pinMode(2, OUTPUT)).Times(1);
+    EXPECT_CALL(*arduinoMock, pinMode(3, OUTPUT)).Times(1);
     MQ7COArduino mq7co(2, 3);
 
     EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(25873405));
-    EXPECT_CALL(*arduinoMock, analogWrite(3, HIGH_5_0)).Times(1);
+    EXPECT_CALL(*arduinoMock, analogWrite(3, mq7co_nm::HIGH_5_0)).Times(1);
     EXPECT_TRUE(mq7co.init());
     releaseArduinoMock();
 }
@@ -30,9 +31,10 @@ TEST_F(MQ7COArduinoTest, test_init_WithTheSamePortForSignalAndHeater_Fails_Retur
 TEST_F(MQ7COArduinoTest, test_setDifferentSignalAndHeaterPINs_allowsInitReturnTrue)
 {
     ArduinoMock *arduinoMock = arduinoMockInstance();
-    EXPECT_CALL(*arduinoMock, pinMode(_, OUTPUT)).Times(2);
+    EXPECT_CALL(*arduinoMock, pinMode(4, OUTPUT)).Times(1);
+    EXPECT_CALL(*arduinoMock, pinMode(1, OUTPUT)).Times(1);
     EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(1111111));
-    EXPECT_CALL(*arduinoMock, analogWrite(1, HIGH_5_0)).Times(1);
+    EXPECT_CALL(*arduinoMock, analogWrite(1, mq7co_nm::HIGH_5_0)).Times(1);
     MQ7COArduino mq7co;
 
     mq7co.changeSignalAndHeaterPINs(4, 1);
@@ -53,7 +55,7 @@ TEST_F(MQ7COArduinoTest, test_setSameSignalAndHeaterPINs_failsInit)
 TEST_F(MQ7COArduinoTest, test_getCurrentMeasurementByID_WithoutInit_ReturnsMinusOne)
 {
     MQ7COArduino mq7co(1, 2);
-    EXPECT_EQ(mq7co.getCurrentMeasurementByID(), -1);
+    EXPECT_EQ(-1, mq7co.getCurrentMeasurementByID());
 }
 
 TEST_F(MQ7COArduinoTest, test_requestCurrentMeasurement_SavesAverage)
@@ -63,10 +65,10 @@ TEST_F(MQ7COArduinoTest, test_requestCurrentMeasurement_SavesAverage)
     MQ7COArduino mq7co(1, 2);
     uint32_t startIntervalMillis = 8500;
     EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(startIntervalMillis));
-    EXPECT_CALL(*arduinoMock, analogWrite(2, HIGH_5_0)).Times(AtLeast(1));
+    EXPECT_CALL(*arduinoMock, analogWrite(2, mq7co_nm::HIGH_5_0)).Times(AtLeast(1));
     mq7co.init();
 
-    EXPECT_CALL(*arduinoMock, analogWrite(2, LOW_1_4)).Times(1);
+    EXPECT_CALL(*arduinoMock, analogWrite(2, mq7co_nm::LOW_1_4)).Times(1);
     uint32_t incrementIntervalMillis = 0;
     uint16_t nextLoopMillis = 3000;
     for (int i = 0; i < 60; i++)
@@ -76,21 +78,21 @@ TEST_F(MQ7COArduinoTest, test_requestCurrentMeasurement_SavesAverage)
         mq7co.requestCurrentMeasurement();
         incrementIntervalMillis += nextLoopMillis;
     }
-    EXPECT_EQ(mq7co.getCurrentMeasurementByID(), 224);
+    EXPECT_EQ(224, mq7co.getCurrentMeasurementByID());
     releaseArduinoMock();
 }
 
-TEST_F(MQ7COArduinoTest, test_requestCurrentMeasurement_withLargeIntervals_calculatesAverageWithPartialData)
+TEST_F(MQ7COArduinoTest, test_requestCurrentMeasurement_withLargeScanFrequency_calculatesAverageWithPartialData)
 {
     ArduinoMock *arduinoMock = arduinoMockInstance();
     EXPECT_CALL(*arduinoMock, pinMode(_, OUTPUT)).Times(2);
     MQ7COArduino mq7co(1, 2);
     uint32_t startIntervalMillis = 8500;
     EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(startIntervalMillis));
-    EXPECT_CALL(*arduinoMock, analogWrite(2, HIGH_5_0)).Times(AtLeast(1));
+    EXPECT_CALL(*arduinoMock, analogWrite(2, mq7co_nm::HIGH_5_0)).Times(AtLeast(1));
     mq7co.init();
 
-    EXPECT_CALL(*arduinoMock, analogWrite(2, LOW_1_4)).Times(1);
+    EXPECT_CALL(*arduinoMock, analogWrite(2, mq7co_nm::LOW_1_4)).Times(1);
     uint32_t incrementIntervalMillis = 0;
     uint16_t nextLoopMillis = 12000;
     for (int i = 0; i < 14; i++)
@@ -100,10 +102,10 @@ TEST_F(MQ7COArduinoTest, test_requestCurrentMeasurement_withLargeIntervals_calcu
         mq7co.requestCurrentMeasurement();
         incrementIntervalMillis += nextLoopMillis;
     }
-    EXPECT_EQ(mq7co.getCurrentMeasurementByID(), 531);
+    EXPECT_EQ(531, mq7co.getCurrentMeasurementByID());
 
     nextLoopMillis = 15000;
-    EXPECT_CALL(*arduinoMock, analogWrite(2, LOW_1_4)).Times(1);
+    EXPECT_CALL(*arduinoMock, analogWrite(2, mq7co_nm::LOW_1_4)).Times(1);
     for (int i = 0; i < 12; i++)
     {
         EXPECT_CALL(*arduinoMock, millis).Times(AtLeast(0)).WillRepeatedly(Return(startIntervalMillis + incrementIntervalMillis));
@@ -111,21 +113,21 @@ TEST_F(MQ7COArduinoTest, test_requestCurrentMeasurement_withLargeIntervals_calcu
         mq7co.requestCurrentMeasurement();
         incrementIntervalMillis += nextLoopMillis;
     }
-    EXPECT_EQ(mq7co.getCurrentMeasurementByID(), 529);
+    EXPECT_EQ(529, mq7co.getCurrentMeasurementByID());
     releaseArduinoMock();
 }
 
-TEST_F(MQ7COArduinoTest, test_requestCurrentMeasurement_withSmallIntervals_calculatesAverageWithPartialData)
+TEST_F(MQ7COArduinoTest, test_requestCurrentMeasurement_withSmallScanFrequency_calculatesAverageWithPartialData)
 {
     ArduinoMock *arduinoMock = arduinoMockInstance();
     EXPECT_CALL(*arduinoMock, pinMode(_, OUTPUT)).Times(2);
     MQ7COArduino mq7co(1, 2);
     uint32_t startIntervalMillis = 8500;
     EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(startIntervalMillis));
-    EXPECT_CALL(*arduinoMock, analogWrite(2, HIGH_5_0)).Times(AtLeast(1));
+    EXPECT_CALL(*arduinoMock, analogWrite(2, mq7co_nm::HIGH_5_0)).Times(AtLeast(1));
     mq7co.init();
 
-    EXPECT_CALL(*arduinoMock, analogWrite(2, LOW_1_4)).Times(1);
+    EXPECT_CALL(*arduinoMock, analogWrite(2, mq7co_nm::LOW_1_4)).Times(1);
     uint32_t incrementIntervalMillis = 0;
     uint16_t nextLoopMillis = 1000;
     for (int i = 0; i < 160; i++)
@@ -135,7 +137,7 @@ TEST_F(MQ7COArduinoTest, test_requestCurrentMeasurement_withSmallIntervals_calcu
         mq7co.requestCurrentMeasurement();
         incrementIntervalMillis += nextLoopMillis;
     }
-    EXPECT_EQ(mq7co.getCurrentMeasurementByID(), 863);
+    EXPECT_EQ(863, mq7co.getCurrentMeasurementByID());
     releaseArduinoMock();
 }
 
@@ -144,10 +146,58 @@ TEST_F(MQ7COArduinoTest, test_requestCurrentMeasurement_withoutInit_ReturnsMinus
     ArduinoMock *arduinoMock = arduinoMockInstance();
     MQ7COArduino mq7co(1, 2);
     EXPECT_CALL(*arduinoMock, millis).Times(0);
-    EXPECT_CALL(*arduinoMock, analogWrite(2, HIGH_5_0)).Times(0);
+    EXPECT_CALL(*arduinoMock, analogWrite(2, mq7co_nm::HIGH_5_0)).Times(0);
 
     mq7co.requestCurrentMeasurement();
 
-    EXPECT_EQ(mq7co.getCurrentMeasurementByID(), -1);
+    EXPECT_EQ(-1, mq7co.getCurrentMeasurementByID());
+    releaseArduinoMock();
+}
+
+TEST_F(MQ7COArduinoTest, test_requestCurrentMeasurement_withSmallInterval_calculatesAverageWithPartialData)
+{
+    ArduinoMock *arduinoMock = arduinoMockInstance();
+    EXPECT_CALL(*arduinoMock, pinMode(_, OUTPUT)).Times(2);
+    MQ7COArduino mq7co(1, 2);
+    uint32_t startIntervalMillis = 8500;
+    EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(startIntervalMillis));
+    EXPECT_CALL(*arduinoMock, analogWrite(2, mq7co_nm::HIGH_5_0)).Times(AtLeast(1));
+    mq7co.init(1000);
+
+    EXPECT_CALL(*arduinoMock, analogWrite(2, mq7co_nm::LOW_1_4)).Times(1);
+    uint32_t incrementIntervalMillis = 0;
+    uint16_t nextLoopMillis = 500;
+    for (int i = 0; i < 330; i++)
+    {
+        EXPECT_CALL(*arduinoMock, millis).Times(AtLeast(0)).WillRepeatedly(Return(startIntervalMillis + incrementIntervalMillis));
+        EXPECT_CALL(*arduinoMock, analogRead(1)).Times(AtLeast(0)).WillRepeatedly(Return(730 + i));
+        mq7co.requestCurrentMeasurement();
+        incrementIntervalMillis += nextLoopMillis;
+    }
+    EXPECT_EQ(979, mq7co.getCurrentMeasurementByID());
+    releaseArduinoMock();
+}
+
+TEST_F(MQ7COArduinoTest, test_requestCurrentMeasurement_withLargelInterval_calculatesAverageWithPartialData)
+{
+    ArduinoMock *arduinoMock = arduinoMockInstance();
+    EXPECT_CALL(*arduinoMock, pinMode(_, OUTPUT)).Times(2);
+    MQ7COArduino mq7co(1, 2);
+    uint32_t startIntervalMillis = 8500;
+    EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(startIntervalMillis));
+    EXPECT_CALL(*arduinoMock, analogWrite(2, mq7co_nm::HIGH_5_0)).Times(AtLeast(1));
+    mq7co.init(5000);
+
+    EXPECT_CALL(*arduinoMock, analogWrite(2, mq7co_nm::LOW_1_4)).Times(1);
+    uint32_t incrementIntervalMillis = 0;
+    uint16_t nextLoopMillis = 1000;
+    for (int i = 0; i < 165; i++)
+    {
+        EXPECT_CALL(*arduinoMock, millis).Times(AtLeast(0)).WillRepeatedly(Return(startIntervalMillis + incrementIntervalMillis));
+        EXPECT_CALL(*arduinoMock, analogRead(1)).Times(AtLeast(0)).WillRepeatedly(Return(300 + i));
+        mq7co.requestCurrentMeasurement();
+        incrementIntervalMillis += nextLoopMillis;
+    }
+    EXPECT_EQ(435, mq7co.getCurrentMeasurementByID());
     releaseArduinoMock();
 }
