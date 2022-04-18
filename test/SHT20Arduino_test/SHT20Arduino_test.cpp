@@ -28,7 +28,7 @@ TEST_F(SHT20ArduinoTest, test_Init_fails_getAddressReturns_Zero)
     EXPECT_EQ(0, sht.getAddress());
 }
 
-TEST_F(SHT20ArduinoTest, test_gettingTemperatureWithoutInit_fails)
+TEST_F(SHT20ArduinoTest, test_gettingMeasurementsWithoutInit_fails)
 {
     iarduino_I2C_SHT i2c(0x2A);
     EXPECT_CALL(i2c, begin()).Times(0);
@@ -37,8 +37,24 @@ TEST_F(SHT20ArduinoTest, test_gettingTemperatureWithoutInit_fails)
     EXPECT_CALL(i2c, getTem()).Times(0);
     sht.requestCurrentMeasurement();
 
-    float temp = sht.getCurrentMeasurementByID();
-    EXPECT_FLOAT_EQ(-127, temp);
+    float measurement = sht.getCurrentMeasurementByID();
+    EXPECT_FLOAT_EQ(-127, measurement);
+    measurement = sht.getCurrentMeasurementByID(1);
+    EXPECT_FLOAT_EQ(-127, measurement);
+}
+
+TEST_F(SHT20ArduinoTest, test_gettingSensorIDAboveExisting_fails)
+{
+    iarduino_I2C_SHT i2c(0x2A);
+    EXPECT_CALL(i2c, begin()).Times(0);
+    SHT20Arduino sht(i2c);
+
+    EXPECT_CALL(i2c, getTem()).Times(0);
+    EXPECT_CALL(i2c, getHum()).Times(0);
+    sht.requestCurrentMeasurement();
+
+    float nonexist = sht.getCurrentMeasurementByID(5);
+    EXPECT_FLOAT_EQ(-127, nonexist);
 }
 
 TEST_F(SHT20ArduinoTest, test_gettingTemperatureWithoutRequesting_fails)
@@ -49,8 +65,11 @@ TEST_F(SHT20ArduinoTest, test_gettingTemperatureWithoutRequesting_fails)
     EXPECT_TRUE(sht.init());
 
     EXPECT_CALL(i2c, getTem()).Times(0);
-    float temp = sht.getCurrentMeasurementByID();
-    EXPECT_FLOAT_EQ(-127, temp);
+    EXPECT_CALL(i2c, getHum()).Times(0);
+    float measurement = sht.getCurrentMeasurementByID();
+    EXPECT_FLOAT_EQ(-127, measurement);
+    measurement = sht.getCurrentMeasurementByID(1);
+    EXPECT_FLOAT_EQ(-127, measurement);
 }
 
 TEST_F(SHT20ArduinoTest, test_requestCurrentMeasurement_withinTimeInterval_SavesArrayOfMeasurements)

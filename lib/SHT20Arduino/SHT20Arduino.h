@@ -20,8 +20,8 @@ class SHT20Arduino : public ISensor
 private:
     iarduino_I2C_SHT &_sht;
     bool _sensorInitCompleted;
-    float _sensorHumidityArray[sht_nm::NUMBER_OF_MEASUREMENTS];
     float _sensorTemperatureArray[sht_nm::NUMBER_OF_MEASUREMENTS];
+    float _sensorHumidityArray[sht_nm::NUMBER_OF_MEASUREMENTS];
     uint8_t _currentSavingItemInArray;
     float _humidityAverage;
     float _temperatureAverage;

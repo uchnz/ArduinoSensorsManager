@@ -1,3 +1,34 @@
+// #include <iarduino_Pressure_BMP.h> // Подключаем библиотеку для работы с датчиками BMP180 или BMP280
+// iarduino_Pressure_BMP sensor;      // Создаём объект sensor для работы с датчиком адрес которого на шине I2C установлен по умолчанию.
+// void setup()
+// {
+//     Serial.begin(115200);
+//     delay(1000);
+//     sensor.begin(); // Инициируем работу с датчиком (начальная высота по умолчанию = 0 метров)
+// }
+// void loop()
+// {
+//     // Читаем показания (давление возвращается в мм.рт.ст.)
+//     if (sensor.read(1))
+//     {
+//         Serial.println((String) "CEHCOP BMP" + sensor.type + ": \t P = " + sensor.pressure + "\tMM.PT.CT, \t T = " + sensor.temperature + " *C, \t\t B = " + sensor.altitude + " M.");
+//     }
+//     else
+//     {
+//         Serial.println("HET OTBETA OT CEHCOPA");
+//     }
+//     // Читаем показания (давление возвращается в Па)
+//     if (sensor.read(2))
+//     {
+//         Serial.println((String) "CEHCOP BMP" + sensor.type + ": \t P = " + sensor.pressure + "\tPa, \t\t T = " + sensor.temperature + " *C, \t\t B = " + sensor.altitude + " M.");
+//     }
+//     else
+//     {
+//         Serial.println("HET OTBETA OT CEHCOPA");
+//     }
+
+//     delay(3000); // Ждём 3 секунды (не обязательно)
+// }
 
 // // #include <Wire.h>             // * Подключаем библиотеку для работы с аппаратной шиной I2C.
 // #include <iarduino_I2C_SHT.h> //   Подключаем библиотеку для работы с датчиком температуры и влажности I2C-flash (Sensor Humidity and Temperature).
@@ -49,8 +80,10 @@ SASArduino co2(A3);
 SASArduino raindrop(A4);
 SASArduino uv(A5);
 FloatArduino floatSensor(38);
-iarduino_I2C_SHT i2c(0x09);
-SHT20Arduino sht20(i2c);
+iarduino_I2C_SHT shtI2C(0x09);
+SHT20Arduino sht20(shtI2C);
+iarduino_Pressure_BMP bmpI2C;
+BMP280Arduino bmp280(bmpI2C);
 
 // ISensor *d_array[totalSensorPorts] = {&dallasModule1, &dallasModule2, &moisureR1, &mq7co, &raindrop, &floatSensor};
 
@@ -73,6 +106,7 @@ void setup()
     digitalWrite(10, LOW);
     InitSASSensor(uv);
     InitSHT20Sensor(sht20);
+    InitBMP280Sensor(bmp280);
 
     // sensorsManager.initSenorsOnAllPINs(d_array, totalSensorPorts);
     sensorsManager.setAddressesToSendMeasurementsTo(addressesToSendTo, totalSensorPorts);
@@ -96,6 +130,7 @@ void loop()
     raindrop.requestCurrentMeasurement();
     // uv.requestCurrentMeasurement();
     sht20.requestCurrentMeasurement();
+    bmp280.requestCurrentMeasurement();
 
     if (!isItTimeToParse(millisPassedSinceLastParse, scanInterval))
         return;
@@ -114,6 +149,10 @@ void loop()
     // printf("raindrop analog: %d\n", analogRead(A4));
     printf("sht20 temp: %.2f\n", sht20.getCurrentMeasurementByID());
     printf("sht20 hum: %.2f\n", sht20.getCurrentMeasurementByID(1));
+    printf("bmp280 temp: %.2f\n", bmp280.getCurrentMeasurementByID());
+    printf("bmp280 pressure: %.2f\n", bmp280.getCurrentMeasurementByID(1));
+    printf("bmp280 altitude: %.2f\n", bmp280.getCurrentMeasurementByID(2));
+
     // printf("uv: %d\n", uv.getCurrentMeasurementByID());
     // printf("uv analog: %d\n", analogRead(A5));
     printf("-------------------------\n\n");

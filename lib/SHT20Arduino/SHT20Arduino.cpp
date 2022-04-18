@@ -6,14 +6,10 @@ SHT20Arduino::SHT20Arduino(iarduino_I2C_SHT &sht)
     _sensorInitCompleted = false;
     _startReadMillis = 0;
     _readingInterval = sht_nm::DEFAULT_READING_INTERVAL;
-    _temperatureAverage = sht_nm::UNINITIALIZED_MEASUREMENT_VALUE;
-    _humidityAverage = sht_nm::UNINITIALIZED_MEASUREMENT_VALUE;
+    _temperatureAverage = _humidityAverage = sht_nm::UNINITIALIZED_MEASUREMENT_VALUE;
     _currentSavingItemInArray = 0;
     for (uint8_t i = 0; i < sht_nm::NUMBER_OF_MEASUREMENTS; i++)
-    {
-        _sensorHumidityArray[i] = sht_nm::UNINITIALIZED_MEASUREMENT_VALUE;
-        _sensorTemperatureArray[i] = sht_nm::UNINITIALIZED_MEASUREMENT_VALUE;
-    }
+        _sensorTemperatureArray[i] = _sensorHumidityArray[i] = sht_nm::UNINITIALIZED_MEASUREMENT_VALUE;
 }
 
 bool SHT20Arduino::init(uint16_t ReadingInterval)
@@ -34,8 +30,7 @@ uint8_t SHT20Arduino::getAddress()
 
 void SHT20Arduino::saveAverageMeasurement()
 {
-    _temperatureAverage = 0;
-    _humidityAverage = 0;
+    _temperatureAverage = _humidityAverage = 0;
     for (uint8_t i = 0; i < _currentSavingItemInArray; i++)
     {
         _temperatureAverage += _sensorTemperatureArray[i];

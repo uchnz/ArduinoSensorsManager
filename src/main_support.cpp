@@ -37,7 +37,6 @@ void InitDallasSensor(DallasArduino &dallas)
     dallas.init();
     dallas.setSensorsPrecision(sensor_precision1);
 }
-// void InitMoisureRSensor(MoisureRArduino &moisure)
 void InitSASSensor(SASArduino &sas)
 {
     sas.init(500);
@@ -46,14 +45,15 @@ void InitMQ7COSensor(MQ7COArduino &mq7co)
 {
     mq7co.init(7000);
 }
-// void initRaindropsSensor(RaindropsArduino &rd)
-// {
-//     rd.init();
-// }
 void InitSHT20Sensor(SHT20Arduino &sht20)
 {
     sht20.init(1000);
 }
+void InitBMP280Sensor(BMP280Arduino &bmp280)
+{
+    bmp280.init(1000);
+}
+
 void initFloatArduinoSensor(FloatArduino &fl)
 {
     fl.init();

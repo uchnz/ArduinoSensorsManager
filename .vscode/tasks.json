@@ -3,6 +3,24 @@
     "tasks": [
         {
             "type": "shell",
+            "label": "test BMP280Arduino_test",
+            "command": "pio",
+            "args": [
+                "test",
+                "-e",
+                "native",
+                "-f",
+                "BMP280Arduino_test"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "isDefault": false,
+                "kind": "build"
+            }
+        },        {
+            "type": "shell",
             "label": "test SHT20Arduino_test",
             "command": "pio",
             "args": [
