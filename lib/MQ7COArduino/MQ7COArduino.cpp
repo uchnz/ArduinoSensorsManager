@@ -33,7 +33,7 @@ bool MQ7COArduino::init(uint16_t ReadInterval)
     if (_signalPIN == _signalHeaterPIN)
         return false;
 
-    pinMode(_signalPIN, OUTPUT);
+    pinMode(_signalPIN, INPUT);
     pinMode(_signalHeaterPIN, OUTPUT);
     _sensorInitCompleted = true;
     _pimpl->resetOnInit(ReadInterval);

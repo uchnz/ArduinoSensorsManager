@@ -50,6 +50,10 @@ void InitMQ7COSensor(MQ7COArduino &mq7co)
 // {
 //     rd.init();
 // }
+void InitSHT20Sensor(SHT20Arduino &sht20)
+{
+    sht20.init(1000);
+}
 void initFloatArduinoSensor(FloatArduino &fl)
 {
     fl.init();
@@ -57,9 +61,9 @@ void initFloatArduinoSensor(FloatArduino &fl)
 //*** END SETUP HELPERS ***//
 
 //*** LOOP HELPERS ***//
-bool isItTimeToParse(uint64_t millisPassedSinceLastParse, const uint16_t scanInterval)
+bool isItTimeToParse(uint32_t millisPassedSinceLastParse, const uint16_t scanInterval)
 {
-    uint64_t millisNow = millis();
+    uint32_t millisNow = millis();
     if ((millisNow - millisPassedSinceLastParse) > scanInterval)
         return true;
 

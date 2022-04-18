@@ -27,7 +27,7 @@ bool SASArduino::init(uint16_t ReadingInterval)
     if (sas_nm::UNINITIALIZED_PIN_VALUE == _signalPIN)
         return false;
 
-    pinMode(_signalPIN, OUTPUT);
+    pinMode(_signalPIN, INPUT);
     _readingInterval = ReadingInterval;
     _sensorInitCompleted = true;
     return true;
@@ -47,16 +47,24 @@ void SASArduino::saveAverageMeasurement()
     _sensorValue = _sensorValue / sas_nm::NUMBER_OF_MEASUREMENTS;
     _currentSavingItemInArray = 0;
 }
+bool SASArduino::isReadyForNextRead(uint32_t now)
+{
+    return (now - _startReadMillis) >= _readingInterval;
+}
+bool SASArduino::isArrayFull()
+{
+    return (_currentSavingItemInArray > sas_nm::NUMBER_OF_MEASUREMENTS - 1);
+}
 void SASArduino::requestCurrentMeasurement()
 {
     if (!_sensorInitCompleted)
         return;
 
     uint32_t now = millis();
-    if (now - _startReadMillis < _readingInterval)
+    if (!isReadyForNextRead(now))
         return;
 
-    if (_currentSavingItemInArray > sas_nm::NUMBER_OF_MEASUREMENTS - 1)
+    if (isArrayFull())
         saveAverageMeasurement();
 
     _sensorValueArray[_currentSavingItemInArray++] = analogRead(_signalPIN);

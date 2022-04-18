@@ -23,11 +23,6 @@ namespace mq7co_nm
     const uint16_t DEFAULT_READING_INTERVAL = 3000;
 }
 
-// #define NUMBER_OF_MEASUREMENTS 10
-// #define UNINITIALIZED_MEASUREMENT_VALUE -1
-// #define NUMBER_OF_SENSORS_ON_BUS 1
-// #define DEFAULT_READING_INTERVAL 3000
-
 class MQ7Impl;
 class MQ7COArduino : public ISensor
 {

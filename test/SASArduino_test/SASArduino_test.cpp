@@ -9,7 +9,7 @@ using ::testing::Return;
 TEST_F(SASArduinoTest, test_Init_CallsPinMode_toSetPinToOUT_ReturnsTrue)
 {
     ArduinoMock *arduinoMock = arduinoMockInstance();
-    EXPECT_CALL(*arduinoMock, pinMode(2, OUTPUT)).Times(1);
+    EXPECT_CALL(*arduinoMock, pinMode(2, INPUT)).Times(1);
     SASArduino moisure(2);
 
     EXPECT_TRUE(moisure.init());
@@ -29,7 +29,7 @@ TEST_F(SASArduinoTest, test_SetPINWithNonZero_allowsInitReturnTrue)
     SASArduino moisure;
     EXPECT_FALSE(moisure.init());
 
-    EXPECT_CALL(*arduinoMock, pinMode(13, OUTPUT)).Times(1);
+    EXPECT_CALL(*arduinoMock, pinMode(13, INPUT)).Times(1);
     moisure.SetPIN(13);
 
     EXPECT_TRUE(moisure.init());
@@ -48,7 +48,7 @@ TEST_F(SASArduinoTest, test_SetPIN_resetsInitStatus)
 {
     ArduinoMock *arduinoMock = arduinoMockInstance();
     SASArduino moisure(1);
-    EXPECT_CALL(*arduinoMock, pinMode(1, OUTPUT)).Times(1);
+    EXPECT_CALL(*arduinoMock, pinMode(1, INPUT)).Times(1);
     EXPECT_TRUE(moisure.init());
     moisure.SetPIN(4);
 
@@ -70,7 +70,7 @@ TEST_F(SASArduinoTest, test_getCurrentMeasurementByID_withoutRequestCurrentMeasu
 {
     ArduinoMock *arduinoMock = arduinoMockInstance();
     SASArduino moisure(2);
-    EXPECT_CALL(*arduinoMock, pinMode(2, OUTPUT)).Times(1);
+    EXPECT_CALL(*arduinoMock, pinMode(2, INPUT)).Times(1);
     EXPECT_TRUE(moisure.init());
 
     EXPECT_CALL(*arduinoMock, analogRead(0)).Times(0);
@@ -83,7 +83,7 @@ TEST_F(SASArduinoTest, test_requestCurrentMeasurement_withinTimeInterval_SavesAr
 {
     ArduinoMock *arduinoMock = arduinoMockInstance();
     SASArduino moisure(2);
-    EXPECT_CALL(*arduinoMock, pinMode(2, OUTPUT)).Times(1);
+    EXPECT_CALL(*arduinoMock, pinMode(2, INPUT)).Times(1);
     EXPECT_TRUE(moisure.init());
 
     EXPECT_CALL(*arduinoMock, analogRead(2)).Times(4).WillOnce(Return(140)).WillOnce(Return(150)).WillOnce(Return(160)).WillOnce(Return(270));
@@ -116,7 +116,7 @@ TEST_F(SASArduinoTest, test_requestCurrentMeasurement_withDifferentMeasurementIn
 {
     ArduinoMock *arduinoMock = arduinoMockInstance();
     SASArduino moisure(2);
-    EXPECT_CALL(*arduinoMock, pinMode(2, OUTPUT)).Times(1);
+    EXPECT_CALL(*arduinoMock, pinMode(2, INPUT)).Times(1);
     EXPECT_TRUE(moisure.init(1000));
 
     EXPECT_CALL(*arduinoMock, analogRead(2)).Times(4).WillOnce(Return(140)).WillOnce(Return(150)).WillOnce(Return(160)).WillOnce(Return(270));
@@ -132,7 +132,7 @@ TEST_F(SASArduinoTest, test_requestCurrentMeasurement_withDifferentMeasurementIn
     EXPECT_EQ(150, moisure.getCurrentMeasurementByID());
 
     moisure.SetPIN(4);
-    EXPECT_CALL(*arduinoMock, pinMode(4, OUTPUT)).Times(1);
+    EXPECT_CALL(*arduinoMock, pinMode(4, INPUT)).Times(1);
     EXPECT_TRUE(moisure.init(2000));
     incrementIntervalMillis = 0;
     nextLoopMillis = 3000;

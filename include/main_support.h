@@ -7,6 +7,7 @@
 #include <SASArduino.h>
 #include <MQ7COArduino.h>
 // #include <RaindropsArduino.h>
+#include <SHT20Arduino.h>
 #include <FloatArduino.h>
 #include <SensorManager.h>
 
@@ -20,9 +21,10 @@ void InitSASSensor(SASArduino &moisure);
 void InitMQ7COSensor(MQ7COArduino &mq7co);
 // void initRaindropsSensor(RaindropsArduino &rd);
 void initFloatArduinoSensor(FloatArduino &fl);
+void InitSHT20Sensor(SHT20Arduino &sht20);
 
 //*** LOOP HELPERS ***//
-bool isItTimeToParse(uint64_t millisPassedSinceLastParse, const uint16_t scanInterval);
+bool isItTimeToParse(uint32_t millisPassedSinceLastParse, const uint16_t scanInterval);
 
 //*** Callabacks ***//
 void callbackIncommingMQTTMessages(String &topic, String &payload);

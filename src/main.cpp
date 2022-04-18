@@ -1,21 +1,56 @@
+
+// // #include <Wire.h>             // * Подключаем библиотеку для работы с аппаратной шиной I2C.
+// #include <iarduino_I2C_SHT.h> //   Подключаем библиотеку для работы с датчиком температуры и влажности I2C-flash (Sensor Humidity and Temperature).
+// iarduino_I2C_SHT sht(9);      //   Объявляем объект sht для работы с функциями и методами библиотеки iarduino_I2C_SHT.
+//                               // Если при объявлении объекта указать адрес, например, sht(0xBB), то пример будет работать с тем модулем, адрес которого был указан.
+
+// void setup()
+// {                         //
+//     delay(500);           // * Ждём завершение переходных процессов связанных с подачей питания.
+//     Serial.begin(115200); //
+//     while (!Serial)
+//     {
+//         ;
+//     } // * Ждём завершения инициализации шины UART.
+
+//     sht.begin(); //   Инициируем работу с датчиком температуры и влажности.
+// } //
+//   //
+// void loop()
+// { //
+//     Serial.println(sht.getAddress());
+//     Serial.print("Температура = ");    //
+//     Serial.print(sht.getTem());        //   Выводим текущую температуру, от -40.0 до +125 °C.
+//     Serial.print(" °C, влажность = "); //
+//     Serial.print(sht.getHum());        //   Выводим текущую влажность воздуха, от 0 до 100%.
+//     Serial.print(" %.\r\n");           //
+//     delay(500);                        // * Задержка позволяет медленнее заполнять монитор последовательного порта.
+// }
+
 #include <LibPrintf.h>
 #include <main_support.h>
 
-EthArduino ethernetModule;
+#include "I2CScanner.h"
+#include <Wire.h>
 
+I2CScanner scanner;
+
+EthArduino ethernetModule;
 MQTTArduino mqttClientModule;
 const uint8_t totalSensorPorts = 6;
 const char *addressesToSendTo[totalSensorPorts] = {"/UZV1/temp1", "/UZV2/temp1and2", "/UZV1/mousure", "/UZV1/mq7co", "/UZV1/rd", "/UZV1/floatSensor"};
 
 DallasArduino dallasModule1(32);
 DallasArduino dallasModule2(22);
-MQ7COArduino mq7co(2, 7);
-SASArduino moisureR1(0);
-SASArduino moisureC1(5);
-SASArduino raindrop(4);
-SASArduino co2(3);
-SASArduino uv(6);
+SASArduino moisureR1(A0);
+SASArduino moisureC1(A1);
+MQ7COArduino mq7co(A2, 7);
+SASArduino co2(A3);
+SASArduino raindrop(A4);
+SASArduino uv(A5);
 FloatArduino floatSensor(38);
+iarduino_I2C_SHT i2c(0x09);
+SHT20Arduino sht20(i2c);
 
 // ISensor *d_array[totalSensorPorts] = {&dallasModule1, &dallasModule2, &moisureR1, &mq7co, &raindrop, &floatSensor};
 
@@ -35,33 +70,53 @@ void setup()
     InitSASSensor(moisureC1);
     InitSASSensor(raindrop);
     InitSASSensor(co2);
+    digitalWrite(10, LOW);
     InitSASSensor(uv);
+    InitSHT20Sensor(sht20);
+
     // sensorsManager.initSenorsOnAllPINs(d_array, totalSensorPorts);
     sensorsManager.setAddressesToSendMeasurementsTo(addressesToSendTo, totalSensorPorts);
+
+    printf("Listing connected I2C devices:\n");
+    scanner.Init();
+    scanner.Scan();
 
     printf("Setup complete.\n\n");
 }
 
-uint64_t millisPassedSinceLastParse = 0;
+uint32_t millisPassedSinceLastParse = 0;
 const uint16_t scanInterval = 2000;
-uint64_t i = 0;
+uint32_t i = 0;
 void loop()
 {
-    mq7co.requestCurrentMeasurement();
     moisureR1.requestCurrentMeasurement();
     moisureC1.requestCurrentMeasurement();
-    raindrop.requestCurrentMeasurement();
+    mq7co.requestCurrentMeasurement();
     co2.requestCurrentMeasurement();
-    uv.requestCurrentMeasurement();
+    raindrop.requestCurrentMeasurement();
+    // uv.requestCurrentMeasurement();
+    sht20.requestCurrentMeasurement();
+
     if (!isItTimeToParse(millisPassedSinceLastParse, scanInterval))
         return;
 
-    // printf("mq7: %2f\n", mq7co.getCurrentMeasurementByID());
-    printf("mouisureR: %2f\n", moisureR1.getCurrentMeasurementByID());
-    printf("mouisureC: %2f\n", moisureC1.getCurrentMeasurementByID());
-    printf("raindrop: %2f\n", raindrop.getCurrentMeasurementByID());
-    printf("co2: %2f\n", co2.getCurrentMeasurementByID());
-    // printf("uv: %2f\n", uv.getCurrentMeasurementByID());
+    printf("seconds passed: %u\n", i / 1000);
+    i += scanInterval;
+    printf("mouisureR: %d\n", (int)moisureR1.getCurrentMeasurementByID());
+    // printf("mouisureR analog: %d\n", analogRead(A0));
+    printf("mouisureC: %d\n", (int)moisureC1.getCurrentMeasurementByID());
+    // printf("mouisureC analog: %d\n", analogRead(A1));
+    printf("mq7-co: %d\n", (int)mq7co.getCurrentMeasurementByID());
+    // printf("mq7-co analog: %d\n", analogRead(A2));
+    printf("mq135-co2: %d\n", (int)co2.getCurrentMeasurementByID());
+    // printf("mq135-co2 analog: %d\n", analogRead(A3));
+    printf("raindrop: %d\n", (int)raindrop.getCurrentMeasurementByID());
+    // printf("raindrop analog: %d\n", analogRead(A4));
+    printf("sht20 temp: %.2f\n", sht20.getCurrentMeasurementByID());
+    printf("sht20 hum: %.2f\n", sht20.getCurrentMeasurementByID(1));
+    // printf("uv: %d\n", uv.getCurrentMeasurementByID());
+    // printf("uv analog: %d\n", analogRead(A5));
+    printf("-------------------------\n\n");
 
     // sensorsManager.refreshSensorsData2D();
     // sensorsManager.sendSensorsData2D();

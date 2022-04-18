@@ -23,6 +23,8 @@ private:
     uint16_t _readingInterval;
 
     void saveAverageMeasurement();
+    bool isReadyForNextRead(uint32_t now);
+    bool isArrayFull();
 
 public:
     SASArduino();
