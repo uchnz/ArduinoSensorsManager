@@ -54,7 +54,7 @@ void InitBMP280Sensor(BMP280Arduino &bmp280)
     bmp280.init(1000);
 }
 
-void initFloatArduinoSensor(FloatArduino &fl)
+void InitOnOffSensor(OnOffSensorArduino &fl)
 {
     fl.init();
 }

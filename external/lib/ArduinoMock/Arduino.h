@@ -3,12 +3,19 @@
 #include <stdint.h>
 #include <gmock/gmock.h>
 
-#define INPUT 0x00
+#define INPUT 0x0
+#define INPUT_PULLUP 0x2
 #define OUTPUT 0x1
+
+#define HIGH 0x1
+#define LOW 0x0
 
 void pinMode(uint8_t, uint8_t);
 void analogWrite(uint8_t, uint8_t);
 int analogRead(uint8_t);
+void digitalWrite(uint8_t, uint8_t);
+int digitalRead(uint8_t);
+
 uint32_t millis();
 
 class ArduinoMock
@@ -19,6 +26,8 @@ public:
     MOCK_METHOD(void, pinMode, (uint8_t, uint8_t));
     MOCK_METHOD(void, analogWrite, (uint8_t, uint8_t));
     MOCK_METHOD(int, analogRead, (uint8_t));
+    MOCK_METHOD(void, digitalWrite, (uint8_t, uint8_t));
+    MOCK_METHOD(int, digitalRead, (uint8_t));
     MOCK_METHOD(uint32_t, millis, ());
 };
 

@@ -1,15 +1,5 @@
 #include <SASArduino.h>
 
-SASArduino::SASArduino()
-{
-    SetPIN(sas_nm::UNINITIALIZED_PIN_VALUE);
-}
-
-SASArduino::SASArduino(uint8_t signalPIN)
-{
-    SetPIN(signalPIN);
-}
-
 void SASArduino::SetPIN(uint8_t signalPIN)
 {
     _signalPIN = signalPIN;
@@ -20,6 +10,14 @@ void SASArduino::SetPIN(uint8_t signalPIN)
     _readingInterval = sas_nm::DEFAULT_READING_INTERVAL;
     for (uint8_t i = 0; i < sas_nm::NUMBER_OF_MEASUREMENTS; i++)
         _sensorValueArray[i] = sas_nm::UNINITIALIZED_MEASUREMENT_VALUE;
+}
+SASArduino::SASArduino()
+{
+    SetPIN(sas_nm::UNINITIALIZED_PIN_VALUE);
+}
+SASArduino::SASArduino(uint8_t signalPIN)
+{
+    SetPIN(signalPIN);
 }
 
 bool SASArduino::init(uint16_t ReadingInterval)

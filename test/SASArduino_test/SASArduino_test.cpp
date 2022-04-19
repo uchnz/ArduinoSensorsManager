@@ -6,7 +6,7 @@ using ::testing::_;
 using ::testing::AtLeast;
 using ::testing::Return;
 
-TEST_F(SASArduinoTest, test_Init_CallsPinMode_toSetPinToOUT_ReturnsTrue)
+TEST_F(SASArduinoTest, test_Init_CallsPinMode_toSetPinToInput_ReturnsTrue)
 {
     ArduinoMock *arduinoMock = arduinoMockInstance();
     EXPECT_CALL(*arduinoMock, pinMode(2, INPUT)).Times(1);

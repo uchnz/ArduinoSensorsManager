@@ -34,6 +34,18 @@ int analogRead(uint8_t pin)
     return arduinoMock->analogRead(pin);
 }
 
+void digitalWrite(uint8_t pin, uint8_t value)
+{
+    assert(arduinoMock != NULL);
+    arduinoMock->digitalWrite(pin, value);
+}
+
+int digitalRead(uint8_t pin)
+{
+    assert(arduinoMock != NULL);
+    return arduinoMock->digitalRead(pin);
+}
+
 uint32_t millis()
 {
     assert(arduinoMock != NULL);

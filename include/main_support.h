@@ -7,7 +7,7 @@
 #include <MQ7COArduino.h>
 #include <SHT20Arduino.h>
 #include <BMP280Arduino.h>
-#include <FloatArduino.h>
+#include <OnOffSensorArduino.h>
 #include <SensorManager.h>
 
 //*** SETUP HELPERS ***//
@@ -17,8 +17,9 @@ void initConnectionToMQTTBroker(MQTTArduino &mqtt);
 void InitDallasSensor(DallasArduino &dallas);
 void InitSASSensor(SASArduino &moisure);
 void InitMQ7COSensor(MQ7COArduino &mq7co);
-void initFloatArduinoSensor(FloatArduino &fl);
+void InitOnOffSensor(OnOffSensorArduino &fl);
 void InitSHT20Sensor(SHT20Arduino &sht20);
+void InitBMP280Sensor(BMP280Arduino &bmp280);
 void InitBMP280Sensor(BMP280Arduino &bmp280);
 
 //*** LOOP HELPERS ***//

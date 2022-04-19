@@ -3,6 +3,24 @@
     "tasks": [
         {
             "type": "shell",
+            "label": "test OnOffSensorArduino_test",
+            "command": "pio",
+            "args": [
+                "test",
+                "-e",
+                "native",
+                "-f",
+                "OnOffSensorArduino_test"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "isDefault": false,
+                "kind": "build"
+            }
+        },         {
+            "type": "shell",
             "label": "test BMP280Arduino_test",
             "command": "pio",
             "args": [

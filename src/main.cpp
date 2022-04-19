@@ -79,7 +79,7 @@ MQ7COArduino mq7co(A2, 7);
 SASArduino co2(A3);
 SASArduino raindrop(A4);
 SASArduino uv(A5);
-FloatArduino floatSensor(38);
+OnOffSensorArduino floatSensor(38);
 iarduino_I2C_SHT shtI2C(0x09);
 SHT20Arduino sht20(shtI2C);
 iarduino_Pressure_BMP bmpI2C;
@@ -107,6 +107,7 @@ void setup()
     InitSASSensor(uv);
     InitSHT20Sensor(sht20);
     InitBMP280Sensor(bmp280);
+    InitOnOffSensor(floatSensor);
 
     // sensorsManager.initSenorsOnAllPINs(d_array, totalSensorPorts);
     sensorsManager.setAddressesToSendMeasurementsTo(addressesToSendTo, totalSensorPorts);
@@ -131,6 +132,7 @@ void loop()
     // uv.requestCurrentMeasurement();
     sht20.requestCurrentMeasurement();
     bmp280.requestCurrentMeasurement();
+    floatSensor.requestCurrentMeasurement();
 
     if (!isItTimeToParse(millisPassedSinceLastParse, scanInterval))
         return;
@@ -152,6 +154,7 @@ void loop()
     printf("bmp280 temp: %.2f\n", bmp280.getCurrentMeasurementByID());
     printf("bmp280 pressure: %.2f\n", bmp280.getCurrentMeasurementByID(1));
     printf("bmp280 altitude: %.2f\n", bmp280.getCurrentMeasurementByID(2));
+    printf("float: %d\n", (int)floatSensor.getCurrentMeasurementByID());
 
     // printf("uv: %d\n", uv.getCurrentMeasurementByID());
     // printf("uv analog: %d\n", analogRead(A5));
