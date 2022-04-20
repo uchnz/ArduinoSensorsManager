@@ -71,8 +71,14 @@ MQTTArduino mqttClientModule;
 const uint8_t totalSensorPorts = 6;
 const char *addressesToSendTo[totalSensorPorts] = {"/UZV1/temp1", "/UZV2/temp1and2", "/UZV1/mousure", "/UZV1/mq7co", "/UZV1/rd", "/UZV1/floatSensor"};
 
-DallasArduino dallasModule1(32);
-DallasArduino dallasModule2(22);
+// DallasArduino dallasModule1(32);
+// DallasArduino dallasModule2(22);
+OneWire ow1(22);
+DallasTemperature sensor1(&ow1);
+DallasArduino dallas1(sensor1);
+OneWire ow2(32);
+DallasTemperature sensor2(&ow2);
+DallasArduino dallas2(sensor2);
 SASArduino moisureR1(A0);
 SASArduino moisureC1(A1);
 MQ7COArduino mq7co(A2, 7);
@@ -87,17 +93,19 @@ BMP280Arduino bmp280(bmpI2C);
 
 // ISensor *d_array[totalSensorPorts] = {&dallasModule1, &dallasModule2, &moisureR1, &mq7co, &raindrop, &floatSensor};
 
-SensorManager sensorsManager(mqttClientModule);
+// SensorManager sensorsManager(mqttClientModule);
 
 void setup()
 {
     initSystemParameters();
     printf("\nStarting setup...\n");
 
-    initNetworkCard(ethernetModule);
-    initConnectionToMQTTBroker(mqttClientModule);
-    InitDallasSensor(dallasModule1);
-    InitDallasSensor(dallasModule2);
+    // initNetworkCard(ethernetModule);
+    // initConnectionToMQTTBroker(mqttClientModule);
+    InitDallasSensor(dallas1);
+    InitDallasSensor(dallas2);
+    // InitDallasSensor(dallasModule1);
+    // InitDallasSensor(dallasModule2);
     InitMQ7COSensor(mq7co);
     InitSASSensor(moisureR1);
     InitSASSensor(moisureC1);
@@ -110,7 +118,7 @@ void setup()
     InitOnOffSensor(floatSensor);
 
     // sensorsManager.initSenorsOnAllPINs(d_array, totalSensorPorts);
-    sensorsManager.setAddressesToSendMeasurementsTo(addressesToSendTo, totalSensorPorts);
+    // sensorsManager.setAddressesToSendMeasurementsTo(addressesToSendTo, totalSensorPorts);
 
     printf("Listing connected I2C devices:\n");
     scanner.Init();
@@ -124,6 +132,8 @@ const uint16_t scanInterval = 2000;
 uint32_t i = 0;
 void loop()
 {
+    dallas1.requestCurrentMeasurement();
+    dallas2.requestCurrentMeasurement();
     moisureR1.requestCurrentMeasurement();
     moisureC1.requestCurrentMeasurement();
     mq7co.requestCurrentMeasurement();
@@ -139,6 +149,10 @@ void loop()
 
     printf("seconds passed: %u\n", i / 1000);
     i += scanInterval;
+    printf("dallas1 temp1: %.2f\n", dallas1.getCurrentMeasurementByID(0));
+    printf("dallas1 temp2: %.2f\n", dallas1.getCurrentMeasurementByID(1));
+    printf("dallas2 temp1: %.2f\n", dallas2.getCurrentMeasurementByID());
+    printf("dallas2 temp2: %.2f\n", dallas2.getCurrentMeasurementByID(1));
     printf("mouisureR: %d\n", (int)moisureR1.getCurrentMeasurementByID());
     // printf("mouisureR analog: %d\n", analogRead(A0));
     printf("mouisureC: %d\n", (int)moisureC1.getCurrentMeasurementByID());

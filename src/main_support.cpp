@@ -35,7 +35,7 @@ void initConnectionToMQTTBroker(MQTTArduino &mqtt)
 void InitDallasSensor(DallasArduino &dallas)
 {
     dallas.init();
-    dallas.setSensorsPrecision(sensor_precision1);
+    // dallas.setSensorsPrecision(sensor_precision1);
 }
 void InitSASSensor(SASArduino &sas)
 {
