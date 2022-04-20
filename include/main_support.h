@@ -20,7 +20,6 @@ void InitMQ7COSensor(MQ7COArduino &mq7co);
 void InitOnOffSensor(OnOffSensorArduino &fl);
 void InitSHT20Sensor(SHT20Arduino &sht20);
 void InitBMP280Sensor(BMP280Arduino &bmp280);
-void InitBMP280Sensor(BMP280Arduino &bmp280);
 
 //*** LOOP HELPERS ***//
 bool isItTimeToParse(uint32_t millisPassedSinceLastParse, const uint16_t scanInterval);

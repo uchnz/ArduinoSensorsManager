@@ -3,8 +3,6 @@
 
 uint8_t mac[6] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
 char MQTTBrokerIP[] = "10.62.202.108";
-const uint8_t sensor_precision1 = 9;
-const uint8_t sensor_precision2 = 12;
 const uint16_t MQTT_KeepAlive = 600;
 char topicToReadSettingsFrom[] = "/settings";
 
@@ -35,7 +33,6 @@ void initConnectionToMQTTBroker(MQTTArduino &mqtt)
 void InitDallasSensor(DallasArduino &dallas)
 {
     dallas.init();
-    // dallas.setSensorsPrecision(sensor_precision1);
 }
 void InitSASSensor(SASArduino &sas)
 {
@@ -53,7 +50,6 @@ void InitBMP280Sensor(BMP280Arduino &bmp280)
 {
     bmp280.init(1000);
 }
-
 void InitOnOffSensor(OnOffSensorArduino &fl)
 {
     fl.init();

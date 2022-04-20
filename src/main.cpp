@@ -1,63 +1,3 @@
-// #include <iarduino_Pressure_BMP.h> // Подключаем библиотеку для работы с датчиками BMP180 или BMP280
-// iarduino_Pressure_BMP sensor;      // Создаём объект sensor для работы с датчиком адрес которого на шине I2C установлен по умолчанию.
-// void setup()
-// {
-//     Serial.begin(115200);
-//     delay(1000);
-//     sensor.begin(); // Инициируем работу с датчиком (начальная высота по умолчанию = 0 метров)
-// }
-// void loop()
-// {
-//     // Читаем показания (давление возвращается в мм.рт.ст.)
-//     if (sensor.read(1))
-//     {
-//         Serial.println((String) "CEHCOP BMP" + sensor.type + ": \t P = " + sensor.pressure + "\tMM.PT.CT, \t T = " + sensor.temperature + " *C, \t\t B = " + sensor.altitude + " M.");
-//     }
-//     else
-//     {
-//         Serial.println("HET OTBETA OT CEHCOPA");
-//     }
-//     // Читаем показания (давление возвращается в Па)
-//     if (sensor.read(2))
-//     {
-//         Serial.println((String) "CEHCOP BMP" + sensor.type + ": \t P = " + sensor.pressure + "\tPa, \t\t T = " + sensor.temperature + " *C, \t\t B = " + sensor.altitude + " M.");
-//     }
-//     else
-//     {
-//         Serial.println("HET OTBETA OT CEHCOPA");
-//     }
-
-//     delay(3000); // Ждём 3 секунды (не обязательно)
-// }
-
-// // #include <Wire.h>             // * Подключаем библиотеку для работы с аппаратной шиной I2C.
-// #include <iarduino_I2C_SHT.h> //   Подключаем библиотеку для работы с датчиком температуры и влажности I2C-flash (Sensor Humidity and Temperature).
-// iarduino_I2C_SHT sht(9);      //   Объявляем объект sht для работы с функциями и методами библиотеки iarduino_I2C_SHT.
-//                               // Если при объявлении объекта указать адрес, например, sht(0xBB), то пример будет работать с тем модулем, адрес которого был указан.
-
-// void setup()
-// {                         //
-//     delay(500);           // * Ждём завершение переходных процессов связанных с подачей питания.
-//     Serial.begin(115200); //
-//     while (!Serial)
-//     {
-//         ;
-//     } // * Ждём завершения инициализации шины UART.
-
-//     sht.begin(); //   Инициируем работу с датчиком температуры и влажности.
-// } //
-//   //
-// void loop()
-// { //
-//     Serial.println(sht.getAddress());
-//     Serial.print("Температура = ");    //
-//     Serial.print(sht.getTem());        //   Выводим текущую температуру, от -40.0 до +125 °C.
-//     Serial.print(" °C, влажность = "); //
-//     Serial.print(sht.getHum());        //   Выводим текущую влажность воздуха, от 0 до 100%.
-//     Serial.print(" %.\r\n");           //
-//     delay(500);                        // * Задержка позволяет медленнее заполнять монитор последовательного порта.
-// }
-
 #include <LibPrintf.h>
 #include <main_support.h>
 
@@ -71,8 +11,6 @@ MQTTArduino mqttClientModule;
 const uint8_t totalSensorPorts = 6;
 const char *addressesToSendTo[totalSensorPorts] = {"/UZV1/temp1", "/UZV2/temp1and2", "/UZV1/mousure", "/UZV1/mq7co", "/UZV1/rd", "/UZV1/floatSensor"};
 
-// DallasArduino dallasModule1(32);
-// DallasArduino dallasModule2(22);
 OneWire ow1(22);
 DallasTemperature sensor1(&ow1);
 DallasArduino dallas1(sensor1);
@@ -104,8 +42,6 @@ void setup()
     // initConnectionToMQTTBroker(mqttClientModule);
     InitDallasSensor(dallas1);
     InitDallasSensor(dallas2);
-    // InitDallasSensor(dallasModule1);
-    // InitDallasSensor(dallasModule2);
     InitMQ7COSensor(mq7co);
     InitSASSensor(moisureR1);
     InitSASSensor(moisureC1);
