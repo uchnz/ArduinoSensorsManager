@@ -1,10 +1,11 @@
-#include <LibPrintf.h>
 #include <main_support.h>
 
-#include "I2CScanner.h"
+#include <LibPrintf.h>
 #include <Wire.h>
 
-I2CScanner scanner;
+// #include "I2CScanner.h"
+
+// I2CScanner scanner;
 
 EthArduino ethernetModule;
 MQTTArduino mqttClientModule;
@@ -47,7 +48,7 @@ void setup()
     InitSASSensor(moisureC1);
     InitSASSensor(raindrop);
     InitSASSensor(co2);
-    digitalWrite(10, LOW);
+    // digitalWrite(10, LOW);
     InitSASSensor(uv);
     InitSHT20Sensor(sht20);
     InitBMP280Sensor(bmp280);
@@ -56,9 +57,9 @@ void setup()
     // sensorsManager.initSenorsOnAllPINs(d_array, totalSensorPorts);
     // sensorsManager.setAddressesToSendMeasurementsTo(addressesToSendTo, totalSensorPorts);
 
-    printf("Listing connected I2C devices:\n");
-    scanner.Init();
-    scanner.Scan();
+    // printf("Listing connected I2C devices:\n");
+    // scanner.Init();
+    // scanner.Scan();
 
     printf("Setup complete.\n\n");
 }
@@ -75,7 +76,7 @@ void loop()
     mq7co.requestCurrentMeasurement();
     co2.requestCurrentMeasurement();
     raindrop.requestCurrentMeasurement();
-    // uv.requestCurrentMeasurement();
+    uv.requestCurrentMeasurement();
     sht20.requestCurrentMeasurement();
     bmp280.requestCurrentMeasurement();
     floatSensor.requestCurrentMeasurement();
@@ -90,24 +91,17 @@ void loop()
     printf("dallas2 temp1: %.2f\n", dallas2.getCurrentMeasurementByID());
     printf("dallas2 temp2: %.2f\n", dallas2.getCurrentMeasurementByID(1));
     printf("mouisureR: %d\n", (int)moisureR1.getCurrentMeasurementByID());
-    // printf("mouisureR analog: %d\n", analogRead(A0));
     printf("mouisureC: %d\n", (int)moisureC1.getCurrentMeasurementByID());
-    // printf("mouisureC analog: %d\n", analogRead(A1));
     printf("mq7-co: %d\n", (int)mq7co.getCurrentMeasurementByID());
-    // printf("mq7-co analog: %d\n", analogRead(A2));
     printf("mq135-co2: %d\n", (int)co2.getCurrentMeasurementByID());
-    // printf("mq135-co2 analog: %d\n", analogRead(A3));
     printf("raindrop: %d\n", (int)raindrop.getCurrentMeasurementByID());
-    // printf("raindrop analog: %d\n", analogRead(A4));
     printf("sht20 temp: %.2f\n", sht20.getCurrentMeasurementByID());
     printf("sht20 hum: %.2f\n", sht20.getCurrentMeasurementByID(1));
     printf("bmp280 temp: %.2f\n", bmp280.getCurrentMeasurementByID());
     printf("bmp280 pressure: %.2f\n", bmp280.getCurrentMeasurementByID(1));
     printf("bmp280 altitude: %.2f\n", bmp280.getCurrentMeasurementByID(2));
+    printf("uv: %d\n", uv.getCurrentMeasurementByID());
     printf("float: %d\n", (int)floatSensor.getCurrentMeasurementByID());
-
-    // printf("uv: %d\n", uv.getCurrentMeasurementByID());
-    // printf("uv analog: %d\n", analogRead(A5));
     printf("-------------------------\n\n");
 
     // sensorsManager.refreshSensorsData2D();
