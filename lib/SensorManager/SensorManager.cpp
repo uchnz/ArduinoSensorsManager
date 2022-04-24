@@ -179,13 +179,13 @@ bool SensorManager::refreshSensorsData2D()
     return true;
 }
 
-void SensorManager::getJSON(double value, char *id, char *output)
-{
-    StaticJsonDocument<200> doc;
-    doc["id"] = "IDS1_temp";
-    doc["value"] = value;
-    // serializeJson(doc, output);
-}
+// void SensorManager::getJSON(double value, char *id, char *output)
+// {
+//     StaticJsonDocument<200> doc;
+//     doc["id"] = "IDS1_temp";
+//     doc["value"] = value;
+//     // serializeJson(doc, output);
+// }
 // bool SensorManager::sendSensorsData2D()
 // {
 //     bool atLeastOneError = false;
@@ -211,16 +211,16 @@ void SensorManager::getJSON(double value, char *id, char *output)
 
 //     return !atLeastOneError;
 // }
-void SensorManager::formatToJSON(uint8_t sensorID, uint8_t valueID, char *message, uint16_t messageSize)
-{
-    StaticJsonDocument<200> doc;
-    doc["id"] = _sensorsNamesArray[sensorID];
-    char valueTruncated[10];
-    sprintf(valueTruncated, "%.2f", _measurementsArray2D[sensorID][valueID]);
-    doc["value"] = valueTruncated;
+// void SensorManager::formatToJSON(uint8_t sensorID, uint8_t valueID, char *message, uint16_t messageSize)
+// {
+//     StaticJsonDocument<200> doc;
+//     doc["id"] = _sensorsNamesArray[sensorID];
+//     char valueTruncated[10];
+//     sprintf(valueTruncated, "%.2f", _measurementsArray2D[sensorID][valueID]);
+//     doc["value"] = valueTruncated;
 
-    serializeJson(doc, message, messageSize);
-}
+//     serializeJson(doc, message, messageSize);
+// }
 
 // bool SensorManager::sendSensorsData2D()
 // {
@@ -240,17 +240,15 @@ void SensorManager::formatToJSON(uint8_t sensorID, uint8_t valueID, char *messag
 // }
 uint16_t SensorManager::makeJSON(char *message, uint16_t len, uint8_t sensorID)
 {
-    // printf("\n-----size of _numberOfSensorsOnEachPort[sensorID]: %d  ----", _numberOfSensorsOnEachPort[sensorID]);
     size_t capacity = JSON_ARRAY_SIZE(_numberOfSensorsOnEachPort[sensorID] + 1) + JSON_OBJECT_SIZE(2);
-    // printf("\n-----size of DynamicJSON: %d----\n", capacity);
     DynamicJsonDocument doc(capacity);
     doc["name"] = _sensorsNamesArray[sensorID];
     JsonArray data = doc.createNestedArray("data");
     for (int i = 0; i < _numberOfSensorsOnEachPort[sensorID]; i++)
         data[i] = _measurementsArray2D[sensorID][i];
+
     serializeJson(doc, message, len);
-    // printf("\n\n-----size of DynamicJSON: %d----", capacity);
-    // printf("\nmessage MIN:\n%s\r---SIZE: %d----\n\n\n", message, strlen(message));
+
     return strlen(message);
 }
 bool SensorManager::sendSensorsData2D()
@@ -258,9 +256,8 @@ bool SensorManager::sendSensorsData2D()
     bool atLeastOneError = false;
     for (uint8_t i = 0; i < _totalPortsWithSensors; i++)
     {
-        char messageToSend[100];
-        uint16_t len = makeJSON(messageToSend, 100, i);
-        printf("\nmessage MIN:\n%s\r---SIZE: %d----\n\n\n", messageToSend, strlen(messageToSend));
+        char messageToSend[SM_nm::MAX_MESSAGE_SIZE];
+        uint16_t len = makeJSON(messageToSend, SM_nm::MAX_MESSAGE_SIZE, i);
         bool result = _clientMQTT.send(messageToSend, _addressesToSendMeasurementsTo[i]);
         if (!result)
             atLeastOneError = true;

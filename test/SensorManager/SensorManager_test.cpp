@@ -432,7 +432,7 @@ TEST_F(SensorManagerTest, DISABLED_test_sendSensorsData2D_WithNullAddress_Return
     EXPECT_FALSE(_mgr.sendSensorsData2D());
 }
 
-TEST_F(SensorManagerTest, test_sendingJSON_withData_ReturnsTrues)
+TEST_F(SensorManagerTest, test_sendingJSON_SingleSensor_ReturnsTrues)
 {
     MockSensor d1;
     ISensor *array[1] = {&d1};
