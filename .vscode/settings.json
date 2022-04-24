@@ -39,7 +39,8 @@
         "tuple": "cpp",
         "type_traits": "cpp",
         "utility": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "new": "cpp"
     },
     "gtest-adapter.debugConfig": [
         "PIO Debug"

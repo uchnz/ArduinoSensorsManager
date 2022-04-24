@@ -3,6 +3,24 @@
     "tasks": [
         {
             "type": "shell",
+            "label": "test JSON_test",
+            "command": "pio",
+            "args": [
+                "test",
+                "-e",
+                "native",
+                "-f",
+                "JSON_test"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "isDefault": false,
+                "kind": "build"
+            }
+        },        {
+            "type": "shell",
             "label": "test DallasArduino_test",
             "command": "pio",
             "args": [

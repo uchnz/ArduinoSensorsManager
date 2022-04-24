@@ -12,7 +12,7 @@ TEST_F(OnOffSensorArduinoTest, test_Init_CallsPinMode_toSetPinToInput_ReturnsTru
     EXPECT_CALL(*arduinoMock, pinMode(2, INPUT_PULLUP)).Times(1);
     OnOffSensorArduino onoff(2);
 
-    EXPECT_TRUE(onoff.init());
+    EXPECT_TRUE(onoff.init("sensorName"));
     releaseArduinoMock();
 }
 
@@ -20,19 +20,19 @@ TEST_F(OnOffSensorArduinoTest, test_Init_FailsWithoutPIN_ReturnsFalse)
 {
     OnOffSensorArduino onoff;
 
-    EXPECT_FALSE(onoff.init());
+    EXPECT_FALSE(onoff.init("sensorName"));
 }
 
 TEST_F(OnOffSensorArduinoTest, test_SetPINWithNonZero_allowsInitReturnTrue)
 {
     ArduinoMock *arduinoMock = arduinoMockInstance();
     OnOffSensorArduino onoff;
-    EXPECT_FALSE(onoff.init());
+    EXPECT_FALSE(onoff.init("sensorName"));
 
     EXPECT_CALL(*arduinoMock, pinMode(13, INPUT_PULLUP)).Times(1);
     onoff.SetPIN(13);
 
-    EXPECT_TRUE(onoff.init());
+    EXPECT_TRUE(onoff.init("sensorName"));
     releaseArduinoMock();
 }
 
@@ -49,7 +49,7 @@ TEST_F(OnOffSensorArduinoTest, test_SetPIN_resetsInitStatus)
     ArduinoMock *arduinoMock = arduinoMockInstance();
     OnOffSensorArduino onoff(1);
     EXPECT_CALL(*arduinoMock, pinMode(1, INPUT_PULLUP)).Times(1);
-    EXPECT_TRUE(onoff.init());
+    EXPECT_TRUE(onoff.init("sensorName"));
     onoff.SetPIN(4);
 
     EXPECT_EQ(onoff.getCurrentMeasurementByID(), -1);
@@ -71,7 +71,7 @@ TEST_F(OnOffSensorArduinoTest, test_getCurrentMeasurementByID_withoutRequestCurr
     ArduinoMock *arduinoMock = arduinoMockInstance();
     OnOffSensorArduino onoff(2);
     EXPECT_CALL(*arduinoMock, pinMode(2, INPUT_PULLUP)).Times(1);
-    EXPECT_TRUE(onoff.init());
+    EXPECT_TRUE(onoff.init("sensorName"));
 
     EXPECT_CALL(*arduinoMock, digitalRead(0)).Times(0);
     EXPECT_EQ(onoff.getCurrentMeasurementByID(), -1);
@@ -84,7 +84,7 @@ TEST_F(OnOffSensorArduinoTest, test_requestCurrentMeasurement_withinTimeInterval
     ArduinoMock *arduinoMock = arduinoMockInstance();
     OnOffSensorArduino onoff(2);
     EXPECT_CALL(*arduinoMock, pinMode(2, INPUT_PULLUP)).Times(1);
-    EXPECT_TRUE(onoff.init());
+    EXPECT_TRUE(onoff.init("sensorName"));
 
     EXPECT_CALL(*arduinoMock, digitalRead(2)).Times(4).WillOnce(Return(HIGH)).WillOnce(Return(LOW)).WillOnce(Return(HIGH)).WillOnce(Return(LOW));
     uint32_t startIntervalMillis = 8500;
@@ -117,7 +117,7 @@ TEST_F(OnOffSensorArduinoTest, test_requestCurrentMeasurement_withDifferentMeasu
     ArduinoMock *arduinoMock = arduinoMockInstance();
     OnOffSensorArduino onoff(2);
     EXPECT_CALL(*arduinoMock, pinMode(2, INPUT_PULLUP)).Times(1);
-    EXPECT_TRUE(onoff.init(100));
+    EXPECT_TRUE(onoff.init("sensorName", 100));
 
     EXPECT_CALL(*arduinoMock, digitalRead(2)).Times(4).WillOnce(Return(LOW)).WillOnce(Return(HIGH)).WillOnce(Return(LOW)).WillOnce(Return(HIGH));
     uint32_t startIntervalMillis = 8500;
@@ -133,7 +133,7 @@ TEST_F(OnOffSensorArduinoTest, test_requestCurrentMeasurement_withDifferentMeasu
 
     onoff.SetPIN(4);
     EXPECT_CALL(*arduinoMock, pinMode(4, INPUT_PULLUP)).Times(1);
-    EXPECT_TRUE(onoff.init(10));
+    EXPECT_TRUE(onoff.init("sensorName", 10));
     incrementIntervalMillis = 0;
     nextLoopMillis = 30;
     EXPECT_CALL(*arduinoMock, digitalRead(4)).Times(4).WillOnce(Return(LOW)).WillOnce(Return(HIGH)).WillOnce(Return(LOW)).WillOnce(Return(LOW));

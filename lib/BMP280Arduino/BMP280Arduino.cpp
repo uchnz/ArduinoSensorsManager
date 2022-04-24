@@ -11,9 +11,20 @@ BMP280Arduino::BMP280Arduino(iarduino_Pressure_BMP &bmp)
     for (uint8_t i = 0; i < bmp_nm::NUMBER_OF_MEASUREMENTS; i++)
         _sensorTemperatureArray[i] = _sensorPressureArray[i] = _sensorAltitudeArray[i] = bmp_nm::UNINITIALIZED_MEASUREMENT_VALUE;
 }
-
-bool BMP280Arduino::init(uint16_t ReadingInterval)
+void BMP280Arduino::initName(const char *name)
 {
+    int nameLengthWithNull = strlen(name) + 1;
+    if (nameLengthWithNull > bmp_nm::MAX_SENSOR_NAME)
+        nameLengthWithNull = bmp_nm::MAX_SENSOR_NAME - 1;
+
+    memcpy(_sensorName, name, nameLengthWithNull);
+}
+bool BMP280Arduino::init(const char *name, uint16_t ReadingInterval)
+{
+    if (!name || strlen(name) < 1)
+        return false;
+
+    initName(name);
     _sensorInitCompleted = _bmp.begin();
     _readingInterval = ReadingInterval;
 
@@ -74,7 +85,7 @@ uint8_t BMP280Arduino::getNumberOfConnectedSensors()
     return bmp_nm::NUMBER_OF_SENSORS_ON_BUS;
 }
 
-float BMP280Arduino::getCurrentMeasurementByID(uint8_t id)
+double BMP280Arduino::getCurrentMeasurementByID(uint8_t id)
 {
     if (!_sensorInitCompleted)
         return bmp_nm::UNINITIALIZED_MEASUREMENT_VALUE;
@@ -87,4 +98,10 @@ float BMP280Arduino::getCurrentMeasurementByID(uint8_t id)
         return _altitudeAverage;
 
     return bmp_nm::UNINITIALIZED_MEASUREMENT_VALUE;
+}
+
+// uint8_t BMP280Arduino::getName(char *&name)
+uint8_t BMP280Arduino::getName(char *name)
+{
+    return 0;
 }

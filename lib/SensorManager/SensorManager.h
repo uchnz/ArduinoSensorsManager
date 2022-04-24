@@ -14,14 +14,17 @@ private:
     char **_addressesToSendMeasurementsTo;
     uint8_t _totalAddresses;
 
-    uint8_t _totalNumberOfOccupiedPINsByISensorObjects;
+    uint8_t _totalPortsWithSensors;
     ISensor **_ISenosorObjectsManagingArray2D;
-    uint8_t *_numberOfSensorsOnPINsArray;
-    float **_measurementsArray2D;
+    uint8_t *_numberOfSensorsOnEachPort;
+    double **_measurementsArray2D;
+    char **_sensorsNamesArray;
 
     void initArrays(ISensor **sensorsArray2D, uint8_t totalOccupiedPINs);
     void fillArraysWithInitialValues();
     bool isSensorArrayAllNulls(ISensor **sensorsArray2D, uint8_t totalOccupiedPINs);
+    void formatToJSON(uint8_t sensorID, uint8_t valueID, char *message, uint16_t messageSize);
+    uint16_t makeJSON(char *message, uint16_t len, uint8_t sensorID);
 
 public:
     SensorManager(IMQTT &mqtt);
@@ -33,10 +36,12 @@ public:
     uint8_t getTotalNumberOfOccupiedPINs();
     bool initSenorsOnAllPINs(ISensor **sensorsArray2D, uint8_t totalOccupiedPINs);
 
-    float getCurrentMeasurementOfOneSenorByID(uint8_t row, uint8_t col = 0);
+    double getCurrentMeasurementOfOneSenorByID(uint8_t row, uint8_t col = 0);
 
     uint8_t getNumberOfSensorsOnPINByID(uint8_t id);
 
     bool refreshSensorsData2D();
     bool sendSensorsData2D();
+
+    void getJSON(double value, char *id, char *output);
 };

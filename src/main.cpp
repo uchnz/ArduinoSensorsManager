@@ -4,13 +4,10 @@
 #include <Wire.h>
 
 // #include "I2CScanner.h"
-
 // I2CScanner scanner;
 
 EthArduino ethernetModule;
 MQTTArduino mqttClientModule;
-const uint8_t totalSensorPorts = 6;
-const char *addressesToSendTo[totalSensorPorts] = {"/UZV1/temp1", "/UZV2/temp1and2", "/UZV1/mousure", "/UZV1/mq7co", "/UZV1/rd", "/UZV1/floatSensor"};
 
 OneWire ow1(22);
 DallasTemperature sensor1(&ow1);
@@ -23,24 +20,30 @@ SASArduino moisureC1(A1);
 MQ7COArduino mq7co(A2, 7);
 SASArduino co2(A3);
 SASArduino raindrop(A4);
-SASArduino uv(A5);
 OnOffSensorArduino floatSensor(38);
+SASArduino uv(A5);
 iarduino_I2C_SHT shtI2C(0x09);
 SHT20Arduino sht20(shtI2C);
 iarduino_Pressure_BMP bmpI2C;
 BMP280Arduino bmp280(bmpI2C);
 
-// ISensor *d_array[totalSensorPorts] = {&dallasModule1, &dallasModule2, &moisureR1, &mq7co, &raindrop, &floatSensor};
+const uint8_t totalSensorPorts = 11;
+const char *sendToAddresses[totalSensorPorts] = {"/temp/dl1", "/temp/dl2", "/moisure/r1", "/moisure/c1",
+                                                 "/gas/co", "/gas/co2", "/water/leak", "/water/level",
+                                                 "/light/uv", "/combo/mois", "/combo/pressure"};
+ISensor *senorsArray[totalSensorPorts] = {&dallas1, &dallas2, &moisureR1, &moisureC1,
+                                          &mq7co, &co2, &raindrop, &floatSensor,
+                                          &uv, &sht20, &bmp280};
 
-// SensorManager sensorsManager(mqttClientModule);
+SensorManager sensorsManager(mqttClientModule);
 
 void setup()
 {
     initSystemParameters();
     printf("\nStarting setup...\n");
 
-    // initNetworkCard(ethernetModule);
-    // initConnectionToMQTTBroker(mqttClientModule);
+    initNetworkCard(ethernetModule);
+    initConnectionToMQTTBroker(mqttClientModule);
     InitDallasSensor(dallas1);
     InitDallasSensor(dallas2);
     InitMQ7COSensor(mq7co);
@@ -48,14 +51,13 @@ void setup()
     InitSASSensor(moisureC1);
     InitSASSensor(raindrop);
     InitSASSensor(co2);
-    // digitalWrite(10, LOW);
     InitSASSensor(uv);
     InitSHT20Sensor(sht20);
     InitBMP280Sensor(bmp280);
     InitOnOffSensor(floatSensor);
 
-    // sensorsManager.initSenorsOnAllPINs(d_array, totalSensorPorts);
-    // sensorsManager.setAddressesToSendMeasurementsTo(addressesToSendTo, totalSensorPorts);
+    sensorsManager.initSenorsOnAllPINs(senorsArray, totalSensorPorts);
+    sensorsManager.setAddressesToSendMeasurementsTo(sendToAddresses, totalSensorPorts);
 
     // printf("Listing connected I2C devices:\n");
     // scanner.Init();
@@ -65,7 +67,7 @@ void setup()
 }
 
 uint32_t millisPassedSinceLastParse = 0;
-const uint16_t scanInterval = 2000;
+const uint16_t scanInterval = 5000;
 uint32_t i = 0;
 void loop()
 {
@@ -80,6 +82,8 @@ void loop()
     sht20.requestCurrentMeasurement();
     bmp280.requestCurrentMeasurement();
     floatSensor.requestCurrentMeasurement();
+
+    sensorsManager.refreshSensorsData2D();
 
     if (!isItTimeToParse(millisPassedSinceLastParse, scanInterval))
         return;
@@ -104,7 +108,6 @@ void loop()
     printf("float: %d\n", (int)floatSensor.getCurrentMeasurementByID());
     printf("-------------------------\n\n");
 
-    // sensorsManager.refreshSensorsData2D();
-    // sensorsManager.sendSensorsData2D();
+    sensorsManager.sendSensorsData2D();
     millisPassedSinceLastParse = millis();
 }

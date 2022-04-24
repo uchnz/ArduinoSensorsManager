@@ -15,7 +15,7 @@ TEST_F(DallasArduinoTest, test_Init_Successful_getDeviceCount_ReturnsNumberOfDev
     EXPECT_CALL(sensor, begin()).Times(1);
 
     EXPECT_CALL(sensor, getDeviceCount()).Times(1).WillOnce(Return(1));
-    EXPECT_TRUE(dallas.init());
+    EXPECT_TRUE(dallas.init("sensorName"));
 
     EXPECT_EQ(1, dallas.getNumberOfConnectedSensors());
 }
@@ -40,12 +40,12 @@ TEST_F(DallasArduinoTest, test_reInitFails_getDeviceCount_ReturnsPreviousNumber)
     EXPECT_CALL(sensor, begin()).Times(1);
 
     EXPECT_CALL(sensor, getDeviceCount()).Times(1).WillOnce(Return(7));
-    EXPECT_TRUE(dallas.init());
+    EXPECT_TRUE(dallas.init("sensorName"));
     EXPECT_EQ(7, dallas.getNumberOfConnectedSensors());
 
     EXPECT_CALL(sensor, begin()).Times(0);
     EXPECT_CALL(sensor, getDeviceCount()).Times(0);
-    EXPECT_FALSE(dallas.init());
+    EXPECT_FALSE(dallas.init("sensorName"));
     EXPECT_EQ(7, dallas.getNumberOfConnectedSensors());
 }
 
@@ -57,7 +57,7 @@ TEST_F(DallasArduinoTest, test_InitFails_getDeviceCount_ReturnsZero)
     EXPECT_CALL(sensor, begin()).Times(1);
 
     EXPECT_CALL(sensor, getDeviceCount()).Times(1).WillOnce(Return(0));
-    EXPECT_FALSE(dallas.init());
+    EXPECT_FALSE(dallas.init("sensorName"));
 
     EXPECT_EQ(0, dallas.getNumberOfConnectedSensors());
 }
@@ -90,7 +90,7 @@ TEST_F(DallasArduinoTest, test_getCurrentMeasurementByID_withOneSensor_ReturnsCo
     DallasArduino dallas(sensor);
     EXPECT_CALL(sensor, begin()).Times(1);
     EXPECT_CALL(sensor, getDeviceCount()).Times(1).WillOnce(Return(1));
-    EXPECT_TRUE(dallas.init());
+    EXPECT_TRUE(dallas.init("sensorName"));
 
     EXPECT_CALL(sensor, requestTemperatures()).Times(4);
     EXPECT_CALL(sensor, getTempCByIndex(0)).Times(4).WillOnce(Return(-10.8)).WillOnce(Return(-11)).WillOnce(Return(-11.2)).WillOnce(Return(74.8));
@@ -103,7 +103,7 @@ TEST_F(DallasArduinoTest, test_getCurrentMeasurementByID_withOneSensor_ReturnsCo
         dallas.requestCurrentMeasurement();
         incrementIntervalMillis += nextLoopMillis;
     }
-    EXPECT_FLOAT_EQ(-11, dallas.getCurrentMeasurementByID());
+    EXPECT_DOUBLE_EQ(-11, dallas.getCurrentMeasurementByID());
 
     EXPECT_CALL(sensor, requestTemperatures()).Times(4);
     EXPECT_CALL(sensor, getTempCByIndex(0)).Times(4).WillOnce(Return(75.1)).WillOnce(Return(75.4)).WillOnce(Return(75.8)).WillOnce(Return(90));
@@ -115,7 +115,7 @@ TEST_F(DallasArduinoTest, test_getCurrentMeasurementByID_withOneSensor_ReturnsCo
         dallas.requestCurrentMeasurement();
         incrementIntervalMillis += nextLoopMillis;
     }
-    EXPECT_FLOAT_EQ(75.1, dallas.getCurrentMeasurementByID());
+    EXPECT_DOUBLE_EQ(75.1, dallas.getCurrentMeasurementByID());
     releaseArduinoMock();
 }
 
@@ -127,7 +127,7 @@ TEST_F(DallasArduinoTest, test_getCurrentMeasurementByID_withOneSensor_withDiffe
     DallasArduino dallas(sensor);
     EXPECT_CALL(sensor, begin()).Times(1);
     EXPECT_CALL(sensor, getDeviceCount()).Times(1).WillOnce(Return(1));
-    EXPECT_TRUE(dallas.init(1000));
+    EXPECT_TRUE(dallas.init("sensorName", 1000));
 
     EXPECT_CALL(sensor, requestTemperatures()).Times(4);
     EXPECT_CALL(sensor, getTempCByIndex(0)).Times(4).WillOnce(Return(0)).WillOnce(Return(-2)).WillOnce(Return(2)).WillOnce(Return(117.7));
@@ -140,7 +140,7 @@ TEST_F(DallasArduinoTest, test_getCurrentMeasurementByID_withOneSensor_withDiffe
         dallas.requestCurrentMeasurement();
         incrementIntervalMillis += nextLoopMillis;
     }
-    EXPECT_FLOAT_EQ(0, dallas.getCurrentMeasurementByID());
+    EXPECT_DOUBLE_EQ(0, dallas.getCurrentMeasurementByID());
 
     EXPECT_CALL(sensor, requestTemperatures()).Times(3);
     EXPECT_CALL(sensor, getTempCByIndex(0)).Times(3).WillOnce(Return(17.7)).WillOnce(Return(-82.3)).WillOnce(Return(1320));
@@ -152,7 +152,7 @@ TEST_F(DallasArduinoTest, test_getCurrentMeasurementByID_withOneSensor_withDiffe
         dallas.requestCurrentMeasurement();
         incrementIntervalMillis += nextLoopMillis;
     }
-    EXPECT_FLOAT_EQ(17.7, dallas.getCurrentMeasurementByID());
+    EXPECT_DOUBLE_EQ(17.7, dallas.getCurrentMeasurementByID());
 
     releaseArduinoMock();
 }
@@ -165,7 +165,7 @@ TEST_F(DallasArduinoTest, test_getTemperatures_ManySensors_ReturnsCorrectTempera
     DallasArduino dallas(sensor);
     EXPECT_CALL(sensor, begin()).Times(1);
     EXPECT_CALL(sensor, getDeviceCount()).Times(1).WillOnce(Return(3));
-    EXPECT_TRUE(dallas.init());
+    EXPECT_TRUE(dallas.init("sensorName"));
 
     EXPECT_CALL(sensor, requestTemperatures()).Times(4);
     EXPECT_CALL(sensor, getTempCByIndex(0)).Times(4).WillOnce(Return(-40.1)).WillOnce(Return(-39.9)).WillOnce(Return(-39.7)).WillOnce(Return(20));
@@ -180,9 +180,9 @@ TEST_F(DallasArduinoTest, test_getTemperatures_ManySensors_ReturnsCorrectTempera
         dallas.requestCurrentMeasurement();
         incrementIntervalMillis += nextLoopMillis;
     }
-    EXPECT_FLOAT_EQ(-39.9, dallas.getCurrentMeasurementByID());
-    EXPECT_FLOAT_EQ(0, dallas.getCurrentMeasurementByID(1));
-    EXPECT_FLOAT_EQ(6.35, dallas.getCurrentMeasurementByID(2));
+    EXPECT_DOUBLE_EQ(-39.9, dallas.getCurrentMeasurementByID());
+    EXPECT_DOUBLE_EQ(0, dallas.getCurrentMeasurementByID(1));
+    EXPECT_DOUBLE_EQ(6.35, dallas.getCurrentMeasurementByID(2));
 
     EXPECT_CALL(sensor, requestTemperatures()).Times(3);
     EXPECT_CALL(sensor, getTempCByIndex(0)).Times(3).WillOnce(Return(22)).WillOnce(Return(24)).WillOnce(Return(125));
@@ -196,9 +196,9 @@ TEST_F(DallasArduinoTest, test_getTemperatures_ManySensors_ReturnsCorrectTempera
         dallas.requestCurrentMeasurement();
         incrementIntervalMillis += nextLoopMillis;
     }
-    EXPECT_FLOAT_EQ(22, dallas.getCurrentMeasurementByID());
-    EXPECT_FLOAT_EQ(27.5, dallas.getCurrentMeasurementByID(1));
-    EXPECT_FLOAT_EQ(-8, dallas.getCurrentMeasurementByID(2));
+    EXPECT_DOUBLE_EQ(22, dallas.getCurrentMeasurementByID());
+    EXPECT_DOUBLE_EQ(27.5, dallas.getCurrentMeasurementByID(1));
+    EXPECT_DOUBLE_EQ(-8, dallas.getCurrentMeasurementByID(2));
     releaseArduinoMock();
 }
 
@@ -210,14 +210,14 @@ TEST_F(DallasArduinoTest, test_nonExistentSensorID_ReturnsErrorValue)
     DallasArduino dallas(sensor);
     EXPECT_CALL(sensor, begin()).Times(1);
     EXPECT_CALL(sensor, getDeviceCount()).Times(1).WillOnce(Return(2));
-    EXPECT_TRUE(dallas.init());
+    EXPECT_TRUE(dallas.init("sensorName"));
 
     EXPECT_CALL(sensor, requestTemperatures()).Times(1);
     EXPECT_CALL(sensor, getTempCByIndex(_)).Times(2).WillOnce(Return(1)).WillOnce(Return(-1));
     EXPECT_CALL(*arduinoMock, millis).Times(2).WillRepeatedly(Return(1000));
     dallas.requestCurrentMeasurement();
 
-    EXPECT_FLOAT_EQ(-127, dallas.getCurrentMeasurementByID(2));
-    EXPECT_FLOAT_EQ(-127, dallas.getCurrentMeasurementByID(5));
+    EXPECT_DOUBLE_EQ(-127, dallas.getCurrentMeasurementByID(2));
+    EXPECT_DOUBLE_EQ(-127, dallas.getCurrentMeasurementByID(5));
     releaseArduinoMock();
 }

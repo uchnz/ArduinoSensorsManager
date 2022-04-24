@@ -15,17 +15,17 @@ TEST_F(MQ7COArduinoTest, test_Init_CallsPinMode_toSetPinsToOUT_ReturnsTrue)
 
     EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(25873405));
     EXPECT_CALL(*arduinoMock, analogWrite(3, mq7co_nm::HIGH_5_0)).Times(1);
-    EXPECT_TRUE(mq7co.init());
+    EXPECT_TRUE(mq7co.init("sensorName"));
     releaseArduinoMock();
 }
 
 TEST_F(MQ7COArduinoTest, test_init_WithTheSamePortForSignalAndHeater_Fails_ReturnsFalse)
 {
     MQ7COArduino mq7co;
-    EXPECT_FALSE(mq7co.init());
+    EXPECT_FALSE(mq7co.init("sensorName"));
 
     MQ7COArduino mq7(A1, A1);
-    EXPECT_FALSE(mq7.init());
+    EXPECT_FALSE(mq7.init("sensorName"));
 }
 
 TEST_F(MQ7COArduinoTest, test_setDifferentSignalAndHeaterPINs_allowsInitReturnTrue)
@@ -39,7 +39,7 @@ TEST_F(MQ7COArduinoTest, test_setDifferentSignalAndHeaterPINs_allowsInitReturnTr
 
     mq7co.changeSignalAndHeaterPINs(A2, 1);
 
-    EXPECT_TRUE(mq7co.init());
+    EXPECT_TRUE(mq7co.init("sensorName"));
     releaseArduinoMock();
 }
 
@@ -49,7 +49,7 @@ TEST_F(MQ7COArduinoTest, test_setSameSignalAndHeaterPINs_failsInit)
 
     mq7co.changeSignalAndHeaterPINs(A3, A3);
 
-    EXPECT_FALSE(mq7co.init());
+    EXPECT_FALSE(mq7co.init("sensorName"));
 }
 
 TEST_F(MQ7COArduinoTest, test_getCurrentMeasurementByID_WithoutInit_ReturnsMinusOne)
@@ -67,7 +67,7 @@ TEST_F(MQ7COArduinoTest, test_requestCurrentMeasurement_SavesAverage)
     uint32_t startIntervalMillis = 8500;
     EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(startIntervalMillis));
     EXPECT_CALL(*arduinoMock, analogWrite(2, mq7co_nm::HIGH_5_0)).Times(AtLeast(1));
-    mq7co.init();
+    mq7co.init("sensorName");
 
     EXPECT_CALL(*arduinoMock, analogWrite(2, mq7co_nm::LOW_1_4)).Times(1);
     uint32_t incrementIntervalMillis = 0;
@@ -92,7 +92,7 @@ TEST_F(MQ7COArduinoTest, test_requestCurrentMeasurement_withLargeScanFrequency_c
     uint32_t startIntervalMillis = 8500;
     EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(startIntervalMillis));
     EXPECT_CALL(*arduinoMock, analogWrite(2, mq7co_nm::HIGH_5_0)).Times(AtLeast(1));
-    mq7co.init();
+    mq7co.init("sensorName");
 
     EXPECT_CALL(*arduinoMock, analogWrite(2, mq7co_nm::LOW_1_4)).Times(1);
     uint32_t incrementIntervalMillis = 0;
@@ -128,7 +128,7 @@ TEST_F(MQ7COArduinoTest, test_requestCurrentMeasurement_withSmallScanFrequency_c
     uint32_t startIntervalMillis = 8500;
     EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(startIntervalMillis));
     EXPECT_CALL(*arduinoMock, analogWrite(2, mq7co_nm::HIGH_5_0)).Times(AtLeast(1));
-    mq7co.init();
+    mq7co.init("sensorName");
 
     EXPECT_CALL(*arduinoMock, analogWrite(2, mq7co_nm::LOW_1_4)).Times(1);
     uint32_t incrementIntervalMillis = 0;
@@ -166,7 +166,7 @@ TEST_F(MQ7COArduinoTest, test_requestCurrentMeasurement_withSmallInterval_calcul
     uint32_t startIntervalMillis = 8500;
     EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(startIntervalMillis));
     EXPECT_CALL(*arduinoMock, analogWrite(2, mq7co_nm::HIGH_5_0)).Times(AtLeast(1));
-    mq7co.init(1000);
+    mq7co.init("sensorName", 1000);
 
     EXPECT_CALL(*arduinoMock, analogWrite(2, mq7co_nm::LOW_1_4)).Times(1);
     uint32_t incrementIntervalMillis = 0;
@@ -191,7 +191,7 @@ TEST_F(MQ7COArduinoTest, test_requestCurrentMeasurement_withLargelInterval_calcu
     uint32_t startIntervalMillis = 8500;
     EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(startIntervalMillis));
     EXPECT_CALL(*arduinoMock, analogWrite(2, mq7co_nm::HIGH_5_0)).Times(AtLeast(1));
-    mq7co.init(5000);
+    mq7co.init("sensorName", 5000);
 
     EXPECT_CALL(*arduinoMock, analogWrite(2, mq7co_nm::LOW_1_4)).Times(1);
     uint32_t incrementIntervalMillis = 0;

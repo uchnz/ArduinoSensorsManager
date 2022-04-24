@@ -15,6 +15,7 @@ namespace bmp_nm
     const uint8_t TEMPERATURE_ID = 0;
     const uint8_t PRESSURE_ID = 1;
     const uint8_t ALTITUDE_ID = 2;
+    const uint8_t MAX_SENSOR_NAME = 30;
 }
 
 class BMP280Arduino : public ISensor
@@ -22,26 +23,30 @@ class BMP280Arduino : public ISensor
 private:
     iarduino_Pressure_BMP &_bmp;
     bool _sensorInitCompleted;
-    float _sensorTemperatureArray[bmp_nm::NUMBER_OF_MEASUREMENTS];
-    float _sensorPressureArray[bmp_nm::NUMBER_OF_MEASUREMENTS];
-    float _sensorAltitudeArray[bmp_nm::NUMBER_OF_MEASUREMENTS];
+    char _sensorName[bmp_nm::MAX_SENSOR_NAME];
+    double _sensorTemperatureArray[bmp_nm::NUMBER_OF_MEASUREMENTS];
+    double _sensorPressureArray[bmp_nm::NUMBER_OF_MEASUREMENTS];
+    double _sensorAltitudeArray[bmp_nm::NUMBER_OF_MEASUREMENTS];
     uint8_t _currentSavingItemInArray;
-    float _temperatureAverage;
-    float _pressureAverage;
-    float _altitudeAverage;
+    double _temperatureAverage;
+    double _pressureAverage;
+    double _altitudeAverage;
     uint32_t _startReadMillis;
     uint16_t _readingInterval;
 
+    void initName(const char *name);
     void saveAverageMeasurement();
     bool isReadyForNextRead(uint32_t now);
     bool isArrayFull();
 
 public:
     BMP280Arduino(iarduino_Pressure_BMP &bmp);
-    bool init(uint16_t ReadingInterval = bmp_nm::DEFAULT_READING_INTERVAL);
+    bool init(const char *name, uint16_t ReadingInterval = bmp_nm::DEFAULT_READING_INTERVAL);
     uint8_t getAddress();
 
     void requestCurrentMeasurement() override;
     uint8_t getNumberOfConnectedSensors() override;
-    float getCurrentMeasurementByID(uint8_t id = 0) override;
+    double getCurrentMeasurementByID(uint8_t id = 0) override;
+    uint8_t getName(char *name);
+    // uint8_t getName(char *&name);
 };

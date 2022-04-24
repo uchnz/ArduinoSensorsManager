@@ -28,7 +28,15 @@ MQ7COArduino::MQ7COArduino(uint8_t signalPIN, uint8_t signalHeaterPIN)
     changeSignalAndHeaterPINs(signalPIN, signalHeaterPIN);
 }
 
-bool MQ7COArduino::init(uint16_t ReadInterval)
+void MQ7COArduino::initName(const char *name)
+{
+    int nameLengthWithNull = strlen(name) + 1;
+    if (nameLengthWithNull > mq7co_nm::MAX_SENSOR_NAME)
+        nameLengthWithNull = mq7co_nm::MAX_SENSOR_NAME - 1;
+
+    memcpy(_sensorName, name, nameLengthWithNull);
+}
+bool MQ7COArduino::init(const char *name, uint16_t ReadingInterval)
 {
     if (_signalPIN == _signalHeaterPIN)
         return false;
@@ -36,7 +44,7 @@ bool MQ7COArduino::init(uint16_t ReadInterval)
     pinMode(_signalPIN, INPUT);
     pinMode(_signalHeaterPIN, OUTPUT);
     _sensorInitCompleted = true;
-    _pimpl->resetOnInit(ReadInterval);
+    _pimpl->resetOnInit(ReadingInterval);
     _pimpl->setPhase(mq7impl::HEATING);
     setHeaterVoltageForPhase(mq7co_nm::HIGH_5_0);
 
@@ -71,7 +79,7 @@ uint8_t MQ7COArduino::getNumberOfConnectedSensors()
     return mq7co_nm::NUMBER_OF_SENSORS_ON_BUS;
 }
 
-float MQ7COArduino::getCurrentMeasurementByID(uint8_t id)
+double MQ7COArduino::getCurrentMeasurementByID(uint8_t id)
 {
     return _averageOfAllMeasuredValues;
 }
@@ -106,4 +114,10 @@ void MQ7COArduino::requestCurrentMeasurement()
     }
     _pimpl->setPhase(mq7impl::HEATING);
     setHeaterVoltageForPhase(mq7co_nm::HIGH_5_0);
+}
+
+// uint8_t MQ7COArduino::getName(char *&name)
+uint8_t MQ7COArduino::getName(char *name)
+{
+    return 0;
 }

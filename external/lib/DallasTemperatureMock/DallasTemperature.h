@@ -22,5 +22,5 @@ public:
     MOCK_METHOD(void, begin, ());
     MOCK_METHOD(uint8_t, getDeviceCount, ());
     MOCK_METHOD(void, requestTemperatures, ());
-    MOCK_METHOD(float, getTempCByIndex, (uint8_t));
+    MOCK_METHOD(double, getTempCByIndex, (uint8_t));
 };

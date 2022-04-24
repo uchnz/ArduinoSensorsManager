@@ -19,13 +19,23 @@ SASArduino::SASArduino(uint8_t signalPIN)
 {
     SetPIN(signalPIN);
 }
+void SASArduino::initName(const char *name)
+{
+    int nameLengthWithNull = strlen(name) + 1;
+    if (nameLengthWithNull > sas_nm::MAX_SENSOR_NAME)
+        nameLengthWithNull = sas_nm::MAX_SENSOR_NAME - 1;
 
-bool SASArduino::init(uint16_t ReadingInterval)
+    memcpy(_sensorName, name, nameLengthWithNull);
+}
+bool SASArduino::init(const char *name, uint16_t ReadingInterval)
 {
     if (sas_nm::UNINITIALIZED_PIN_VALUE == _signalPIN)
         return false;
+    if (!name || strlen(name) < 1)
+        return false;
 
     pinMode(_signalPIN, INPUT);
+    initName(name);
     _readingInterval = ReadingInterval;
     _sensorInitCompleted = true;
     return true;
@@ -69,10 +79,20 @@ void SASArduino::requestCurrentMeasurement()
     _startReadMillis = millis();
 }
 
-float SASArduino::getCurrentMeasurementByID(uint8_t id)
+double SASArduino::getCurrentMeasurementByID(uint8_t id)
 {
     if (!_sensorInitCompleted)
         return sas_nm::UNINITIALIZED_MEASUREMENT_VALUE;
 
     return _sensorValue;
+}
+
+uint8_t SASArduino::getName(char *name)
+{
+    if (!_sensorInitCompleted)
+        return 0;
+
+    int nameLength = strlen(_sensorName);
+    memcpy(name, _sensorName, nameLength + 1);
+    return nameLength;
 }

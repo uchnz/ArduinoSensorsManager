@@ -13,8 +13,8 @@ public:
 
     MOCK_METHOD(bool, begin, ());
     MOCK_METHOD(uint8_t, getAddress, ());
-    MOCK_METHOD(float, getTem, ());
-    MOCK_METHOD(float, getHum, ());
+    MOCK_METHOD(double, getTem, ());
+    MOCK_METHOD(double, getHum, ());
 };
 // bool begin(void);
 // bool reset(void);

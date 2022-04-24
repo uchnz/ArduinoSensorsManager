@@ -25,7 +25,15 @@ DallasArduino::~DallasArduino()
     }
 }
 
-bool DallasArduino::init(uint16_t readingInterval)
+void DallasArduino::initName(const char *name)
+{
+    int nameLengthWithNull = strlen(name) + 1;
+    if (nameLengthWithNull > dallas_nm::MAX_SENSOR_NAME)
+        nameLengthWithNull = dallas_nm::MAX_SENSOR_NAME - 1;
+
+    memcpy(_sensorName, name, nameLengthWithNull);
+}
+bool DallasArduino::init(const char *name, uint16_t ReadingInterval)
 {
     if (_totalConnectedSensors > 0)
         return false;
@@ -35,15 +43,15 @@ bool DallasArduino::init(uint16_t readingInterval)
     if (!_totalConnectedSensors)
         return false;
 
-    _readingInterval = readingInterval;
+    _readingInterval = ReadingInterval;
 
-    _averageTemperatures = new float[_totalConnectedSensors];
+    _averageTemperatures = new double[_totalConnectedSensors];
     for (uint8_t i = 0; i < _totalConnectedSensors; i++)
         _averageTemperatures[i] = dallas_nm::UNINITIALIZED_MEASUREMENT_VALUE;
 
-    _temperatures2DArray = new float *[_totalConnectedSensors];
+    _temperatures2DArray = new double *[_totalConnectedSensors];
     for (uint8_t i = 0; i < _totalConnectedSensors; i++)
-        _temperatures2DArray[i] = new float[dallas_nm::NUMBER_OF_MEASUREMENTS];
+        _temperatures2DArray[i] = new double[dallas_nm::NUMBER_OF_MEASUREMENTS];
 
     for (uint8_t i = 0; i < _totalConnectedSensors; i++)
         for (uint8_t j = 0; j < dallas_nm::NUMBER_OF_MEASUREMENTS; j++)
@@ -99,7 +107,7 @@ uint8_t DallasArduino::getNumberOfConnectedSensors()
     return _totalConnectedSensors;
 }
 
-float DallasArduino::getCurrentMeasurementByID(uint8_t id)
+double DallasArduino::getCurrentMeasurementByID(uint8_t id)
 {
     if (!_totalConnectedSensors)
         return dallas_nm::UNINITIALIZED_MEASUREMENT_VALUE;
@@ -108,4 +116,10 @@ float DallasArduino::getCurrentMeasurementByID(uint8_t id)
         return dallas_nm::UNINITIALIZED_MEASUREMENT_VALUE;
 
     return _averageTemperatures[id];
+}
+
+// uint8_t DallasArduino::getName(char *&name)
+uint8_t DallasArduino::getName(char *name)
+{
+    return 0;
 }

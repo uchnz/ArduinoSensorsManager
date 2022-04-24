@@ -12,8 +12,20 @@ SHT20Arduino::SHT20Arduino(iarduino_I2C_SHT &sht)
         _sensorTemperatureArray[i] = _sensorHumidityArray[i] = sht_nm::UNINITIALIZED_MEASUREMENT_VALUE;
 }
 
-bool SHT20Arduino::init(uint16_t ReadingInterval)
+void SHT20Arduino::initName(const char *name)
 {
+    int nameLengthWithNull = strlen(name) + 1;
+    if (nameLengthWithNull > sht_nm::MAX_SENSOR_NAME)
+        nameLengthWithNull = sht_nm::MAX_SENSOR_NAME - 1;
+
+    memcpy(_sensorName, name, nameLengthWithNull);
+}
+bool SHT20Arduino::init(const char *name, uint16_t ReadingInterval)
+{
+    if ((!name) || (strlen(name) < 1))
+        return false;
+
+    memcpy(_name, name, strlen(name));
     _sensorInitCompleted = _sht.begin();
     _readingInterval = ReadingInterval;
 
@@ -70,7 +82,7 @@ uint8_t SHT20Arduino::getNumberOfConnectedSensors()
     return sht_nm::NUMBER_OF_SENSORS_ON_BUS;
 }
 
-float SHT20Arduino::getCurrentMeasurementByID(uint8_t id)
+double SHT20Arduino::getCurrentMeasurementByID(uint8_t id)
 {
     if (!_sensorInitCompleted)
         return sht_nm::UNINITIALIZED_MEASUREMENT_VALUE;
@@ -81,4 +93,10 @@ float SHT20Arduino::getCurrentMeasurementByID(uint8_t id)
         return _humidityAverage;
 
     return sht_nm::UNINITIALIZED_MEASUREMENT_VALUE;
+}
+
+// uint8_t SHT20Arduino::getName(char *&name)
+uint8_t SHT20Arduino::getName(char *name)
+{
+    return 0;
 }

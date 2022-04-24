@@ -21,7 +21,15 @@ OnOffSensorArduino::OnOffSensorArduino(uint8_t signalPIN)
     SetPIN(signalPIN);
 }
 
-bool OnOffSensorArduino::init(uint16_t ReadingInterval)
+void OnOffSensorArduino::initName(const char *name)
+{
+    int nameLengthWithNull = strlen(name) + 1;
+    if (nameLengthWithNull > oos_nm::MAX_SENSOR_NAME)
+        nameLengthWithNull = oos_nm::MAX_SENSOR_NAME - 1;
+
+    memcpy(_sensorName, name, nameLengthWithNull);
+}
+bool OnOffSensorArduino::init(const char *name, uint16_t ReadingInterval)
 {
 
     if (oos_nm::UNINITIALIZED_PIN_VALUE == _signalPIN)
@@ -71,10 +79,16 @@ void OnOffSensorArduino::requestCurrentMeasurement()
     _startReadMillis = millis();
 }
 
-float OnOffSensorArduino::getCurrentMeasurementByID(uint8_t id)
+double OnOffSensorArduino::getCurrentMeasurementByID(uint8_t id)
 {
     if (!_sensorInitCompleted)
         return oos_nm::UNINITIALIZED_MEASUREMENT_VALUE;
 
     return _sensorValue;
+}
+
+// uint8_t OnOffSensorArduino::getName(char *&name)
+uint8_t OnOffSensorArduino::getName(char *name)
+{
+    return 0;
 }
