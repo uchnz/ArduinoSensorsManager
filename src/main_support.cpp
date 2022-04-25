@@ -30,29 +30,30 @@ void initConnectionToMQTTBroker(MQTTArduino &mqtt)
     mqtt.connect();
     mqtt.subscribeToTopic(topicToReadSettingsFrom);
 }
-void InitDallasSensor(DallasArduino &dallas)
+
+void InitDallasSensor(DallasArduino &dallas, const char *name, uint16_t interval)
 {
-    dallas.init();
+    dallas.init(name);
 }
-void InitSASSensor(SASArduino &sas)
+void InitSASSensor(SASArduino &sas, const char *name, uint16_t interval)
 {
-    sas.init(500);
+    sas.init(name);
 }
-void InitMQ7COSensor(MQ7COArduino &mq7co)
+void InitMQ7COSensor(MQ7COArduino &mq7co, const char *name, uint16_t interval)
 {
-    mq7co.init(7000);
+    mq7co.init(name);
 }
-void InitSHT20Sensor(SHT20Arduino &sht20)
+void InitSHT20Sensor(SHT20Arduino &sht20, const char *name, uint16_t interval)
 {
-    sht20.init(1000);
+    sht20.init(name);
 }
-void InitBMP280Sensor(BMP280Arduino &bmp280)
+void InitBMP280Sensor(BMP280Arduino &bmp280, const char *name, uint16_t interval)
 {
-    bmp280.init(1000);
+    bmp280.init(name);
 }
-void InitOnOffSensor(OnOffSensorArduino &fl)
+void InitOnOffSensor(OnOffSensorArduino &fl, const char *name, uint16_t interval)
 {
-    fl.init();
+    fl.init(name);
 }
 //*** END SETUP HELPERS ***//
 

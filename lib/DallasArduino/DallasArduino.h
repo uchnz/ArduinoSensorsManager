@@ -39,5 +39,4 @@ public:
     uint8_t getNumberOfConnectedSensors() override;
     double getCurrentMeasurementByID(uint8_t id = 0) override;
     uint8_t getName(char *name);
-    // uint8_t getName(char *&name);
 };
