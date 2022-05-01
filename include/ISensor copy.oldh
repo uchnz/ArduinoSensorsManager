@@ -1,0 +1,40 @@
+#pragma once
+#include <stdint.h>
+
+namespace sensor_nm
+{
+    const uint8_t MAX_SENSOR_NAME = 30;
+}
+class ISensor
+{
+protected:
+    char _sensorName[30];
+
+public:
+    ISensor() = default;
+    ISensor(const char *name);
+    virtual ~ISensor() = default;
+
+    virtual void requestCurrentMeasurement() = 0;
+    virtual uint8_t getNumberOfConnectedSensors() = 0;
+    virtual double getCurrentMeasurementByID(uint8_t id) = 0;
+    virtual uint8_t getName(char *name); // = 0;
+};
+
+ISensor::ISensor(const char *name)
+{
+    _sensorName[0] = 0;
+    if ((!name) || (0 == strlen(name)))
+        return;
+
+    int nameLengthWithNull = strlen(name) + 1;
+    if (nameLengthWithNull > sensor_nm::MAX_SENSOR_NAME)
+        nameLengthWithNull = sensor_nm::MAX_SENSOR_NAME;
+    memcpy(_sensorName, name, nameLengthWithNull);
+}
+
+uint8_t ISensor::getName(char *name)
+{
+    memcpy(name, _sensorName, strlen(_sensorName) + 1);
+    return strlen(_sensorName);
+}

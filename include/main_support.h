@@ -15,10 +15,9 @@ void initSystemParameters();
 void initNetworkCard(EthArduino &eth);
 void initConnectionToMQTTBroker(MQTTArduino &mqtt);
 void InitDallasSensor(DallasArduino &dallas, const char *name, uint16_t interval = 0);
-void InitSASSensor(SASArduino &moisure, const char *name, uint16_t interval = 0);
 void InitMQ7COSensor(MQ7COArduino &mq7co, const char *name, uint16_t interval = 0);
 void InitOnOffSensor(OnOffSensorArduino &fl, const char *name, uint16_t interval = 0);
-void InitSHT20Sensor(SHT20Arduino &sht20, const char *name, uint16_t interval = 0);
+// void InitSHT20Sensor(SHT20Arduino &sht20, const char *name, uint16_t interval = 0);
 void InitBMP280Sensor(BMP280Arduino &bmp280, const char *name, uint16_t interval = 0);
 
 //*** LOOP HELPERS ***//

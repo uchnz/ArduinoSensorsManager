@@ -35,18 +35,14 @@ void InitDallasSensor(DallasArduino &dallas, const char *name, uint16_t interval
 {
     dallas.init(name);
 }
-void InitSASSensor(SASArduino &sas, const char *name, uint16_t interval)
-{
-    sas.init(name);
-}
 void InitMQ7COSensor(MQ7COArduino &mq7co, const char *name, uint16_t interval)
 {
     mq7co.init(name);
 }
-void InitSHT20Sensor(SHT20Arduino &sht20, const char *name, uint16_t interval)
-{
-    sht20.init(name);
-}
+// void InitSHT20Sensor(SHT20Arduino &sht20, const char *name, uint16_t interval)
+// {
+//     sht20.init(name);
+// }
 void InitBMP280Sensor(BMP280Arduino &bmp280, const char *name, uint16_t interval)
 {
     bmp280.init(name);

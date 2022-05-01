@@ -51,7 +51,7 @@ public:
     void changeSignalAndHeaterPINs(uint8_t signalPIN, uint8_t signalHeaterPIN);
     bool init(const char *name, uint16_t ReadingInterval = mq7co_nm::DEFAULT_READING_INTERVAL);
 
-    void requestCurrentMeasurement() override;
+    bool requestCurrentMeasurement() override;
     uint8_t getNumberOfConnectedSensors() override;
     double getCurrentMeasurementByID(uint8_t id = 0) override;
     uint8_t getName(char *name);

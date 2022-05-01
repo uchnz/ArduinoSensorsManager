@@ -1,8 +1,9 @@
 #include <SHT20Arduino.h>
 
-SHT20Arduino::SHT20Arduino(iarduino_I2C_SHT &sht)
+SHT20Arduino::SHT20Arduino(iarduino_I2C_SHT &sht, const char *name)
     : _sht(sht)
 {
+    _sensorName[0] = 0;
     _sensorInitCompleted = false;
     _startReadMillis = 0;
     _readingInterval = sht_nm::DEFAULT_READING_INTERVAL;
@@ -10,24 +11,39 @@ SHT20Arduino::SHT20Arduino(iarduino_I2C_SHT &sht)
     _currentSavingItemInArray = 0;
     for (uint8_t i = 0; i < sht_nm::NUMBER_OF_MEASUREMENTS; i++)
         _sensorTemperatureArray[i] = _sensorHumidityArray[i] = sht_nm::UNINITIALIZED_MEASUREMENT_VALUE;
+    setName(name);
 }
 
-void SHT20Arduino::initName(const char *name)
+// void SHT20Arduino::initName(const char *name)
+// {
+//     int nameLengthWithNull = strlen(name) + 1;
+//     if (nameLengthWithNull > sht_nm::MAX_SENSOR_NAME)
+//         nameLengthWithNull = sht_nm::MAX_SENSOR_NAME - 1;
+
+//     memcpy(_sensorName, name, nameLengthWithNull);
+// }
+bool SHT20Arduino::setName(const char *name)
 {
+    if (!name || (0 == strlen(name)))
+        return false;
+
     int nameLengthWithNull = strlen(name) + 1;
     if (nameLengthWithNull > sht_nm::MAX_SENSOR_NAME)
         nameLengthWithNull = sht_nm::MAX_SENSOR_NAME - 1;
-
     memcpy(_sensorName, name, nameLengthWithNull);
-}
-bool SHT20Arduino::init(const char *name, uint16_t ReadingInterval)
-{
-    if ((!name) || (strlen(name) < 1))
-        return false;
 
-    memcpy(_name, name, strlen(name));
-    _sensorInitCompleted = _sht.begin();
+    return true;
+}
+bool SHT20Arduino::init(uint16_t ReadingInterval)
+{
+    if (0 == strlen(_sensorName))
+        return false;
+    // if ((!name) || (strlen(name) < 1))
+    //     return false;
+
+    // memcpy(_name, name, strlen(name));
     _readingInterval = ReadingInterval;
+    _sensorInitCompleted = _sht.begin();
 
     return _sensorInitCompleted;
 }
@@ -60,14 +76,14 @@ bool SHT20Arduino::isArrayFull()
 {
     return (_currentSavingItemInArray > sht_nm::NUMBER_OF_MEASUREMENTS - 1);
 }
-void SHT20Arduino::requestCurrentMeasurement()
+bool SHT20Arduino::requestCurrentMeasurement()
 {
     if (!_sensorInitCompleted)
-        return;
+        return false;
 
     uint32_t now = millis();
     if (!isReadyForNextRead(now))
-        return;
+        return false;
 
     if (isArrayFull())
         saveAverageMeasurement();
@@ -75,6 +91,8 @@ void SHT20Arduino::requestCurrentMeasurement()
     _sensorTemperatureArray[_currentSavingItemInArray] = _sht.getTem();
     _sensorHumidityArray[_currentSavingItemInArray++] = _sht.getHum();
     _startReadMillis = millis();
+
+    return true;
 }
 
 uint8_t SHT20Arduino::getNumberOfConnectedSensors()
@@ -98,5 +116,10 @@ double SHT20Arduino::getCurrentMeasurementByID(uint8_t id)
 // uint8_t SHT20Arduino::getName(char *&name)
 uint8_t SHT20Arduino::getName(char *name)
 {
-    return 0;
+    if (!_sensorInitCompleted)
+        return 0;
+
+    int nameLength = strlen(_sensorName);
+    memcpy(name, _sensorName, nameLength + 1);
+    return nameLength;
 }

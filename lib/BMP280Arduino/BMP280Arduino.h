@@ -44,7 +44,7 @@ public:
     bool init(const char *name, uint16_t ReadingInterval = bmp_nm::DEFAULT_READING_INTERVAL);
     uint8_t getAddress();
 
-    void requestCurrentMeasurement() override;
+    bool requestCurrentMeasurement() override;
     uint8_t getNumberOfConnectedSensors() override;
     double getCurrentMeasurementByID(uint8_t id = 0) override;
     uint8_t getName(char *name);

@@ -29,19 +29,22 @@ private:
     double _temperatureAverage;
     uint32_t _startReadMillis;
     uint16_t _readingInterval;
-    char _name[30];
+    // char _name[30];
 
-    void initName(const char *name);
+    void reset();
+    // void initName(const char *name);
     void saveAverageMeasurement();
     bool isReadyForNextRead(uint32_t now);
     bool isArrayFull();
 
 public:
-    SHT20Arduino(iarduino_I2C_SHT &sht);
-    bool init(const char *name, uint16_t ReadingInterval = sht_nm::DEFAULT_READING_INTERVAL);
+    SHT20Arduino(iarduino_I2C_SHT &sht, const char *name);
+    // bool init(const char *name, uint16_t ReadingInterval = sht_nm::DEFAULT_READING_INTERVAL);
+    bool init(uint16_t ReadingInterval = sht_nm::DEFAULT_READING_INTERVAL);
+    bool setName(const char *name);
     uint8_t getAddress();
 
-    void requestCurrentMeasurement() override;
+    bool requestCurrentMeasurement() override;
     uint8_t getNumberOfConnectedSensors() override;
     double getCurrentMeasurementByID(uint8_t id = 0) override;
     uint8_t getName(char *name);

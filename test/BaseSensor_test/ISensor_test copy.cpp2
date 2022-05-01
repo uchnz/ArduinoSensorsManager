@@ -1,0 +1,96 @@
+
+#include <gtest/gtest.h>
+#include <ISensor_test.h>
+#include <BaseSensor.h>
+
+// using ::testing::_;
+// using ::testing::AtLeast;
+// using ::testing::Return;
+
+TEST_F(ISensorTest, test_name)
+{
+    char name[30];
+    BaseSensor sensor2("namezzzzz");
+    EXPECT_EQ(9, sensor2.getName(name));
+    EXPECT_STREQ("namezzzzz", name);
+
+    BaseSensor sensor("testname");
+    EXPECT_EQ(8, sensor.getName(name));
+    EXPECT_STREQ("testname", name);
+}
+
+TEST_F(ISensorTest, test_emptyName_ReturnsZeroAndEmptyString)
+{
+    char name[30];
+    BaseSensor sensor;
+    EXPECT_EQ(0, sensor.getName(name));
+
+    BaseSensor sensor2("");
+    EXPECT_EQ(0, sensor2.getName(name));
+    EXPECT_STREQ("", name);
+}
+
+TEST_F(ISensorTest, test_nullName_ReturnsZeroAndEmptyString)
+{
+    char name[30];
+    BaseSensor sensor2(nullptr);
+    EXPECT_EQ(0, sensor2.getName(name));
+    EXPECT_STREQ("", name);
+}
+
+TEST_F(ISensorTest, test_toBigName_TruncatesToMaxSize)
+{
+    char name[30];
+    BaseSensor sensor2("Name is to big to fit into member var");
+    EXPECT_EQ(30, sensor2.getName(name));
+    EXPECT_STREQ("Name is to big to fit into mem", name);
+}
+
+TEST_F(ISensorTest, test_setName_savesCorrectName)
+{
+    char name[30];
+    BaseSensor sensor;
+    sensor.setName("correct name");
+    EXPECT_EQ(12, sensor.getName(name));
+    EXPECT_STREQ("correct name", name);
+}
+
+TEST_F(ISensorTest, test_setName_withNull_changesNothing)
+{
+    char name[30];
+    BaseSensor sensor("prev name");
+    sensor.setName(nullptr);
+    EXPECT_EQ(9, sensor.getName(name));
+    EXPECT_STREQ("prev name", name);
+}
+
+TEST_F(ISensorTest, test_setName_withEmptyString_changesNothing)
+{
+    char name[30];
+    BaseSensor sensor("prev name");
+    sensor.setName("");
+    EXPECT_EQ(9, sensor.getName(name));
+    EXPECT_STREQ("prev name", name);
+}
+
+TEST_F(ISensorTest, test_setName_withToBigName_TruncatesToMaxSize)
+{
+    char name[30];
+    BaseSensor sensor;
+    EXPECT_EQ(0, sensor.getName(name));
+
+    sensor.setName("Name is to big to fit into member var");
+    EXPECT_EQ(30, sensor.getName(name));
+    EXPECT_STREQ("Name is to big to fit into mem", name);
+}
+
+TEST_F(ISensorTest, test_getCurrentMeasurement_returnsSavedMeasurement)
+{
+    BaseSensor sensor;
+
+    double val = sensor.getCurrentMeasurementByID();
+    EXPECT_EQ(1, val);
+
+    val = sensor.getCurrentMeasurementByID();
+    EXPECT_EQ(-5.5, val);
+}

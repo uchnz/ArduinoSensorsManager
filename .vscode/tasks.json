@@ -3,6 +3,63 @@
     "tasks": [
         {
             "type": "shell",
+            "label": "test TimerArduino_test",
+            "command": "pio",
+            "args": [
+                "test",
+                "-e",
+                "native",
+                "-f",
+                "TimerArduino_test"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "isDefault": false,
+                "kind": "build"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "test ArduinoIO_test",
+            "command": "pio",
+            "args": [
+                "test",
+                "-e",
+                "native",
+                "-f",
+                "ArduinoIO_test"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "isDefault": false,
+                "kind": "build"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "test BaseSensor_test",
+            "command": "pio",
+            "args": [
+                "test",
+                "-e",
+                "native",
+                "-f",
+                "BaseSensor_test"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "isDefault": false,
+                "kind": "build"
+            }
+        },
+        {
+            "type": "shell",
             "label": "test JSON_test",
             "command": "pio",
             "args": [
@@ -19,7 +76,8 @@
                 "isDefault": false,
                 "kind": "build"
             }
-        },        {
+        }, 
+        {
             "type": "shell",
             "label": "test DallasArduino_test",
             "command": "pio",

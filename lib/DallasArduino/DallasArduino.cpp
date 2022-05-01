@@ -82,14 +82,14 @@ bool DallasArduino::isArrayFull()
 {
     return (_currentSavingItemInArray > dallas_nm::NUMBER_OF_MEASUREMENTS - 1);
 }
-void DallasArduino::requestCurrentMeasurement()
+bool DallasArduino::requestCurrentMeasurement()
 {
     if (!_totalConnectedSensors)
-        return;
+        return false;
 
     uint32_t now = millis();
     if (!isReadyForNextRead(now))
-        return;
+        return false;
 
     if (isArrayFull())
         saveAverageMeasurement();
@@ -100,6 +100,8 @@ void DallasArduino::requestCurrentMeasurement()
 
     _currentSavingItemInArray++;
     _startReadMillis = millis();
+
+    return true;
 }
 
 uint8_t DallasArduino::getNumberOfConnectedSensors()

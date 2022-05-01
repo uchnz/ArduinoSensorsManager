@@ -10,8 +10,8 @@ TEST_F(SHT20ArduinoTest, test_Init_Successful_getAddressReturns_correctAddress)
 {
     iarduino_I2C_SHT i2c(0x3f);
     EXPECT_CALL(i2c, begin()).Times(1).WillOnce(Return(true));
-    SHT20Arduino sht(i2c);
-    EXPECT_TRUE(sht.init("TempMoisure1"));
+    SHT20Arduino sht(i2c, "TempMoisure1");
+    EXPECT_TRUE(sht.init());
 
     EXPECT_CALL(i2c, getAddress()).Times(1).WillOnce(Return(0x3f));
     EXPECT_EQ(0x3f, sht.getAddress());
@@ -21,8 +21,8 @@ TEST_F(SHT20ArduinoTest, test_Init_fails_getAddressReturns_Zero)
 {
     iarduino_I2C_SHT i2c(0xff);
     EXPECT_CALL(i2c, begin()).Times(1).WillOnce(Return(false));
-    SHT20Arduino sht(i2c);
-    EXPECT_FALSE(sht.init("some Name"));
+    SHT20Arduino sht(i2c, "some Name");
+    EXPECT_FALSE(sht.init());
 
     EXPECT_CALL(i2c, getAddress()).Times(0);
     EXPECT_EQ(0, sht.getAddress());
@@ -32,7 +32,7 @@ TEST_F(SHT20ArduinoTest, test_gettingMeasurementsWithoutInit_fails)
 {
     iarduino_I2C_SHT i2c(0x2A);
     EXPECT_CALL(i2c, begin()).Times(0);
-    SHT20Arduino sht(i2c);
+    SHT20Arduino sht(i2c, "sht");
 
     EXPECT_CALL(i2c, getTem()).Times(0);
     sht.requestCurrentMeasurement();
@@ -47,7 +47,7 @@ TEST_F(SHT20ArduinoTest, test_gettingSensorIDAboveExisting_fails)
 {
     iarduino_I2C_SHT i2c(0x2A);
     EXPECT_CALL(i2c, begin()).Times(0);
-    SHT20Arduino sht(i2c);
+    SHT20Arduino sht(i2c, "sht");
 
     EXPECT_CALL(i2c, getTem()).Times(0);
     EXPECT_CALL(i2c, getHum()).Times(0);
@@ -61,8 +61,8 @@ TEST_F(SHT20ArduinoTest, test_gettingTemperatureWithoutRequesting_fails)
 {
     iarduino_I2C_SHT i2c(0x2A);
     EXPECT_CALL(i2c, begin()).Times(1).WillOnce(Return(true));
-    SHT20Arduino sht(i2c);
-    EXPECT_TRUE(sht.init("name/with \\"));
+    SHT20Arduino sht(i2c, "name/with \\");
+    EXPECT_TRUE(sht.init());
 
     EXPECT_CALL(i2c, getTem()).Times(0);
     EXPECT_CALL(i2c, getHum()).Times(0);
@@ -77,8 +77,8 @@ TEST_F(SHT20ArduinoTest, test_requestCurrentMeasurement_withinTimeInterval_Saves
     ArduinoMock *arduinoMock = arduinoMockInstance();
     iarduino_I2C_SHT i2c(0x2A);
     EXPECT_CALL(i2c, begin()).Times(1).WillOnce(Return(true));
-    SHT20Arduino sht(i2c);
-    EXPECT_TRUE(sht.init("s"));
+    SHT20Arduino sht(i2c, "s");
+    EXPECT_TRUE(sht.init());
 
     EXPECT_CALL(i2c, getTem()).Times(4).WillOnce(Return(-11)).WillOnce(Return(-11.50)).WillOnce(Return(-12)).WillOnce(Return(33.3));
     EXPECT_CALL(i2c, getHum()).Times(4).WillOnce(Return(25)).WillOnce(Return(25.5)).WillOnce(Return(26)).WillOnce(Return(69.1));
@@ -116,8 +116,8 @@ TEST_F(SHT20ArduinoTest, test_requestCurrentMeasurement_withDifferentMeasurement
     ArduinoMock *arduinoMock = arduinoMockInstance();
     iarduino_I2C_SHT i2c(0x7A);
     EXPECT_CALL(i2c, begin()).Times(1).WillOnce(Return(true));
-    SHT20Arduino sht(i2c);
-    EXPECT_TRUE(sht.init("s1", 1000));
+    SHT20Arduino sht(i2c, "sht");
+    EXPECT_TRUE(sht.init(1000));
 
     EXPECT_CALL(i2c, getTem()).Times(4).WillOnce(Return(74)).WillOnce(Return(84)).WillOnce(Return(94)).WillOnce(Return(21.9));
     EXPECT_CALL(i2c, getHum()).Times(4).WillOnce(Return(0.15)).WillOnce(Return(0.20)).WillOnce(Return(0.25)).WillOnce(Return(87.33));
@@ -134,7 +134,7 @@ TEST_F(SHT20ArduinoTest, test_requestCurrentMeasurement_withDifferentMeasurement
     EXPECT_DOUBLE_EQ(0.20, sht.getCurrentMeasurementByID(1));
 
     EXPECT_CALL(i2c, begin()).Times(1).WillOnce(Return(true));
-    EXPECT_TRUE(sht.init("s1", 2000));
+    EXPECT_TRUE(sht.init(2000));
     incrementIntervalMillis = 0;
     nextLoopMillis = 3000;
     EXPECT_CALL(i2c, getTem()).Times(4).WillOnce(Return(22.1)).WillOnce(Return(22.3)).WillOnce(Return(22.3)).WillOnce(Return(0));

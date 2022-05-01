@@ -176,6 +176,7 @@ bool SensorManager::refreshSensorsData2D()
         for (uint8_t j = 0; j < _numberOfSensorsOnEachPort[i]; j++)
             _measurementsArray2D[i][j] = _ISenosorObjectsManagingArray2D[i]->getCurrentMeasurementByID(j);
     }
+
     return true;
 }
 
@@ -240,14 +241,19 @@ bool SensorManager::refreshSensorsData2D()
 // }
 uint16_t SensorManager::makeJSON(char *message, uint16_t len, uint8_t sensorID)
 {
+    // printf("sensors on port: %d\n", _numberOfSensorsOnEachPort[sensorID]);
     size_t capacity = JSON_ARRAY_SIZE(_numberOfSensorsOnEachPort[sensorID] + 1) + JSON_OBJECT_SIZE(2);
     DynamicJsonDocument doc(capacity);
-    doc["name"] = _sensorsNamesArray[sensorID];
+    doc["name"] = (const char *)_sensorsNamesArray[sensorID]; // explisit cast to avoid copying of a string and reduce size of 'doc' object
+                                                              // without 'const' doesn't work either way, don't know why yet
     JsonArray data = doc.createNestedArray("data");
-    for (int i = 0; i < _numberOfSensorsOnEachPort[sensorID]; i++)
+    for (uint8_t i = 0; i < _numberOfSensorsOnEachPort[sensorID]; i++)
+    {
         data[i] = _measurementsArray2D[sensorID][i];
-
+        // printf("name:%s, value[%d][%d]: %.0f\n", _sensorsNamesArray[sensorID], sensorID, i, _measurementsArray2D[sensorID][i]);
+    }
     serializeJson(doc, message, len);
+    printf("message: %s\n\n", message);
 
     return strlen(message);
 }

@@ -61,14 +61,14 @@ bool BMP280Arduino::isArrayFull()
 {
     return (_currentSavingItemInArray > bmp_nm::NUMBER_OF_MEASUREMENTS - 1);
 }
-void BMP280Arduino::requestCurrentMeasurement()
+bool BMP280Arduino::requestCurrentMeasurement()
 {
     if (!_sensorInitCompleted)
-        return;
+        return false;
 
     uint32_t now = millis();
     if (!isReadyForNextRead(now))
-        return;
+        return false;
 
     if (isArrayFull())
         saveAverageMeasurement();
@@ -78,6 +78,8 @@ void BMP280Arduino::requestCurrentMeasurement()
     _sensorPressureArray[_currentSavingItemInArray] = _bmp.pressure;
     _sensorAltitudeArray[_currentSavingItemInArray++] = _bmp.altitude;
     _startReadMillis = millis();
+
+    return true;
 }
 
 uint8_t BMP280Arduino::getNumberOfConnectedSensors()

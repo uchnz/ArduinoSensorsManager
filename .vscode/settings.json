@@ -40,7 +40,8 @@
         "type_traits": "cpp",
         "utility": "cpp",
         "variant": "cpp",
-        "new": "cpp"
+        "new": "cpp",
+        "typeinfo": "cpp"
     },
     "gtest-adapter.debugConfig": [
         "PIO Debug"

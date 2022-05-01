@@ -84,36 +84,38 @@ double MQ7COArduino::getCurrentMeasurementByID(uint8_t id)
     return _averageOfAllMeasuredValues;
 }
 
-void MQ7COArduino::requestCurrentMeasurement()
+bool MQ7COArduino::requestCurrentMeasurement()
 {
     if (!_sensorInitCompleted)
-        return;
+        return false;
 
     if (_pimpl->isInPhase(mq7impl::HEATING))
     {
         if (!_pimpl->isPhaseCompleted(mq7impl::HEATING))
-            return;
+            return false;
         _pimpl->setPhase(mq7impl::COOLING);
         setHeaterVoltageForPhase(mq7co_nm::LOW_1_4);
     }
     if (_pimpl->isInPhase(mq7impl::COOLING))
     {
         if (!_pimpl->isPhaseCompleted(mq7impl::COOLING))
-            return;
+            return false;
         _pimpl->setPhase(mq7impl::READING);
     }
     if (_pimpl->isInPhase(mq7impl::READING))
     {
         if (!_pimpl->isTimeToReadMeasurement())
-            return;
+            return false;
         readNextMeasurement();
         if (!_pimpl->isPhaseCompleted(mq7impl::READING))
-            return;
+            return false;
         saveAverageMeasurement();
         resetArrayCounter();
     }
     _pimpl->setPhase(mq7impl::HEATING);
     setHeaterVoltageForPhase(mq7co_nm::HIGH_5_0);
+
+    return true;
 }
 
 // uint8_t MQ7COArduino::getName(char *&name)

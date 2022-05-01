@@ -63,20 +63,22 @@ bool OnOffSensorArduino::isArrayFull()
 {
     return (_currentSavingItemInArray > oos_nm::NUMBER_OF_MEASUREMENTS - 1);
 }
-void OnOffSensorArduino::requestCurrentMeasurement()
+bool OnOffSensorArduino::requestCurrentMeasurement()
 {
     if (!_sensorInitCompleted)
-        return;
+        return false;
 
     uint32_t now = millis();
     if (!isReadyForNextRead(now))
-        return;
+        return false;
 
     if (isArrayFull())
         saveAverageMeasurement();
 
     _sensorValueArray[_currentSavingItemInArray++] = digitalRead(_signalPIN);
     _startReadMillis = millis();
+
+    return true;
 }
 
 double OnOffSensorArduino::getCurrentMeasurementByID(uint8_t id)
