@@ -1,6 +1,5 @@
 #include <BaseSensor.h>
 #include <string.h>
-#include <iostream>
 
 void BaseSensor::reset()
 {
@@ -25,6 +24,10 @@ BaseSensor::BaseSensor(const char *name, IIO &io)
 {
     reset();
     saveName(name);
+}
+BaseSensor::~BaseSensor()
+{
+    _timer = nullptr;
 }
 
 uint8_t BaseSensor::getName(char *name)
@@ -51,11 +54,11 @@ bool BaseSensor::init(ITimer *timer)
 
     if (!timer)
         return false;
-
     _timer = timer;
-    _sensorInitCompleted = true;
 
-    return true;
+    _sensorInitCompleted = _io.init();
+
+    return _sensorInitCompleted;
 }
 
 bool BaseSensor::isInitialized()

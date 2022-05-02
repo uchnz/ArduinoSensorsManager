@@ -41,7 +41,9 @@
         "utility": "cpp",
         "variant": "cpp",
         "new": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "arduino.h": "c",
+        "any": "cpp"
     },
     "gtest-adapter.debugConfig": [
         "PIO Debug"

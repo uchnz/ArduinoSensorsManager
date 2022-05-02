@@ -1,59 +1,29 @@
 #include <SHT20Arduino.h>
 
-SHT20Arduino::SHT20Arduino(iarduino_I2C_SHT &sht, const char *name)
-    : _sht(sht)
+void SHT20Arduino::reset()
 {
-    _sensorName[0] = 0;
-    _sensorInitCompleted = false;
-    _startReadMillis = 0;
-    _readingInterval = sht_nm::DEFAULT_READING_INTERVAL;
-    _temperatureAverage = _humidityAverage = sht_nm::UNINITIALIZED_MEASUREMENT_VALUE;
+    _temperatureAverage = _humidityAverage = basesensor_nm::UNINITIALIZED_MEASUREMENT_VALUE;
     _currentSavingItemInArray = 0;
     for (uint8_t i = 0; i < sht_nm::NUMBER_OF_MEASUREMENTS; i++)
-        _sensorTemperatureArray[i] = _sensorHumidityArray[i] = sht_nm::UNINITIALIZED_MEASUREMENT_VALUE;
-    setName(name);
+        _sensorTemperatureArray[i] = _sensorHumidityArray[i] = basesensor_nm::UNINITIALIZED_MEASUREMENT_VALUE;
+}
+SHT20Arduino::SHT20Arduino(const char *name, IIO &io)
+    : BaseSensor(name, io)
+{
+    this->reset();
 }
 
-// void SHT20Arduino::initName(const char *name)
-// {
-//     int nameLengthWithNull = strlen(name) + 1;
-//     if (nameLengthWithNull > sht_nm::MAX_SENSOR_NAME)
-//         nameLengthWithNull = sht_nm::MAX_SENSOR_NAME - 1;
-
-//     memcpy(_sensorName, name, nameLengthWithNull);
-// }
-bool SHT20Arduino::setName(const char *name)
+bool SHT20Arduino::init(ITimer *timer)
 {
-    if (!name || (0 == strlen(name)))
+    if (!BaseSensor::init(timer))
         return false;
-
-    int nameLengthWithNull = strlen(name) + 1;
-    if (nameLengthWithNull > sht_nm::MAX_SENSOR_NAME)
-        nameLengthWithNull = sht_nm::MAX_SENSOR_NAME - 1;
-    memcpy(_sensorName, name, nameLengthWithNull);
 
     return true;
 }
-bool SHT20Arduino::init(uint16_t ReadingInterval)
+
+uint8_t SHT20Arduino::getNumberOfConnectedSensors()
 {
-    if (0 == strlen(_sensorName))
-        return false;
-    // if ((!name) || (strlen(name) < 1))
-    //     return false;
-
-    // memcpy(_name, name, strlen(name));
-    _readingInterval = ReadingInterval;
-    _sensorInitCompleted = _sht.begin();
-
-    return _sensorInitCompleted;
-}
-
-uint8_t SHT20Arduino::getAddress()
-{
-    if (!_sensorInitCompleted)
-        return 0;
-
-    return _sht.getAddress();
+    return sht_nm::NUMBER_OF_SENSORS_ON_BUS;
 }
 
 void SHT20Arduino::saveAverageMeasurement()
@@ -68,58 +38,33 @@ void SHT20Arduino::saveAverageMeasurement()
     _humidityAverage = _humidityAverage / _currentSavingItemInArray;
     _currentSavingItemInArray = 0;
 }
-bool SHT20Arduino::isReadyForNextRead(uint32_t now)
-{
-    return (now - _startReadMillis) >= _readingInterval;
-}
 bool SHT20Arduino::isArrayFull()
 {
     return (_currentSavingItemInArray > sht_nm::NUMBER_OF_MEASUREMENTS - 1);
 }
 bool SHT20Arduino::requestCurrentMeasurement()
 {
-    if (!_sensorInitCompleted)
-        return false;
-
-    uint32_t now = millis();
-    if (!isReadyForNextRead(now))
+    if (!BaseSensor::requestCurrentMeasurement())
         return false;
 
     if (isArrayFull())
         saveAverageMeasurement();
 
-    _sensorTemperatureArray[_currentSavingItemInArray] = _sht.getTem();
-    _sensorHumidityArray[_currentSavingItemInArray++] = _sht.getHum();
-    _startReadMillis = millis();
+    _sensorTemperatureArray[_currentSavingItemInArray] = _io.read(0);
+    _sensorHumidityArray[_currentSavingItemInArray++] = _io.read(1);
 
     return true;
 }
 
-uint8_t SHT20Arduino::getNumberOfConnectedSensors()
-{
-    return sht_nm::NUMBER_OF_SENSORS_ON_BUS;
-}
-
 double SHT20Arduino::getCurrentMeasurementByID(uint8_t id)
 {
-    if (!_sensorInitCompleted)
-        return sht_nm::UNINITIALIZED_MEASUREMENT_VALUE;
+    if (basesensor_nm::UNINITIALIZED_MEASUREMENT_VALUE == BaseSensor::getCurrentMeasurementByID())
+        return basesensor_nm::UNINITIALIZED_MEASUREMENT_VALUE;
 
     if (sht_nm::TEMPERATURE_ID == id)
         return _temperatureAverage;
     if (sht_nm::HUMIDITY_ID == id)
         return _humidityAverage;
 
-    return sht_nm::UNINITIALIZED_MEASUREMENT_VALUE;
-}
-
-// uint8_t SHT20Arduino::getName(char *&name)
-uint8_t SHT20Arduino::getName(char *name)
-{
-    if (!_sensorInitCompleted)
-        return 0;
-
-    int nameLength = strlen(_sensorName);
-    memcpy(name, _sensorName, nameLength + 1);
-    return nameLength;
+    return basesensor_nm::UNINITIALIZED_MEASUREMENT_VALUE;
 }

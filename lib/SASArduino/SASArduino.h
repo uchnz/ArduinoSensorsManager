@@ -1,5 +1,4 @@
 #pragma once
-#include <Arduino.h>
 #include <BaseSensor.h>
 
 namespace sas_nm

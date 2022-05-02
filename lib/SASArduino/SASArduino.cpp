@@ -15,7 +15,6 @@ SASArduino::SASArduino(const char *name, IIO &io)
 
 bool SASArduino::init(ITimer *timer)
 {
-
     if (!BaseSensor::init(timer))
         return false;
 
@@ -33,7 +32,7 @@ void SASArduino::saveAverageMeasurement()
     for (uint8_t i = 0; i < sas_nm::NUMBER_OF_MEASUREMENTS; i++)
         _sensorValueAveraged += _sensorValueArray[i];
 
-    _sensorValueAveraged = _sensorValueAveraged / sas_nm::NUMBER_OF_MEASUREMENTS;
+    _sensorValueAveraged = round((double)_sensorValueAveraged / sas_nm::NUMBER_OF_MEASUREMENTS);
     _currentSavingItemInArray = 0;
 }
 bool SASArduino::isArrayFull()

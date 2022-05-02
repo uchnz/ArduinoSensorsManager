@@ -1,6 +1,14 @@
 #include <gtest/gtest.h>
 
-class ArduinoIOTest : public ::testing::Test
+class IOArduinoTest : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+    }
+};
+
+class SHTIOArduinoTest : public ::testing::Test
 {
 protected:
     void SetUp() override

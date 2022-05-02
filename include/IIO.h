@@ -1,7 +1,10 @@
 #pragma once
+#include <stdint.h>
 
 class IIO
 {
 public:
-    virtual int read() = 0;
+    virtual bool init() = 0;
+    virtual double read(uint8_t id = 0) = 0;
+    virtual uint8_t getTotalSensors() = 0;
 };

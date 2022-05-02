@@ -24,7 +24,9 @@ MockBaseSensor::MockBaseSensor(const char *name, IIO &io)
 class MockIO : public IIO
 {
 public:
-    MOCK_METHOD(int, read, (), (override));
+    MOCK_METHOD(bool, init, (), (override));
+    MOCK_METHOD(double, read, (uint8_t), (override));
+    MOCK_METHOD(uint8_t, getTotalSensors, (), (override));
 };
 
 class MockTimer : public TimerArduino

@@ -22,14 +22,14 @@
         },
         {
             "type": "shell",
-            "label": "test ArduinoIO_test",
+            "label": "test IOArduino_test",
             "command": "pio",
             "args": [
                 "test",
                 "-e",
                 "native",
                 "-f",
-                "ArduinoIO_test"
+                "IOArduino_test"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"

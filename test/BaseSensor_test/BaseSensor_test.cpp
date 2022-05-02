@@ -108,12 +108,13 @@ TEST_F(ISensorTest, test_init_whenNoname_Fails)
     EXPECT_FALSE(sensor.init(&timer));
 }
 
-TEST_F(ISensorTest, test_init2_whenSensorHasName_Successful)
+TEST_F(ISensorTest, test_init_whenSensorHasName_Successful)
 {
     MockIO io;
     MockTimer timer;
     MockBaseSensor sensor("with name", io);
 
+    EXPECT_CALL(io, init()).Times(1).WillOnce(Return(true));
     EXPECT_TRUE(sensor.init(&timer));
 }
 
@@ -122,12 +123,16 @@ TEST_F(ISensorTest, test_init_afterNameChanged_Successful)
     MockIO io;
     MockBaseSensor sensor("with name", io);
     MockTimer timer;
+    EXPECT_CALL(io, init()).Times(1).WillOnce(Return(true));
     EXPECT_TRUE(sensor.init(&timer));
     sensor.setName("new name");
+    EXPECT_CALL(io, init()).Times(1).WillOnce(Return(true));
     EXPECT_TRUE(sensor.init(&timer));
 
     MockBaseSensor sensor2(nullptr, io);
+    EXPECT_CALL(io, init()).Times(0);
     EXPECT_FALSE(sensor2.init(&timer));
+    EXPECT_CALL(io, init()).Times(1).WillOnce(Return(true));
     sensor2.setName("n");
     EXPECT_TRUE(sensor2.init(&timer));
 }
@@ -158,6 +163,7 @@ TEST_F(ISensorTest, test_getNumberOfSensors_afterInit_ReturnsZero)
     MockIO io;
     MockBaseSensor sensor2("with name", io);
     MockTimer timer;
+    EXPECT_CALL(io, init()).Times(1).WillOnce(Return(true));
     sensor2.init(&timer);
     EXPECT_EQ(0, sensor2.getNumberOfConnectedSensors());
 }
@@ -167,9 +173,11 @@ TEST_F(ISensorTest, test_getCurrentMeasurement_withoutInit_Fails)
     MockIO io;
     MockBaseSensor sensor("", io);
     MockTimer timer;
+    EXPECT_CALL(io, init()).Times(0);
     EXPECT_FALSE(sensor.init(&timer));
     EXPECT_EQ(0xFFFFFFFF, sensor.getCurrentMeasurementByID());
 
+    EXPECT_CALL(io, init()).Times(0);
     EXPECT_FALSE(sensor.init(nullptr));
     EXPECT_EQ(0xFFFFFFFF, sensor.getCurrentMeasurementByID());
 }
@@ -179,6 +187,7 @@ TEST_F(ISensorTest, test_getCurrentMeasurement_afterInit_ReturnsZero)
     MockIO io;
     MockBaseSensor sensor("www", io);
     MockTimer timer;
+    EXPECT_CALL(io, init()).Times(1).WillOnce(Return(true));
     EXPECT_TRUE(sensor.init(&timer));
     EXPECT_EQ(0, sensor.getCurrentMeasurementByID());
 }
@@ -188,40 +197,18 @@ TEST_F(ISensorTest, test_requestCurrentMeasurement_withoutInit_Fails)
     MockIO io;
     MockBaseSensor sensor("s", io);
     MockTimer timer;
+    EXPECT_CALL(io, init()).Times(0);
     EXPECT_FALSE(sensor.init(nullptr));
 
     EXPECT_FALSE(sensor.requestCurrentMeasurement());
 }
-
-// TEST_F(ISensorTest, test_requestCurrentMeasurement_withinTimeInterval_returnsTrue)
-// {
-//     ArduinoMock *arduinoMock = arduinoMockInstance();
-//     MockIO io;
-//     MockBaseSensor sensor("sensorname", io);
-//     sensor.init(3500);
-
-//     EXPECT_CALL(*arduinoMock, millis).Times(2).WillOnce(Return(1000)).WillOnce(Return(4000));
-//     EXPECT_FALSE(sensor.requestCurrentMeasurement());
-//     EXPECT_TRUE(sensor.requestCurrentMeasurement());
-//     EXPECT_CALL(*arduinoMock, millis).Times(2).WillOnce(Return(6000)).WillOnce(Return(7500));
-//     EXPECT_FALSE(sensor.requestCurrentMeasurement());
-//     EXPECT_TRUE(sensor.requestCurrentMeasurement());
-
-//     sensor.init(100);
-//     EXPECT_CALL(*arduinoMock, millis).Times(2).WillOnce(Return(7500 + 10)).WillOnce(Return(7500 + 100));
-//     EXPECT_FALSE(sensor.requestCurrentMeasurement());
-//     EXPECT_TRUE(sensor.requestCurrentMeasurement());
-//     EXPECT_CALL(*arduinoMock, millis).Times(2).WillOnce(Return(7500 + 100 + 50)).WillOnce(Return(8000));
-//     EXPECT_FALSE(sensor.requestCurrentMeasurement());
-//     EXPECT_TRUE(sensor.requestCurrentMeasurement());
-//     releaseArduinoMock();
-// }
 
 TEST_F(ISensorTest, test_requestCurrentMeasurement_withinTimeInterval_returnsTrue)
 {
     MockIO io;
     MockTimer timer;
     MockBaseSensor sensor("sensorname", io);
+    EXPECT_CALL(io, init()).Times(1).WillOnce(Return(true));
     sensor.init(&timer);
 
     EXPECT_CALL(timer, isReadyForNextRead).Times(2).WillOnce(Return(false)).WillOnce(Return(true));
@@ -234,6 +221,7 @@ TEST_F(ISensorTest, test_requestCurrentMeasurement_withNullTimerAfterInit_return
     MockIO io;
     MockTimer *timer = new MockTimer();
     MockBaseSensor sensor("sensorname", io);
+    EXPECT_CALL(io, init()).Times(1).WillOnce(Return(true));
     EXPECT_TRUE(sensor.init(timer));
     delete timer;
 
