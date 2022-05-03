@@ -3,6 +3,7 @@
 #include <IOArduino_test.h>
 #include <SHT20Arduino.h>
 #include <SHTIOArduino.h>
+#include <BMP280IOArduino.h>
 
 using ::testing::Return;
 
@@ -78,7 +79,7 @@ TEST_F(SHTIOArduinoTest, test_read2Sensors_beforeInit_returnErrors)
     EXPECT_EQ(0xFFFFFFFF, result);
 }
 
-TEST_F(SHTIOArduinoTest, test_read2Sensors_readSensorAboveID1)
+TEST_F(SHTIOArduinoTest, test_readSensorAboveID1_returnsErrorValue)
 {
     iarduino_I2C_SHT shtI2C(0x09);
     EXPECT_CALL(shtI2C, begin()).Times(1).WillOnce(Return(true));
@@ -106,4 +107,79 @@ TEST_F(SHTIOArduinoTest, test_read2Sensors_afterInit_returnValues)
     EXPECT_CALL(shtI2C, getHum()).Times(1).WillOnce(Return(54.20));
     result = io.read(1);
     EXPECT_EQ(54.20, result);
+}
+
+TEST_F(BMP280IOArduinoTest, test_read3Sensors_beforeInit_returnErrors)
+{
+    iarduino_Pressure_BMP bmpI2C(0x09);
+    EXPECT_CALL(bmpI2C, begin()).Times(0);
+    BMP280IOArduino io(bmpI2C);
+
+    EXPECT_CALL(bmpI2C, read()).Times(0);
+    double result = io.read(0);
+    EXPECT_EQ(0xFFFFFFFF, result);
+
+    EXPECT_CALL(bmpI2C, read()).Times(0);
+    result = io.read(1);
+    EXPECT_EQ(0xFFFFFFFF, result);
+
+    EXPECT_CALL(bmpI2C, read()).Times(0);
+    result = io.read(2);
+    EXPECT_EQ(0xFFFFFFFF, result);
+}
+
+TEST_F(BMP280IOArduinoTest, test_readSensorAboveID2_returnsErrorValue)
+{
+    iarduino_Pressure_BMP bmpI2C(0x09);
+    EXPECT_CALL(bmpI2C, begin()).Times(1).WillOnce(Return(true));
+    BMP280IOArduino io(bmpI2C);
+    io.init();
+
+    EXPECT_CALL(bmpI2C, read()).Times(0);
+    double result = io.read(3);
+
+    EXPECT_EQ(0xFFFFFFFF, result);
+}
+
+TEST_F(BMP280IOArduinoTest, test_read3Sensors_afterInit_returnValues)
+{
+    iarduino_Pressure_BMP bmpI2C(0x09);
+    bmpI2C.temperature = 36.6;
+    bmpI2C.pressure = 756;
+    bmpI2C.altitude = -0.5;
+    EXPECT_CALL(bmpI2C, begin()).Times(1).WillOnce(Return(true));
+    BMP280IOArduino io(bmpI2C);
+    EXPECT_TRUE(io.init());
+
+    EXPECT_CALL(bmpI2C, read()).Times(1).WillOnce(Return(true));
+    double result = io.read(0);
+    EXPECT_FLOAT_EQ(36.6, result);
+
+    EXPECT_CALL(bmpI2C, read()).Times(1).WillOnce(Return(true));
+    result = io.read(1);
+    EXPECT_EQ(756, result);
+
+    EXPECT_CALL(bmpI2C, read()).Times(1).WillOnce(Return(true));
+    result = io.read(2);
+    EXPECT_FLOAT_EQ(-0.5, result);
+}
+
+TEST_F(BMP280IOArduinoTest, test_read3Sensors_withFailRead_returnErrors)
+{
+    iarduino_Pressure_BMP bmpI2C(0x09);
+    EXPECT_CALL(bmpI2C, begin()).Times(1).WillOnce(Return(true));
+    BMP280IOArduino io(bmpI2C);
+    EXPECT_TRUE(io.init());
+
+    EXPECT_CALL(bmpI2C, read()).Times(1).WillOnce(Return(false));
+    double result = io.read(0);
+    EXPECT_EQ(0xFFFFFFFF, result);
+
+    EXPECT_CALL(bmpI2C, read()).Times(1).WillOnce(Return(false));
+    result = io.read(1);
+    EXPECT_EQ(0xFFFFFFFF, result);
+
+    EXPECT_CALL(bmpI2C, read()).Times(1).WillOnce(Return(false));
+    result = io.read(2);
+    EXPECT_EQ(0xFFFFFFFF, result);
 }

@@ -15,3 +15,11 @@ protected:
     {
     }
 };
+
+class BMP280IOArduinoTest : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+    }
+};

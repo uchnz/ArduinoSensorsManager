@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include <SHT20Arduino.h>
 #include <SHTIOArduino.h>
+#include <BMP280IOArduino.h>
+#include <IOArduino.h>
 #include <SHT20Arduino_test.h>
 
 using ::testing::_;
@@ -147,5 +149,90 @@ TEST_F(SHT20ArduinoTest, test_requestCurrentMeasurement_withDifferentMeasurement
     }
     EXPECT_DOUBLE_EQ(22.1, sht20.getCurrentMeasurementByID());
     EXPECT_DOUBLE_EQ(77.33, sht20.getCurrentMeasurementByID(1));
+    releaseArduinoMock();
+}
+
+TEST_F(BMP280ArduinoTest, test_requestCurrentMeasurement_withDifferentMeasurementIntervals_SavesArrayOfMeasurements)
+{
+    ArduinoMock *arduinoMock = arduinoMockInstance();
+    iarduino_Pressure_BMP bmpI2C(0x09);
+    BMP280IOArduino io(bmpI2C);
+    SHT20Arduino bmp("bmp", io);
+
+    TimerArduino timer(1000);
+    EXPECT_CALL(bmpI2C, begin()).Times(1).WillOnce(Return(true));
+    EXPECT_TRUE(bmp.init(&timer));
+
+    EXPECT_CALL(bmpI2C, read()).Times(12).WillRepeatedly(Return(true));
+    uint32_t startIntervalMillis = 8500;
+    uint32_t incrementIntervalMillis = 0;
+    uint16_t nextLoopMillis = 1000;
+    for (int i = 0; i < 4; i++)
+    {
+        bmpI2C.temperature = i;
+        bmpI2C.pressure = i - 2.1;
+        bmpI2C.altitude = i * (-3.1);
+        EXPECT_CALL(*arduinoMock, millis).Times(AtLeast(0)).WillRepeatedly(Return(startIntervalMillis + incrementIntervalMillis));
+        bmp.requestCurrentMeasurement();
+        incrementIntervalMillis += nextLoopMillis;
+    }
+    EXPECT_DOUBLE_EQ(1, bmp.getCurrentMeasurementByID());
+    EXPECT_DOUBLE_EQ(-1.1, bmp.getCurrentMeasurementByID(1));
+    EXPECT_DOUBLE_EQ(-3.1, bmp.getCurrentMeasurementByID(2));
+
+    timer.setReadingInterval(2000);
+    incrementIntervalMillis = 0;
+    nextLoopMillis = 3000;
+    EXPECT_CALL(bmpI2C, read()).Times(12).WillRepeatedly(Return(true));
+    for (int i = 0; i < 4; i++)
+    {
+        bmpI2C.temperature = i;
+        bmpI2C.pressure = i - 2.1;
+        bmpI2C.altitude = i * (-3.1);
+        EXPECT_CALL(*arduinoMock, millis).Times(AtLeast(0)).WillRepeatedly(Return(startIntervalMillis + incrementIntervalMillis));
+        bmp.requestCurrentMeasurement();
+        incrementIntervalMillis += nextLoopMillis;
+    }
+    EXPECT_NEAR(1.33, bmp.getCurrentMeasurementByID(), 0.01);
+    EXPECT_NEAR(-0.77, bmp.getCurrentMeasurementByID(1), 0.01);
+    EXPECT_NEAR(-4.13, bmp.getCurrentMeasurementByID(2), 0.01);
+    releaseArduinoMock();
+}
+
+TEST_F(SASArduinoTest, test_analogReadings_withDifferentMeasurementIntervals_returnsAverageOf3Readings)
+{
+    ArduinoMock *arduinoMock = arduinoMockInstance();
+    EXPECT_CALL(*arduinoMock, pinMode(A2, INPUT)).Times(1);
+    AnalogIOArduino io(A2, INPUT);
+    SHT20Arduino moisure("sensorname", io);
+    TimerArduino timer(1000);
+    EXPECT_TRUE(moisure.init(&timer));
+
+    EXPECT_CALL(*arduinoMock, analogRead(A2)).Times(4).WillOnce(Return(140)).WillOnce(Return(150)).WillOnce(Return(150)).WillOnce(Return(270));
+    uint32_t startIntervalMillis = 8500;
+    uint32_t incrementIntervalMillis = 0;
+    uint16_t nextLoopMillis = 1000;
+    for (int i = 0; i < 4; i++)
+    {
+        EXPECT_CALL(*arduinoMock, millis).Times(AtLeast(0)).WillRepeatedly(Return(startIntervalMillis + incrementIntervalMillis));
+        moisure.requestCurrentMeasurement();
+        incrementIntervalMillis += nextLoopMillis;
+    }
+    EXPECT_NEAR(146.67, moisure.getCurrentMeasurementByID(), 0.01);
+    double nonExistSensorIDResult = 0xFFFFFFFF;
+    EXPECT_EQ(nonExistSensorIDResult, moisure.getCurrentMeasurementByID(1));
+
+    timer.setReadingInterval(2000);
+    incrementIntervalMillis = 0;
+    nextLoopMillis = 3000;
+    EXPECT_CALL(*arduinoMock, analogRead(A2)).Times(4).WillOnce(Return(280)).WillOnce(Return(290)).WillOnce(Return(300)).WillOnce(Return(300));
+    for (int i = 0; i < 4; i++)
+    {
+        EXPECT_CALL(*arduinoMock, millis).Times(AtLeast(0)).WillRepeatedly(Return(startIntervalMillis + incrementIntervalMillis));
+        moisure.requestCurrentMeasurement();
+        incrementIntervalMillis += nextLoopMillis;
+    }
+    EXPECT_EQ(280, moisure.getCurrentMeasurementByID());
+    EXPECT_EQ(nonExistSensorIDResult, moisure.getCurrentMeasurementByID(2));
     releaseArduinoMock();
 }

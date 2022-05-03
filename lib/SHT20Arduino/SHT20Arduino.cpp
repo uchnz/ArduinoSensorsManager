@@ -1,41 +1,82 @@
 #include <SHT20Arduino.h>
 
-void SHT20Arduino::reset()
+void SHT20Arduino::freeMemory()
 {
-    _temperatureAverage = _humidityAverage = basesensor_nm::UNINITIALIZED_MEASUREMENT_VALUE;
-    _currentSavingItemInArray = 0;
-    for (uint8_t i = 0; i < sht_nm::NUMBER_OF_MEASUREMENTS; i++)
-        _sensorTemperatureArray[i] = _sensorHumidityArray[i] = basesensor_nm::UNINITIALIZED_MEASUREMENT_VALUE;
+    if (_averageMeasurementsArray)
+        delete _averageMeasurementsArray;
+
+    if (_measurements2DArray)
+    {
+        uint8_t num = _io.getTotalSensors();
+        for (uint8_t i = 0; i < num; i++)
+            if (_measurements2DArray[i])
+                delete[] _measurements2DArray[i];
+        delete[] _measurements2DArray;
+    }
 }
+SHT20Arduino::~SHT20Arduino()
+{
+    freeMemory();
+}
+
+void SHT20Arduino::createMeasurementsNewArrays()
+{
+    uint8_t num = _io.getTotalSensors();
+    _averageMeasurementsArray = new double[num];
+    _measurements2DArray = new double *[num];
+    for (uint8_t i = 0; i < num; i++)
+        _measurements2DArray[i] = new double[sht_nm::NUMBER_OF_MEASUREMENTS];
+}
+
 SHT20Arduino::SHT20Arduino(const char *name, IIO &io)
     : BaseSensor(name, io)
 {
-    this->reset();
+    _currentSavingItemInArray = 0;
+    _averageMeasurementsArray = nullptr;
+    _measurements2DArray = nullptr;
 }
 
+void SHT20Arduino::reset()
+{
+    _currentSavingItemInArray = 0;
+    uint8_t num = _io.getTotalSensors();
+    for (uint8_t i = 0; i < num; i++)
+    {
+        _averageMeasurementsArray[i] = basesensor_nm::UNINITIALIZED_MEASUREMENT_VALUE;
+        for (uint8_t j = 0; j < sht_nm::NUMBER_OF_MEASUREMENTS; j++)
+            _measurements2DArray[i][j] = basesensor_nm::UNINITIALIZED_MEASUREMENT_VALUE;
+    }
+}
 bool SHT20Arduino::init(ITimer *timer)
 {
     if (!BaseSensor::init(timer))
         return false;
+
+    freeMemory();
+    createMeasurementsNewArrays();
+    reset();
 
     return true;
 }
 
 uint8_t SHT20Arduino::getNumberOfConnectedSensors()
 {
-    return sht_nm::NUMBER_OF_SENSORS_ON_BUS;
+    return _io.getTotalSensors();
 }
 
 void SHT20Arduino::saveAverageMeasurement()
 {
-    _temperatureAverage = _humidityAverage = 0;
-    for (uint8_t i = 0; i < _currentSavingItemInArray; i++)
-    {
-        _temperatureAverage += _sensorTemperatureArray[i];
-        _humidityAverage += _sensorHumidityArray[i];
-    }
-    _temperatureAverage = _temperatureAverage / _currentSavingItemInArray;
-    _humidityAverage = _humidityAverage / _currentSavingItemInArray;
+    uint8_t num = _io.getTotalSensors();
+    for (uint8_t i = 0; i < num; i++)
+        _averageMeasurementsArray[i] = 0;
+
+    for (uint8_t i = 0; i < num; i++)
+        for (uint8_t j = 0; j < _currentSavingItemInArray; j++)
+            _averageMeasurementsArray[i] += _measurements2DArray[i][j];
+
+    for (uint8_t i = 0; i < num; i++)
+        _averageMeasurementsArray[i] = _averageMeasurementsArray[i] / _currentSavingItemInArray;
+
     _currentSavingItemInArray = 0;
 }
 bool SHT20Arduino::isArrayFull()
@@ -50,8 +91,11 @@ bool SHT20Arduino::requestCurrentMeasurement()
     if (isArrayFull())
         saveAverageMeasurement();
 
-    _sensorTemperatureArray[_currentSavingItemInArray] = _io.read(0);
-    _sensorHumidityArray[_currentSavingItemInArray++] = _io.read(1);
+    uint8_t num = _io.getTotalSensors();
+    for (uint8_t i = 0; i < num; i++)
+        _measurements2DArray[i][_currentSavingItemInArray] = _io.read(i);
+
+    _currentSavingItemInArray++;
 
     return true;
 }
@@ -61,10 +105,12 @@ double SHT20Arduino::getCurrentMeasurementByID(uint8_t id)
     if (basesensor_nm::UNINITIALIZED_MEASUREMENT_VALUE == BaseSensor::getCurrentMeasurementByID())
         return basesensor_nm::UNINITIALIZED_MEASUREMENT_VALUE;
 
-    if (sht_nm::TEMPERATURE_ID == id)
-        return _temperatureAverage;
-    if (sht_nm::HUMIDITY_ID == id)
-        return _humidityAverage;
+    uint8_t num = _io.getTotalSensors();
+    if (!num)
+        return basesensor_nm::UNINITIALIZED_MEASUREMENT_VALUE;
 
-    return basesensor_nm::UNINITIALIZED_MEASUREMENT_VALUE;
+    if (id >= num)
+        return basesensor_nm::UNINITIALIZED_MEASUREMENT_VALUE;
+
+    return _averageMeasurementsArray[id];
 }

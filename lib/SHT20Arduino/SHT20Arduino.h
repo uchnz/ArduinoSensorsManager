@@ -7,32 +7,30 @@
 namespace sht_nm
 {
     const uint8_t NUMBER_OF_MEASUREMENTS = 3;
-    const uint8_t NUMBER_OF_SENSORS_ON_BUS = 2;
-    const uint8_t TEMPERATURE_ID = 0;
-    const uint8_t HUMIDITY_ID = 1;
 }
 
 class SHT20Arduino : public BaseSensor
 {
 private:
-    double _sensorTemperatureArray[sht_nm::NUMBER_OF_MEASUREMENTS];
-    double _sensorHumidityArray[sht_nm::NUMBER_OF_MEASUREMENTS];
     uint8_t _currentSavingItemInArray;
-    double _humidityAverage;
-    double _temperatureAverage;
+    double *_averageMeasurementsArray;
+    double **_measurements2DArray;
 
+    void freeMemory();
+    void createMeasurementsNewArrays();
     void saveAverageMeasurement();
     bool isArrayFull();
 
 protected:
-    void reset();
+    virtual void reset();
 
 public:
     SHT20Arduino(const char *name, IIO &io);
+    virtual ~SHT20Arduino();
 
     virtual bool init(ITimer *timer) override;
 
-    bool requestCurrentMeasurement() override;
-    uint8_t getNumberOfConnectedSensors() override;
-    double getCurrentMeasurementByID(uint8_t id = 0) override;
+    virtual bool requestCurrentMeasurement() override;
+    virtual uint8_t getNumberOfConnectedSensors() override;
+    virtual double getCurrentMeasurementByID(uint8_t id = 0) override;
 };

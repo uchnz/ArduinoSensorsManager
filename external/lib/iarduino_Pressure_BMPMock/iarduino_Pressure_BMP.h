@@ -17,5 +17,5 @@ public:
 
     MOCK_METHOD(bool, begin, ());
     MOCK_METHOD(bool, read, ());
-    MOCK_METHOD(bool, read, (uint8_t)); // duplicate read because an argument is optional
+    MOCK_METHOD(bool, read, (uint8_t)); // duplicate read() because an argument is optional
 };

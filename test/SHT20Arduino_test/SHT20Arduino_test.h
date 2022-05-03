@@ -7,3 +7,19 @@ protected:
     {
     }
 };
+
+class BMP280ArduinoTest : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+    }
+};
+
+class SASArduinoTest : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+    }
+};

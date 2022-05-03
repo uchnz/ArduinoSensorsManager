@@ -27,7 +27,7 @@ protected:
 
 public:
     BaseSensor(const char *name, IIO &io);
-    ~BaseSensor();
+    virtual ~BaseSensor();
 
     bool setName(const char *name);
     virtual bool init(ITimer *timer);
