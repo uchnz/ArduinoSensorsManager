@@ -2,7 +2,7 @@
 #include <gmock/gmock.h>
 #include <BaseSensor.h>
 
-class ISensorTest : public ::testing::Test
+class BaseSensorTest : public ::testing::Test
 {
 protected:
     void SetUp() override
@@ -10,16 +10,16 @@ protected:
     }
 };
 
-class MockBaseSensor : public BaseSensor
-{
-public:
-    MockBaseSensor(const char *name, IIO &io);
-};
+// class MockBaseSensor : public BaseSensor
+// {
+// public:
+//     MockBaseSensor(const char *name, IIO &io);
+// };
 
-MockBaseSensor::MockBaseSensor(const char *name, IIO &io)
-    : BaseSensor(name, io)
-{
-}
+// MockBaseSensor::MockBaseSensor(const char *name, IIO &io)
+//     : BaseSensor(name, io)
+// {
+// }
 
 class MockIO : public IIO
 {
