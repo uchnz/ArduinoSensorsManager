@@ -3,6 +3,43 @@
     "tasks": [
         {
             "type": "shell",
+            "label": "test PhaseTimerArduino_test",
+            "command": "pio",
+            "args": [
+                "test",
+                "-e",
+                "native",
+                "-f",
+                "PhaseTimerArduino_test"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "isDefault": false,
+                "kind": "build"
+            }
+        },        {
+            "type": "shell",
+            "label": "test MQ7COIOArduino_test",
+            "command": "pio",
+            "args": [
+                "test",
+                "-e",
+                "native",
+                "-f",
+                "MQ7COIOArduino_test"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "isDefault": false,
+                "kind": "build"
+            }
+        },
+        {
+            "type": "shell",
             "label": "test TimerArduino_test",
             "command": "pio",
             "args": [
@@ -79,25 +116,6 @@
         }, 
         {
             "type": "shell",
-            "label": "test DallasArduino_test",
-            "command": "pio",
-            "args": [
-                "test",
-                "-e",
-                "native",
-                "-f",
-                "DallasArduino_test"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "group": {
-                "isDefault": false,
-                "kind": "build"
-            }
-        },
-        {
-            "type": "shell",
             "label": "test OnOffSensorArduino_test",
             "command": "pio",
             "args": [
@@ -106,82 +124,6 @@
                 "native",
                 "-f",
                 "OnOffSensorArduino_test"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "group": {
-                "isDefault": false,
-                "kind": "build"
-            }
-        },
-        {
-            "type": "shell",
-            "label": "test BMP280Arduino_test",
-            "command": "pio",
-            "args": [
-                "test",
-                "-e",
-                "native",
-                "-f",
-                "BMP280Arduino_test"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "group": {
-                "isDefault": false,
-                "kind": "build"
-            }
-        }, 
-        {
-            "type": "shell",
-            "label": "test SHT20Arduino_test",
-            "command": "pio",
-            "args": [
-                "test",
-                "-e",
-                "native",
-                "-f",
-                "SHT20Arduino_test"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "group": {
-                "isDefault": false,
-                "kind": "build"
-            }
-        },
-        {
-            "type": "shell",
-            "label": "test SASArduino_test",
-            "command": "pio",
-            "args": [
-                "test",
-                "-e",
-                "native",
-                "-f",
-                "SASArduino_test"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "group": {
-                "isDefault": false,
-                "kind": "build"
-            }
-        },
-        {
-            "type": "shell",
-            "label": "test MQ7COArduino_test",
-            "command": "pio",
-            "args": [
-                "test",
-                "-e",
-                "native",
-                "-f",
-                "MQ7COArduino_test"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"

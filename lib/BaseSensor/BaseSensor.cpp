@@ -21,7 +21,6 @@ BaseSensor::BaseSensor(const char *name, IIO &io)
     _averageMeasurementsArray = nullptr;
     _measurements2DArray = nullptr;
     _sensorName[0] = 0;
-    // reset();
     saveName(name);
 }
 
@@ -71,7 +70,6 @@ void BaseSensor::createMeasurementsNewArrays()
 }
 void BaseSensor::reset()
 {
-    // _sensorName[0] = 0;
     _sensorInitCompleted = false;
     _currentSavingItemInArray = 0;
 
@@ -112,7 +110,6 @@ uint8_t BaseSensor::getNumberOfConnectedSensors()
         return basesensor_nm::NOT_INITIALIZED_SENSOR;
 
     return _io.getTotalSensors();
-    // return 0;
 }
 
 void BaseSensor::saveAverageMeasurement()
@@ -170,5 +167,4 @@ double BaseSensor::getCurrentMeasurementByID(uint8_t id)
         return basesensor_nm::UNINITIALIZED_MEASUREMENT_VALUE;
 
     return _averageMeasurementsArray[id];
-    // return 0;
 }

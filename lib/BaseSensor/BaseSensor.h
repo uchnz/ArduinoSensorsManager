@@ -16,22 +16,22 @@ class BaseSensor : public ISensor
 private:
     char _sensorName[basesensor_nm::MAX_SENSOR_NAME];
     bool _sensorInitCompleted;
-    uint8_t _currentSavingItemInArray;
     double *_averageMeasurementsArray;
-    double **_measurements2DArray;
 
     bool saveName(const char *name);
-    bool isInitialized();
     void freeMemory();
     void createMeasurementsNewArrays();
-    void saveAverageMeasurement();
-    bool isArrayFull();
 
 protected:
     IIO &_io;
     ITimer *_timer;
+    uint8_t _currentSavingItemInArray;
+    double **_measurements2DArray;
 
     virtual void reset();
+    bool isInitialized();
+    bool isArrayFull();
+    void saveAverageMeasurement();
 
 public:
     BaseSensor(const char *name, IIO &io);

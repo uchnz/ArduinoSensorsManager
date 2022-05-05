@@ -1,21 +1,24 @@
-// #include <gtest/gtest.h>
-// #include <IOArduino.h>
+#include <gtest/gtest.h>
 
-// class OnOffSensorArduinoTest : public ::testing::Test
-// {
-// protected:
-//     void SetUp() override
-//     {
-//     }
-// };
+class OnOffSensorArduinoTest : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+    }
+};
 
-// class MockArduinoAnalogIO : public AnalogIOArduino
-// {
-// public:
-//     MockArduinoAnalogIO(uint8_t pin, uint8_t type);
-// };
+class MockIO : public IIO
+{
+public:
+    MOCK_METHOD(bool, init, (), (override));
+    MOCK_METHOD(double, read, (uint8_t), (override));
+    MOCK_METHOD(uint8_t, getTotalSensors, (), (override));
+};
 
-// MockArduinoAnalogIO::MockArduinoAnalogIO(uint8_t pin, uint8_t type)
-//     : AnalogIOArduino(pin, type)
-// {
-// }
+class MockTimer : public ITimer // TimerArduino
+{
+public:
+    MOCK_METHOD(bool, isReadyForNextRead, (), (override));
+    MOCK_METHOD(void, setReadingInterval, (uint16_t), (override));
+};

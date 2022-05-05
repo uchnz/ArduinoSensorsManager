@@ -23,3 +23,19 @@ protected:
     {
     }
 };
+
+class DallasArduinoTest : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+    }
+};
+
+class MQ7C0ArduinoTest : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+    }
+};

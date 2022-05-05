@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 #include <IOArduino.h>
 #include <IOArduino_test.h>
-#include <SHT20Arduino.h>
 #include <SHTIOArduino.h>
 #include <BMP280IOArduino.h>
 

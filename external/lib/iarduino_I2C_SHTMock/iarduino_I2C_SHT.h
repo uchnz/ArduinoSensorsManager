@@ -16,20 +16,3 @@ public:
     MOCK_METHOD(double, getTem, ());
     MOCK_METHOD(double, getHum, ());
 };
-// bool begin(void);
-// bool reset(void);
-// bool changeAddress(uint8_t);
-// // uint8_t getAddress(void);
-// uint8_t getVersion(void);
-// bool getPullI2C(void);
-// bool setPullI2C(bool = true);
-// float getHum(void);
-// bool getTemChanged(void);
-// bool getHumChanged(void);
-// bool setTemChange(float);
-// bool setHumChange(float);
-// bool setPeriod(float);
-
-// MOCK_METHOD(void, analogWrite, (uint8_t, uint8_t));
-// MOCK_METHOD(int, analogRead, (uint8_t));
-// MOCK_METHOD(uint32_t, millis, ());

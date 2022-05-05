@@ -29,8 +29,9 @@ public:
     MOCK_METHOD(uint8_t, getTotalSensors, (), (override));
 };
 
-class MockTimer : public TimerArduino
+class MockTimer : public ITimer // TimerArduino
 {
 public:
     MOCK_METHOD(bool, isReadyForNextRead, (), (override));
+    MOCK_METHOD(void, setReadingInterval, (uint16_t), (override));
 };

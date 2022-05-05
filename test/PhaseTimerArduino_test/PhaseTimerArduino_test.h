@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-class DallasArduinoTest : public ::testing::Test
+class PhaseTimerArduinoTest : public ::testing::Test
 {
 protected:
     void SetUp() override

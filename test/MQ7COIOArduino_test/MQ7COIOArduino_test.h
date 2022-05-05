@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-class BMP280ArduinoTest : public ::testing::Test
+class MQ7COIOArduinoTest : public ::testing::Test
 {
 protected:
     void SetUp() override

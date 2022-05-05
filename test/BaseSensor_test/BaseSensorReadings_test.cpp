@@ -1,8 +1,12 @@
 #include <gtest/gtest.h>
-#include <BaseSensor.h>
+// #include <BaseSensor.h>
+#include <MQ7COArduino.h>
 #include <SHTIOArduino.h>
 #include <BMP280IOArduino.h>
 #include <IOArduino.h>
+#include <DallasIOArduino.h>
+#include <MQ7COIOArduino.h>
+#include <PhaseTimerArduino.h>
 #include <BaseSensorReadings_test.h>
 
 using ::testing::_;
@@ -234,5 +238,91 @@ TEST_F(SASArduinoTest, test_analogReadings_withDifferentMeasurementIntervals_ret
     }
     EXPECT_EQ(280, moisure.getCurrentMeasurementByID());
     EXPECT_EQ(nonExistSensorIDResult, moisure.getCurrentMeasurementByID(2));
+    releaseArduinoMock();
+}
+
+TEST_F(DallasArduinoTest, test_getTemperatures_ManySensors_ReturnsCorrectTemperatures)
+{
+    ArduinoMock *arduinoMock = arduinoMockInstance();
+    DallasTemperature dt;
+    EXPECT_CALL(dt, begin()).Times(1);
+    DallasIOArduino io(dt);
+    BaseSensor dallas("dallas", io);
+    TimerArduino timer(100);
+    EXPECT_CALL(dt, getDeviceCount()).Times(2).WillRepeatedly(Return(3));
+    EXPECT_TRUE(dallas.init(&timer));
+
+    EXPECT_CALL(dt, getTempCByIndex(0)).Times(4).WillOnce(Return(-40.1)).WillOnce(Return(-39.9)).WillOnce(Return(-39.7)).WillOnce(Return(20));
+    EXPECT_CALL(dt, getTempCByIndex(1)).Times(4).WillOnce(Return(-0.5)).WillOnce(Return(0)).WillOnce(Return(0.5)).WillOnce(Return(17));
+    EXPECT_CALL(dt, getTempCByIndex(2)).Times(4).WillOnce(Return(6.33)).WillOnce(Return(6.35)).WillOnce(Return(6.37)).WillOnce(Return(-7.8));
+    EXPECT_CALL(dt, getDeviceCount()).Times(5).WillRepeatedly(Return(3));
+    EXPECT_CALL(dt, requestTemperatures()).Times(12);
+    uint32_t startIntervalMillis = 8500;
+    uint32_t incrementIntervalMillis = 0;
+    uint16_t nextLoopMillis = 50;
+    for (int i = 0; i < 7; i++)
+    {
+        EXPECT_CALL(*arduinoMock, millis).Times(AtLeast(0)).WillRepeatedly(Return(startIntervalMillis + incrementIntervalMillis));
+        dallas.requestCurrentMeasurement();
+        incrementIntervalMillis += nextLoopMillis;
+    }
+    EXPECT_CALL(dt, getDeviceCount()).Times(1).WillOnce(Return(3));
+    EXPECT_DOUBLE_EQ(-39.9, dallas.getCurrentMeasurementByID(0));
+    EXPECT_CALL(dt, getDeviceCount()).Times(1).WillOnce(Return(3));
+    EXPECT_DOUBLE_EQ(0, dallas.getCurrentMeasurementByID(1));
+    EXPECT_CALL(dt, getDeviceCount()).Times(1).WillOnce(Return(3));
+    EXPECT_DOUBLE_EQ(6.35, dallas.getCurrentMeasurementByID(2));
+
+    EXPECT_CALL(dt, getTempCByIndex(0)).Times(3).WillOnce(Return(22)).WillOnce(Return(24)).WillOnce(Return(125));
+    EXPECT_CALL(dt, getTempCByIndex(1)).Times(3).WillOnce(Return(27.5)).WillOnce(Return(38)).WillOnce(Return(-125));
+    EXPECT_CALL(dt, getTempCByIndex(2)).Times(3).WillOnce(Return(-8)).WillOnce(Return(-8.2)).WillOnce(Return(0));
+    EXPECT_CALL(dt, getDeviceCount()).Times(4).WillRepeatedly(Return(3));
+    EXPECT_CALL(dt, requestTemperatures()).Times(9);
+    incrementIntervalMillis = 0;
+    nextLoopMillis = 200;
+    for (int i = 0; i < 3; i++)
+    {
+        EXPECT_CALL(*arduinoMock, millis).Times(AtLeast(0)).WillRepeatedly(Return(startIntervalMillis + incrementIntervalMillis));
+        dallas.requestCurrentMeasurement();
+        incrementIntervalMillis += nextLoopMillis;
+    }
+    EXPECT_CALL(dt, getDeviceCount()).Times(1).WillOnce(Return(3));
+    EXPECT_DOUBLE_EQ(22, dallas.getCurrentMeasurementByID());
+    EXPECT_CALL(dt, getDeviceCount()).Times(1).WillOnce(Return(3));
+    EXPECT_DOUBLE_EQ(27.5, dallas.getCurrentMeasurementByID(1));
+    EXPECT_CALL(dt, getDeviceCount()).Times(1).WillOnce(Return(3));
+    EXPECT_DOUBLE_EQ(-8, dallas.getCurrentMeasurementByID(2));
+
+    EXPECT_CALL(dt, getDeviceCount()).Times(1).WillOnce(Return(3));
+    releaseArduinoMock();
+}
+
+TEST_F(MQ7C0ArduinoTest, test_readings_within_60_60_30_Cycle)
+{
+    ArduinoMock *arduinoMock = arduinoMockInstance();
+    EXPECT_CALL(*arduinoMock, pinMode(A6, INPUT)).Times(1);
+    EXPECT_CALL(*arduinoMock, pinMode(2, OUTPUT)).Times(1);
+    ThreePhaseTimerArduino sensorTimer;
+    MQ7COIOArduino io(A6, 2, sensorTimer);
+    MQ7COArduino mq7("mq7", io);
+    TimerArduino timer;
+
+    EXPECT_CALL(*arduinoMock, analogWrite(2, 255)).Times(1);
+    EXPECT_CALL(*arduinoMock, millis).Times(1).WillOnce(Return(1000));
+    EXPECT_TRUE(mq7.init(&timer));
+
+    uint32_t startIntervalMillis = 2000;
+    EXPECT_CALL(*arduinoMock, analogWrite(2, 72)).Times(1);
+    EXPECT_CALL(*arduinoMock, analogWrite(2, 255)).Times(1);
+    uint32_t incrementIntervalMillis = 0;
+    uint16_t nextLoopMillis = 10000;
+    for (int i = 0; i < 16; i++)
+    {
+        EXPECT_CALL(*arduinoMock, millis).Times(AtLeast(0)).WillRepeatedly(Return(startIntervalMillis + incrementIntervalMillis));
+        EXPECT_CALL(*arduinoMock, analogRead(A6)).Times(AtLeast(0)).WillRepeatedly(Return(520 + i));
+        mq7.requestCurrentMeasurement();
+        incrementIntervalMillis += nextLoopMillis;
+    }
+    EXPECT_EQ(533, mq7.getCurrentMeasurementByID());
     releaseArduinoMock();
 }

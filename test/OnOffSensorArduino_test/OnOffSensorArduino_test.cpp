@@ -1,31 +1,22 @@
-// #include <gtest/gtest.h>
-// #include <OnOffSensorArduino.h>
-// #include <OnOffSensorArduino_test.h>
+#include <gtest/gtest.h>
+#include <OnOffSensorArduino.h>
+#include <OnOffSensorArduino_test.h>
 
-// using ::testing::_;
-// using ::testing::AtLeast;
-// using ::testing::Return;
+using ::testing::_;
+using ::testing::AtLeast;
+using ::testing::Return;
 
-// TEST_F(OnOffSensorArduinoTest, test_Init_ReturnsTrue)
-// {
-//     ArduinoMock *arduinoMock = arduinoMockInstance();
-//     EXPECT_CALL(*arduinoMock, pinMode(A0, INPUT)).Times(1);
-//     MockArduinoAnalogIO io(A0, INPUT);
-//     OnOffSensorArduino onoff("mois", io);
-//     TimerArduino timer;
-//     EXPECT_TRUE(onoff.init(&timer));
+TEST_F(OnOffSensorArduinoTest, test_Init_ReturnsTrue)
+{
+    ArduinoMock *arduinoMock = arduinoMockInstance();
+    EXPECT_CALL(*arduinoMock, pinMode(A2, INPUT)).Times(1);
+    AnalogIOArduino io(A2, INPUT);
+    OnOffSensorArduino onoff("mois", io);
+    TimerArduino timer;
 
-//     char name[30];
-//     EXPECT_EQ(4, onoff.getName(name));
-//     EXPECT_STREQ("mois", name);
-
-//     EXPECT_TRUE(onoff.setName("new long name here"));
-//     EXPECT_TRUE(onoff.init(&timer));
-//     EXPECT_EQ(18, onoff.getName(name));
-//     EXPECT_STREQ("new long name here", name);
-
-//     releaseArduinoMock();
-// }
+    EXPECT_TRUE(onoff.init(&timer));
+    releaseArduinoMock();
+}
 
 // TEST_F(OnOffSensorArduinoTest, test_Init_withNameToLong_truncatesNameToSizeOfBuffer)
 // {
@@ -335,3 +326,78 @@
 // // // {
 // // //     FAIL();
 // // // }
+
+TEST_F(OnOffSensorArduinoTest, test_requestCurrentMeasurement_withinTimeInterval_SavesArrayOfMeasurements)
+{
+    ArduinoMock *arduinoMock = arduinoMockInstance();
+    EXPECT_CALL(*arduinoMock, pinMode(A2, INPUT)).Times(1);
+    DigitalIOArduino io(A2, INPUT);
+    OnOffSensorArduino onoff("mois", io);
+    TimerArduino timer(500);
+    EXPECT_TRUE(onoff.init(&timer));
+
+    EXPECT_CALL(*arduinoMock, digitalRead(A2)).Times(4).WillOnce(Return(HIGH)).WillOnce(Return(LOW)).WillOnce(Return(HIGH)).WillOnce(Return(LOW));
+    uint32_t startIntervalMillis = 8500;
+    uint32_t incrementIntervalMillis = 0;
+    uint16_t nextLoopMillis = 500;
+    for (int i = 0; i < 4; i++)
+    {
+        EXPECT_CALL(*arduinoMock, millis).Times(AtLeast(0)).WillRepeatedly(Return(startIntervalMillis + incrementIntervalMillis));
+        onoff.requestCurrentMeasurement();
+        incrementIntervalMillis += nextLoopMillis;
+    }
+    EXPECT_EQ(1, onoff.getCurrentMeasurementByID());
+
+    incrementIntervalMillis = 0;
+    nextLoopMillis = 1000;
+    EXPECT_CALL(*arduinoMock, digitalRead(A2)).Times(3).WillOnce(Return(LOW)).WillOnce(Return(HIGH)).WillOnce(Return(LOW));
+    for (int i = 0; i < 3; i++)
+    {
+        EXPECT_CALL(*arduinoMock, millis).Times(AtLeast(0)).WillRepeatedly(Return(startIntervalMillis + incrementIntervalMillis));
+        onoff.requestCurrentMeasurement();
+        incrementIntervalMillis += nextLoopMillis;
+    }
+    EXPECT_EQ(0, onoff.getCurrentMeasurementByID());
+    releaseArduinoMock();
+}
+
+TEST_F(OnOffSensorArduinoTest, test_requestCurrentMeasurement_withDifferentMeasurementIntervals_SavesArrayOfMeasurements)
+{
+    ArduinoMock *arduinoMock = arduinoMockInstance();
+    EXPECT_CALL(*arduinoMock, pinMode(A7, INPUT)).Times(1);
+    DigitalIOArduino io(A7, INPUT);
+    OnOffSensorArduino onoff("mois", io);
+    TimerArduino timer(100);
+    EXPECT_TRUE(onoff.init(&timer));
+
+    EXPECT_CALL(*arduinoMock, digitalRead(A7)).Times(4).WillOnce(Return(LOW)).WillOnce(Return(HIGH)).WillOnce(Return(LOW)).WillOnce(Return(HIGH));
+    uint32_t startIntervalMillis = 8500;
+    uint32_t incrementIntervalMillis = 0;
+    uint16_t nextLoopMillis = 50;
+    for (int i = 0; i < 7; i++)
+    {
+        EXPECT_CALL(*arduinoMock, millis).Times(AtLeast(0)).WillRepeatedly(Return(startIntervalMillis + incrementIntervalMillis));
+        onoff.requestCurrentMeasurement();
+        incrementIntervalMillis += nextLoopMillis;
+    }
+    EXPECT_EQ(0, onoff.getCurrentMeasurementByID());
+
+    timer.setReadingInterval(10);
+    incrementIntervalMillis = 0;
+    nextLoopMillis = 30;
+    EXPECT_CALL(*arduinoMock, digitalRead(A7)).Times(3).WillOnce(Return(LOW)).WillOnce(Return(HIGH)).WillOnce(Return(LOW));
+    for (int i = 0; i < 3; i++)
+    {
+        EXPECT_CALL(*arduinoMock, millis).Times(AtLeast(0)).WillRepeatedly(Return(startIntervalMillis + incrementIntervalMillis));
+        onoff.requestCurrentMeasurement();
+        incrementIntervalMillis += nextLoopMillis;
+    }
+    EXPECT_EQ(1, onoff.getCurrentMeasurementByID());
+
+    releaseArduinoMock();
+}
+
+// TEST_F(OnOffSensorArduinoTest, DISABLED_test_requestCurrentMeasurement_WhenToShortReadingInterval_ReturnErrorValue)
+// {
+//     FAIL();
+// }
