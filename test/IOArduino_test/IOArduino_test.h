@@ -23,3 +23,11 @@ protected:
     {
     }
 };
+
+class MQ7COIOArduinoTest : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+    }
+};

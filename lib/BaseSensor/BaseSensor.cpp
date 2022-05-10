@@ -1,3 +1,7 @@
+#ifndef __TESTS__
+#include <LibPrintf.h>
+#endif
+
 #include <BaseSensor.h>
 #include <string.h>
 
@@ -90,12 +94,12 @@ bool BaseSensor::init(ITimer *timer)
         return false;
     _timer = timer;
 
+    bool sensorInitStatus = _io.init();
     freeMemory();
     createMeasurementsNewArrays();
     reset();
 
-    _sensorInitCompleted = _io.init();
-
+    _sensorInitCompleted = sensorInitStatus;
     return _sensorInitCompleted;
 }
 
@@ -157,11 +161,11 @@ bool BaseSensor::requestCurrentMeasurement()
 double BaseSensor::getCurrentMeasurementByID(uint8_t id)
 {
     if (!isInitialized())
-        return basesensor_nm::UNINITIALIZED_MEASUREMENT_VALUE;
+        return basesensor_nm::NOT_INITIALIZED_SENSOR;
 
     uint8_t num = _io.getTotalSensors();
     if (!num)
-        return basesensor_nm::UNINITIALIZED_MEASUREMENT_VALUE;
+        return basesensor_nm::NOT_INITIALIZED_SENSOR;
 
     if (id >= num)
         return basesensor_nm::UNINITIALIZED_MEASUREMENT_VALUE;

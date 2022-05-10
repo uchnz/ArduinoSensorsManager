@@ -16,7 +16,7 @@ protected:
     }
 };
 
-class SASArduinoTest : public ::testing::Test
+class AnalogArduinoTest : public ::testing::Test
 {
 protected:
     void SetUp() override
@@ -33,6 +33,14 @@ protected:
 };
 
 class MQ7C0ArduinoTest : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+    }
+};
+
+class OnOffSensorArduinoTest : public ::testing::Test
 {
 protected:
     void SetUp() override

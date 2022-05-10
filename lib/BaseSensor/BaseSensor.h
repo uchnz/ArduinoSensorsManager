@@ -1,3 +1,4 @@
+#pragma once
 #include <ISensor.h>
 #include <Arduino.h>
 #include <IOArduino.h>

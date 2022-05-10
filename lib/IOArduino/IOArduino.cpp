@@ -1,3 +1,7 @@
+#ifndef __TESTS__
+#include <LibPrintf.h>
+#endif
+
 #include <IOArduino.h>
 
 IOArduino::IOArduino(uint8_t pin, uint8_t direction)
@@ -36,6 +40,9 @@ double AnalogIOArduino::read(uint8_t id)
     if (!isInitCompleted())
         return ioarduino_nm::UNINITIALIZED_SENSOR_VALUE;
 
+    // printf("in AnalogIO");
+
+    // return 125;
     return (double)analogRead(_signalPIN);
 }
 

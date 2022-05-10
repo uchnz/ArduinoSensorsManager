@@ -19,24 +19,6 @@
                 "isDefault": false,
                 "kind": "build"
             }
-        },        {
-            "type": "shell",
-            "label": "test MQ7COIOArduino_test",
-            "command": "pio",
-            "args": [
-                "test",
-                "-e",
-                "native",
-                "-f",
-                "MQ7COIOArduino_test"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "group": {
-                "isDefault": false,
-                "kind": "build"
-            }
         },
         {
             "type": "shell",
@@ -114,25 +96,6 @@
                 "kind": "build"
             }
         }, 
-        {
-            "type": "shell",
-            "label": "test OnOffSensorArduino_test",
-            "command": "pio",
-            "args": [
-                "test",
-                "-e",
-                "native",
-                "-f",
-                "OnOffSensorArduino_test"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "group": {
-                "isDefault": false,
-                "kind": "build"
-            }
-        },
         {
             "type": "shell",
             "label": "test SensorManager",

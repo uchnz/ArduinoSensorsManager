@@ -10,17 +10,6 @@ protected:
     }
 };
 
-// class MockBaseSensor : public BaseSensor
-// {
-// public:
-//     MockBaseSensor(const char *name, IIO &io);
-// };
-
-// MockBaseSensor::MockBaseSensor(const char *name, IIO &io)
-//     : BaseSensor(name, io)
-// {
-// }
-
 class MockIO : public IIO
 {
 public:
@@ -29,7 +18,7 @@ public:
     MOCK_METHOD(uint8_t, getTotalSensors, (), (override));
 };
 
-class MockTimer : public ITimer // TimerArduino
+class MockTimer : public ITimer
 {
 public:
     MOCK_METHOD(bool, isReadyForNextRead, (), (override));

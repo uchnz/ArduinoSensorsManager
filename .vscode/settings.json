@@ -47,5 +47,6 @@
     },
     "gtest-adapter.debugConfig": [
         "PIO Debug"
-    ]
+    ],
+    "openhab.useRestApi": false
 }

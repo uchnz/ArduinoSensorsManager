@@ -9,9 +9,7 @@ TEST(JSON, simple)
     doc["value"] = "1.1";
     char messageToSend[200];
     serializeJsonPretty(doc, messageToSend);
-    printf("\n\n");
-    printf(messageToSend);
-    printf("\n\n\n");
+    EXPECT_STREQ("{\r\n  \"sensor\": \"sname\",\r\n  \"id\": 0,\r\n  \"value\": \"1.1\"\r\n}", messageToSend);
 }
 
 TEST(JSON, two_nested)
@@ -25,9 +23,7 @@ TEST(JSON, two_nested)
     doc[1]["value"] = "-44.1";
     char messageToSend[150];
     serializeJsonPretty(doc, messageToSend);
-    printf("\n\n");
-    printf(messageToSend);
-    printf("\n\n\n");
+    EXPECT_STREQ("[\r\n  {\r\n    \"sensor\": \"sname\",\r\n    \"id\": 0,\r\n    \"value\": \"1.1\"\r\n  },\r\n  {\r\n    \"sensor\": \"sn2\",\r\n    \"id\": 1,\r\n    \"value\": \"-44.1\"\r\n  }\r\n]", messageToSend);
 }
 
 TEST(JSON, nested_FOR_simple)
@@ -41,9 +37,7 @@ TEST(JSON, nested_FOR_simple)
     }
     char messageToSend[200];
     serializeJsonPretty(doc, messageToSend);
-    printf("\n\n");
-    printf(messageToSend);
-    printf("\n\n\n");
+    EXPECT_STREQ("[\r\n  {\r\n    \"sensor\": \"sname\",\r\n    \"id\": 0,\r\n    \"value\": 0\r\n  }\r\n]", messageToSend);
 }
 
 TEST(JSON, nested_FOR_objects)
@@ -60,9 +54,7 @@ TEST(JSON, nested_FOR_objects)
     }
     char messageToSend[352];
     serializeJsonPretty(doc, messageToSend);
-
-    printf("\n\n-----size of StaticJSON: %d----", capacity);
-    printf("\nmessage PRETTY:\n%s\r---SIZE: %d---\n\n\n", messageToSend, strlen(messageToSend));
+    EXPECT_STREQ("{\r\n  \"sensor\": \"static sensor\",\r\n  \"measurements\": [\r\n    {\r\n      \"id\": \"23fsfs saf sdff as\",\r\n      \"value\": \"sdfasdas sfasdf asdf\"\r\n    },\r\n    {\r\n      \"id\": \"23fsfs saf sdff as\",\r\n      \"value\": \"sdfasdas sfasdf asdf\"\r\n    },\r\n    {\r\n      \"id\": \"23fsfs saf sdff as\"\r\n    }\r\n  ]\r\n}", messageToSend);
 }
 
 TEST(JSON, dynamicObjects)
@@ -79,9 +71,7 @@ TEST(JSON, dynamicObjects)
     }
     char messageToSend[280];
     serializeJsonPretty(doc, messageToSend);
-
-    printf("\n\n-----size of DynamicJSON: %d----", capacity);
-    printf("\nmessage PRETTY:\n%s\r---SIZE: %d---\n\n\n", messageToSend, strlen(messageToSend));
+    EXPECT_STREQ("{\r\n  \"sensor\": \"dynamic ojbect\",\r\n  \"measurements\": [\r\n    {\r\n      \"id\": 0,\r\n      \"value\": 0\r\n    },\r\n    {\r\n      \"id\": 1,\r\n      \"value\": 2\r\n    },\r\n    {\r\n      \"id\": 2,\r\n      \"value\": 4\r\n    },\r\n    {\r\n      \"id\": 3,\r\n      \"value\": 6\r\n    }\r\n  ]\r\n}", messageToSend);
 }
 
 TEST(JSON, dynamicArray)
@@ -94,7 +84,5 @@ TEST(JSON, dynamicArray)
         data[i] = i;
     char messageToSend[50];
     serializeJson(doc, messageToSend);
-
-    printf("\n\n-----size of DynamicJSON: %d----", capacity);
-    printf("\nmessage MIN:\n%s\r---SIZE: %d----\n\n\n", messageToSend, strlen(messageToSend));
+    EXPECT_STREQ("{\"name\":\"dynamic_array\",\"data\":[0,1,2]}", messageToSend);
 }

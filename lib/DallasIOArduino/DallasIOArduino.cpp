@@ -1,3 +1,8 @@
+#ifndef __TESTS__
+#include <LibPrintf.h>
+#endif
+#include "Arduino.h"
+
 #include <DallasIOArduino.h>
 
 DallasIOArduino::DallasIOArduino(DallasTemperature &dallas)

@@ -2,6 +2,7 @@
 #include <gmock/gmock.h>
 
 #include <ISensor.h>
+#include <IIO.h>
 #include <IMQTT.h>
 #include <SensorManager.h>
 
@@ -10,7 +11,7 @@ using ::testing::_;
 class MockSensor : public ISensor
 {
 public:
-   MOCK_METHOD(void, requestCurrentMeasurement, (), (override));
+   MOCK_METHOD(bool, requestCurrentMeasurement, (), (override));
    MOCK_METHOD(uint8_t, getNumberOfConnectedSensors, (), (override));
    MOCK_METHOD(double, getCurrentMeasurementByID, (uint8_t), (override));
    MOCK_METHOD(uint8_t, getName, (char *), (override));

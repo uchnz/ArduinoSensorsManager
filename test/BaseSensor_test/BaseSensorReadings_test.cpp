@@ -1,85 +1,73 @@
 #include <gtest/gtest.h>
-// #include <BaseSensor.h>
-#include <MQ7COArduino.h>
+#include <PhaseTimerArduino.h>
 #include <SHTIOArduino.h>
 #include <BMP280IOArduino.h>
 #include <IOArduino.h>
 #include <DallasIOArduino.h>
 #include <MQ7COIOArduino.h>
-#include <PhaseTimerArduino.h>
+#include <OnOffSensorArduino.h>
+#include <MQ7COArduino.h>
 #include <BaseSensorReadings_test.h>
 
 using ::testing::_;
 using ::testing::AtLeast;
 using ::testing::Return;
 
-TEST_F(SHT20ArduinoTest, test_Init_Successful)
-{
-    iarduino_I2C_SHT shtI2C(0x09);
-    EXPECT_CALL(shtI2C, begin()).Times(1).WillOnce(Return(true));
-    SHTIOArduino io(shtI2C);
-    BaseSensor sht20("sht", io);
+// TEST_F(SHT20ArduinoTest, test_gettingMeasurementsWithoutInit_fails)
+// {
+//     iarduino_I2C_SHT shtI2C(0x09);
+//     EXPECT_CALL(shtI2C, begin()).Times(0);
+//     SHTIOArduino io(shtI2C);
+//     BaseSensor sht20("sht", io);
 
-    TimerArduino timer;
-    EXPECT_TRUE(sht20.init(&timer));
-}
+//     EXPECT_CALL(shtI2C, getTem()).Times(0);
+//     EXPECT_CALL(shtI2C, getHum()).Times(0);
+//     sht20.requestCurrentMeasurement();
 
-TEST_F(SHT20ArduinoTest, test_gettingMeasurementsWithoutInit_fails)
-{
-    iarduino_I2C_SHT shtI2C(0x09);
-    EXPECT_CALL(shtI2C, begin()).Times(0);
-    SHTIOArduino io(shtI2C);
-    BaseSensor sht20("sht", io);
+//     double measurement = sht20.getCurrentMeasurementByID();
+//     EXPECT_DOUBLE_EQ(basesensor_nm::NOT_INITIALIZED_SENSOR, measurement);
+//     measurement = sht20.getCurrentMeasurementByID(1);
+//     EXPECT_DOUBLE_EQ(basesensor_nm::NOT_INITIALIZED_SENSOR, measurement);
+// }
 
-    EXPECT_CALL(shtI2C, getTem()).Times(0);
-    EXPECT_CALL(shtI2C, getHum()).Times(0);
-    sht20.requestCurrentMeasurement();
+// TEST_F(SHT20ArduinoTest, test_gettingSensorIDAboveExisting_fails)
+// {
+//     iarduino_I2C_SHT shtI2C(0x09);
+//     EXPECT_CALL(shtI2C, begin()).Times(1).WillOnce(Return(true));
+//     SHTIOArduino io(shtI2C);
+//     BaseSensor sht20("sht", io);
 
-    double measurement = sht20.getCurrentMeasurementByID();
-    EXPECT_DOUBLE_EQ(0xFFFFFFFF, measurement);
-    measurement = sht20.getCurrentMeasurementByID(1);
-    EXPECT_DOUBLE_EQ(0xFFFFFFFF, measurement);
-}
+//     TimerArduino timer;
+//     EXPECT_TRUE(sht20.init(&timer));
 
-TEST_F(SHT20ArduinoTest, test_gettingSensorIDAboveExisting_fails)
-{
-    iarduino_I2C_SHT shtI2C(0x09);
-    EXPECT_CALL(shtI2C, begin()).Times(1).WillOnce(Return(true));
-    SHTIOArduino io(shtI2C);
-    BaseSensor sht20("sht", io);
+//     double nonexist = sht20.getCurrentMeasurementByID(5);
+//     EXPECT_DOUBLE_EQ(0xFFFFFFFF, nonexist);
+// }
 
-    TimerArduino timer;
-    EXPECT_TRUE(sht20.init(&timer));
+// TEST_F(SHT20ArduinoTest, test_gettingTemperatureWithoutFirstTimeRequesting_fails)
+// {
+//     iarduino_I2C_SHT shtI2C(0x09);
+//     EXPECT_CALL(shtI2C, begin()).Times(1).WillOnce(Return(true));
+//     SHTIOArduino io(shtI2C);
+//     BaseSensor sht20("sht", io);
 
-    double nonexist = sht20.getCurrentMeasurementByID(5);
-    EXPECT_DOUBLE_EQ(0xFFFFFFFF, nonexist);
-}
+//     TimerArduino timer;
+//     EXPECT_TRUE(sht20.init(&timer));
 
-TEST_F(SHT20ArduinoTest, test_gettingTemperatureWithoutFirstTimeRequesting_fails)
-{
-    iarduino_I2C_SHT shtI2C(0x09);
-    EXPECT_CALL(shtI2C, begin()).Times(1).WillOnce(Return(true));
-    SHTIOArduino io(shtI2C);
-    BaseSensor sht20("sht", io);
+//     EXPECT_CALL(shtI2C, getTem()).Times(0);
+//     EXPECT_CALL(shtI2C, getHum()).Times(0);
+//     double measurement = sht20.getCurrentMeasurementByID();
+//     EXPECT_DOUBLE_EQ(0xFFFFFFFF, measurement);
+//     measurement = sht20.getCurrentMeasurementByID(1);
+//     EXPECT_DOUBLE_EQ(0xFFFFFFFF, measurement);
+// }
 
-    TimerArduino timer;
-    EXPECT_TRUE(sht20.init(&timer));
-
-    EXPECT_CALL(shtI2C, getTem()).Times(0);
-    EXPECT_CALL(shtI2C, getHum()).Times(0);
-    double measurement = sht20.getCurrentMeasurementByID();
-    EXPECT_DOUBLE_EQ(0xFFFFFFFF, measurement);
-    measurement = sht20.getCurrentMeasurementByID(1);
-    EXPECT_DOUBLE_EQ(0xFFFFFFFF, measurement);
-}
-
-TEST_F(SHT20ArduinoTest, test_requestCurrentMeasurement_withinTimeInterval_SavesArrayOfMeasurements)
+TEST_F(SHT20ArduinoTest, test_SHT20_getTemperatureAndHumidity_returnAverageValues)
 {
     ArduinoMock *arduinoMock = arduinoMockInstance();
     iarduino_I2C_SHT shtI2C(0x09);
     SHTIOArduino io(shtI2C);
     BaseSensor sht20("sht", io);
-
     TimerArduino timer;
     EXPECT_CALL(shtI2C, begin()).Times(1).WillOnce(Return(true));
     EXPECT_TRUE(sht20.init(&timer));
@@ -115,7 +103,7 @@ TEST_F(SHT20ArduinoTest, test_requestCurrentMeasurement_withinTimeInterval_Saves
     releaseArduinoMock();
 }
 
-TEST_F(SHT20ArduinoTest, test_requestCurrentMeasurement_withDifferentMeasurementIntervals_SavesArrayOfMeasurements)
+TEST_F(SHT20ArduinoTest, test_SHT20_getTemperatureAndHumidity_withDifferentTimesIntervals)
 {
     ArduinoMock *arduinoMock = arduinoMockInstance();
     iarduino_I2C_SHT shtI2C(0x09);
@@ -156,7 +144,7 @@ TEST_F(SHT20ArduinoTest, test_requestCurrentMeasurement_withDifferentMeasurement
     releaseArduinoMock();
 }
 
-TEST_F(BMP280ArduinoTest, test_requestCurrentMeasurement_withDifferentMeasurementIntervals_SavesArrayOfMeasurements)
+TEST_F(BMP280ArduinoTest, test_BMP280_getTemperaturePressureAltitude_returnAverageValues)
 {
     ArduinoMock *arduinoMock = arduinoMockInstance();
     iarduino_Pressure_BMP bmpI2C(0x09);
@@ -203,7 +191,7 @@ TEST_F(BMP280ArduinoTest, test_requestCurrentMeasurement_withDifferentMeasuremen
     releaseArduinoMock();
 }
 
-TEST_F(SASArduinoTest, test_analogReadings_withDifferentMeasurementIntervals_returnsAverageOf3Readings)
+TEST_F(AnalogArduinoTest, test_analogReadings_withDifferentTimeIntervals_returnAverageValues)
 {
     ArduinoMock *arduinoMock = arduinoMockInstance();
     EXPECT_CALL(*arduinoMock, pinMode(A2, INPUT)).Times(1);
@@ -241,7 +229,7 @@ TEST_F(SASArduinoTest, test_analogReadings_withDifferentMeasurementIntervals_ret
     releaseArduinoMock();
 }
 
-TEST_F(DallasArduinoTest, test_getTemperatures_ManySensors_ReturnsCorrectTemperatures)
+TEST_F(DallasArduinoTest, test_Dallas_getTemperatures_ManySensors_returnCorrectTemperatures)
 {
     ArduinoMock *arduinoMock = arduinoMockInstance();
     DallasTemperature dt;
@@ -297,7 +285,7 @@ TEST_F(DallasArduinoTest, test_getTemperatures_ManySensors_ReturnsCorrectTempera
     releaseArduinoMock();
 }
 
-TEST_F(MQ7C0ArduinoTest, test_readings_within_60_60_30_Cycle)
+TEST_F(MQ7C0ArduinoTest, test_MQ7C0_readings_within_60_60_30_Cycle)
 {
     ArduinoMock *arduinoMock = arduinoMockInstance();
     EXPECT_CALL(*arduinoMock, pinMode(A6, INPUT)).Times(1);
@@ -324,5 +312,75 @@ TEST_F(MQ7C0ArduinoTest, test_readings_within_60_60_30_Cycle)
         incrementIntervalMillis += nextLoopMillis;
     }
     EXPECT_EQ(533, mq7.getCurrentMeasurementByID());
+    releaseArduinoMock();
+}
+
+TEST_F(OnOffSensorArduinoTest, test_digitalRead_returnsAverageValue)
+{
+    ArduinoMock *arduinoMock = arduinoMockInstance();
+    EXPECT_CALL(*arduinoMock, pinMode(A2, INPUT_PULLUP)).Times(1);
+    DigitalIOArduino io(A2, INPUT);
+    OnOffSensorArduino onoff("mois", io);
+    TimerArduino timer(500);
+    EXPECT_TRUE(onoff.init(&timer));
+
+    EXPECT_CALL(*arduinoMock, digitalRead(A2)).Times(4).WillOnce(Return(HIGH)).WillOnce(Return(LOW)).WillOnce(Return(HIGH)).WillOnce(Return(LOW));
+    uint32_t startIntervalMillis = 8500;
+    uint32_t incrementIntervalMillis = 0;
+    uint16_t nextLoopMillis = 500;
+    for (int i = 0; i < 4; i++)
+    {
+        EXPECT_CALL(*arduinoMock, millis).Times(AtLeast(0)).WillRepeatedly(Return(startIntervalMillis + incrementIntervalMillis));
+        onoff.requestCurrentMeasurement();
+        incrementIntervalMillis += nextLoopMillis;
+    }
+    EXPECT_EQ(1, onoff.getCurrentMeasurementByID());
+
+    incrementIntervalMillis = 0;
+    nextLoopMillis = 1000;
+    EXPECT_CALL(*arduinoMock, digitalRead(A2)).Times(3).WillOnce(Return(LOW)).WillOnce(Return(HIGH)).WillOnce(Return(LOW));
+    for (int i = 0; i < 3; i++)
+    {
+        EXPECT_CALL(*arduinoMock, millis).Times(AtLeast(0)).WillRepeatedly(Return(startIntervalMillis + incrementIntervalMillis));
+        onoff.requestCurrentMeasurement();
+        incrementIntervalMillis += nextLoopMillis;
+    }
+    EXPECT_EQ(0, onoff.getCurrentMeasurementByID());
+    releaseArduinoMock();
+}
+
+TEST_F(OnOffSensorArduinoTest, test_test_digitalRead_withDifferentTimeIntervals_returnAverageValues)
+{
+    ArduinoMock *arduinoMock = arduinoMockInstance();
+    EXPECT_CALL(*arduinoMock, pinMode(A7, INPUT_PULLUP)).Times(1);
+    DigitalIOArduino io(A7, INPUT);
+    OnOffSensorArduino onoff("mois", io);
+    TimerArduino timer(100);
+    EXPECT_TRUE(onoff.init(&timer));
+
+    EXPECT_CALL(*arduinoMock, digitalRead(A7)).Times(4).WillOnce(Return(LOW)).WillOnce(Return(HIGH)).WillOnce(Return(LOW)).WillOnce(Return(HIGH));
+    uint32_t startIntervalMillis = 8500;
+    uint32_t incrementIntervalMillis = 0;
+    uint16_t nextLoopMillis = 50;
+    for (int i = 0; i < 7; i++)
+    {
+        EXPECT_CALL(*arduinoMock, millis).Times(AtLeast(0)).WillRepeatedly(Return(startIntervalMillis + incrementIntervalMillis));
+        onoff.requestCurrentMeasurement();
+        incrementIntervalMillis += nextLoopMillis;
+    }
+    EXPECT_EQ(0, onoff.getCurrentMeasurementByID());
+
+    timer.setReadingInterval(10);
+    incrementIntervalMillis = 0;
+    nextLoopMillis = 30;
+    EXPECT_CALL(*arduinoMock, digitalRead(A7)).Times(3).WillOnce(Return(LOW)).WillOnce(Return(HIGH)).WillOnce(Return(LOW));
+    for (int i = 0; i < 3; i++)
+    {
+        EXPECT_CALL(*arduinoMock, millis).Times(AtLeast(0)).WillRepeatedly(Return(startIntervalMillis + incrementIntervalMillis));
+        onoff.requestCurrentMeasurement();
+        incrementIntervalMillis += nextLoopMillis;
+    }
+    EXPECT_EQ(1, onoff.getCurrentMeasurementByID());
+
     releaseArduinoMock();
 }

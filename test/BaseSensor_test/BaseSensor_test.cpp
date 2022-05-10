@@ -1,9 +1,9 @@
 
 #include <gtest/gtest.h>
-// #include <IOArduino.h>
 #include <BaseSensor_test.h>
 
 using ::testing::_;
+using ::testing::AtLeast;
 using ::testing::Return;
 
 TEST_F(BaseSensorTest, test_name)
@@ -108,6 +108,9 @@ TEST_F(BaseSensorTest, test_init_whenNoname_Fails)
     MockTimer timer;
 
     EXPECT_FALSE(sensor.init(&timer));
+
+    BaseSensor sensor2(nullptr, io);
+    EXPECT_FALSE(sensor.init(&timer));
 }
 
 TEST_F(BaseSensorTest, test_init_whenSensorHasName_Successful)
@@ -120,29 +123,6 @@ TEST_F(BaseSensorTest, test_init_whenSensorHasName_Successful)
 
     EXPECT_TRUE(sensor.init(&timer));
 }
-
-// TEST_F(BaseSensorTest, test_init_afterNameChanged_Successful)
-// {
-//     // MockIO io;
-//     ArduinoMock *arduinoMock = arduinoMockInstance();
-//     EXPECT_CALL(*arduinoMock, pinMode(A2, INPUT)).Times(1);
-//     AnalogIOArduino io(A2, INPUT);
-//     BaseSensor sensor("with name", io);
-//     MockTimer timer;
-//     // EXPECT_CALL(io, init()).Times(1).WillOnce(Return(true));
-//     // EXPECT_TRUE(sensor.init(&timer));
-//     sensor.setName("new name");
-//     // EXPECT_CALL(io, init()).Times(1).WillOnce(Return(true));
-//     // EXPECT_TRUE(sensor.init(&timer));
-
-//     BaseSensor sensor2(nullptr, io);
-//     // EXPECT_CALL(io, init()).Times(0);
-//     EXPECT_FALSE(sensor2.init(&timer));
-//     // EXPECT_CALL(io, init()).Times(1).WillOnce(Return(true));
-//     sensor2.setName("n");
-//     EXPECT_TRUE(sensor2.init(&timer));
-//     releaseArduinoMock();
-// }
 
 TEST_F(BaseSensorTest, test_init_withNullTimer_returnsFalse)
 {
@@ -165,30 +145,6 @@ TEST_F(BaseSensorTest, test_getNumberOfSensors_withoutInit_ReturnsErrorNumber)
     EXPECT_EQ(basesensor_nm::NOT_INITIALIZED_SENSOR, sensor3.getNumberOfConnectedSensors());
 }
 
-// TEST_F(BaseSensorTest, test_getNumberOfSensors_afterInit_ReturnsZero)
-// {
-//     MockIO io;
-//     BaseSensor sensor2("with name", io);
-//     MockTimer timer;
-//     EXPECT_CALL(io, init()).Times(1).WillOnce(Return(true));
-//     sensor2.init(&timer);
-//     EXPECT_EQ(0, sensor2.getNumberOfConnectedSensors());
-// }
-
-TEST_F(BaseSensorTest, test_getCurrentMeasurement_withoutInit_Fails)
-{
-    MockIO io;
-    BaseSensor sensor("", io);
-    MockTimer timer;
-    EXPECT_CALL(io, init()).Times(0);
-    EXPECT_FALSE(sensor.init(&timer));
-    EXPECT_EQ(0xFFFFFFFF, sensor.getCurrentMeasurementByID());
-
-    EXPECT_CALL(io, init()).Times(0);
-    EXPECT_FALSE(sensor.init(nullptr));
-    EXPECT_EQ(0xFFFFFFFF, sensor.getCurrentMeasurementByID());
-}
-
 TEST_F(BaseSensorTest, test_requestCurrentMeasurement_withoutInit_Fails)
 {
     MockIO io;
@@ -200,26 +156,21 @@ TEST_F(BaseSensorTest, test_requestCurrentMeasurement_withoutInit_Fails)
     EXPECT_FALSE(sensor.requestCurrentMeasurement());
 }
 
-// TEST_F(BaseSensorTest, test_requestCurrentMeasurement_withNullTimerAfterInit_returnsFalse)
-// {
-//     MockIO io;
-//     EXPECT_CALL(io, getTotalSensors()).Times(2).WillRepeatedly(Return(1));
-//     MockTimer *timer = new MockTimer();
-//     BaseSensor sensor("sensorname", io);
-//     EXPECT_CALL(io, init()).Times(1).WillOnce(Return(true));
-//     EXPECT_TRUE(sensor.init(timer));
-//     delete timer;
+TEST_F(BaseSensorTest, test_getCurrentMeasurement_withoutInit_Fails)
+{
+    MockIO io;
+    BaseSensor sensor("", io);
+    MockTimer timer;
+    EXPECT_CALL(io, init()).Times(0);
+    EXPECT_FALSE(sensor.init(&timer));
+    EXPECT_EQ(basesensor_nm::NOT_INITIALIZED_SENSOR, sensor.getCurrentMeasurementByID());
 
-//     // can't test for deleted pointer before calling isReadyForNextRead, because of using raw pointers
-//     // _timer contains address to deleted object in this case
-//     // change code to use std::unique_ptr instead
+    EXPECT_CALL(io, init()).Times(0);
+    EXPECT_FALSE(sensor.init(nullptr));
+    EXPECT_EQ(basesensor_nm::NOT_INITIALIZED_SENSOR, sensor.getCurrentMeasurementByID());
+}
 
-//     // EXPECT_CALL(*timer, isReadyForNextRead).Times(0);
-//     // EXPECT_FALSE(sensor.requestCurrentMeasurement());
-// }
-
-////////////////////////////
-TEST_F(BaseSensorTest, test_requestCurrentMeasurement_withinTimeInterval_returnsTrue)
+TEST_F(BaseSensorTest, test_whenAllOk_withOneSensor_returnsMeasurement)
 {
     MockIO io;
     MockTimer timer;
@@ -228,21 +179,40 @@ TEST_F(BaseSensorTest, test_requestCurrentMeasurement_withinTimeInterval_returns
     EXPECT_CALL(io, getTotalSensors()).Times(2).WillRepeatedly(Return(1));
     sensor.init(&timer);
 
-    EXPECT_CALL(timer, isReadyForNextRead).Times(2).WillOnce(Return(false)).WillOnce(Return(true));
-    EXPECT_CALL(io, getTotalSensors()).Times(0);
-    EXPECT_CALL(io, read(_)).Times(0);
+    EXPECT_CALL(timer, isReadyForNextRead).Times(1).WillOnce(Return(false));
     EXPECT_FALSE(sensor.requestCurrentMeasurement());
-    EXPECT_CALL(io, getTotalSensors()).Times(2).WillRepeatedly(Return(1));
-    EXPECT_CALL(io, read(_)).Times(1).WillOnce(Return(false));
-    EXPECT_TRUE(sensor.requestCurrentMeasurement());
+
+    for (int i = 0; i < 4; i++)
+    {
+        EXPECT_CALL(timer, isReadyForNextRead).Times(1).WillOnce(Return(true));
+        EXPECT_CALL(io, getTotalSensors()).Times(AtLeast(1)).WillRepeatedly(Return(1));
+        EXPECT_CALL(io, read(0)).Times(1).WillOnce(Return(-36.6 + i));
+        EXPECT_TRUE(sensor.requestCurrentMeasurement());
+    }
+    EXPECT_FLOAT_EQ(-35.6, sensor.getCurrentMeasurementByID());
+    EXPECT_FLOAT_EQ(basesensor_nm::UNINITIALIZED_MEASUREMENT_VALUE, sensor.getCurrentMeasurementByID(1));
 }
 
-// TEST_F(BaseSensorTest, test_getCurrentMeasurement_afterInit_ReturnsZero)
-// {
-//     MockIO io;
-//     BaseSensor sensor("www", io);
-//     MockTimer timer;
-//     EXPECT_CALL(io, init()).Times(1).WillOnce(Return(true));
-//     EXPECT_TRUE(sensor.init(&timer));
-//     EXPECT_EQ(0, sensor.getCurrentMeasurementByID());
-// }
+TEST_F(BaseSensorTest, test_whenAllOk_withManySensors_returnMeasurement)
+{
+    MockIO io;
+    MockTimer timer;
+    BaseSensor sensor("sensorname", io);
+    EXPECT_CALL(io, init()).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(io, getTotalSensors()).Times(2).WillRepeatedly(Return(2));
+    sensor.init(&timer);
+
+    EXPECT_CALL(timer, isReadyForNextRead).Times(1).WillOnce(Return(false));
+    EXPECT_FALSE(sensor.requestCurrentMeasurement());
+
+    for (int i = 0; i < 4; i++)
+    {
+        EXPECT_CALL(timer, isReadyForNextRead).Times(1).WillOnce(Return(true));
+        EXPECT_CALL(io, getTotalSensors()).Times(AtLeast(1)).WillRepeatedly(Return(2));
+        EXPECT_CALL(io, read(_)).Times(2).WillOnce(Return(-36.6 + i)).WillOnce(Return(741.1 + 1));
+        EXPECT_TRUE(sensor.requestCurrentMeasurement());
+    }
+    EXPECT_FLOAT_EQ(-35.6, sensor.getCurrentMeasurementByID());
+    EXPECT_FLOAT_EQ(742.1, sensor.getCurrentMeasurementByID(1));
+    EXPECT_FLOAT_EQ(basesensor_nm::UNINITIALIZED_MEASUREMENT_VALUE, sensor.getCurrentMeasurementByID(2));
+}
