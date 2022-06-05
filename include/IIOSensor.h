@@ -1,7 +1,7 @@
 #pragma once
 #include <stdint.h>
 
-class IIO
+class IIOSensor
 {
 public:
     virtual bool init() = 0;

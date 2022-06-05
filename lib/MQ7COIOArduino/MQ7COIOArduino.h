@@ -1,6 +1,6 @@
 #pragma once
 #include <Arduino.h>
-#include <IIO.h>
+#include <IIOSensor.h>
 #include <IPhaseTimer.h>
 
 namespace mq7coio_nm
@@ -15,7 +15,7 @@ namespace mq7coio_nm
     const uint8_t TOTAL_SENSORS_ON_BUS = 1;
 }
 
-class MQ7COIOArduino : public IIO
+class MQ7COIOArduino : public IIOSensor
 {
 private:
     uint8_t _signalPIN;
@@ -30,7 +30,7 @@ public:
 
     bool isInitCompleted();
 
-    // IIO
+    // IIOSensor
     virtual bool init() override;
     virtual double read(uint8_t id = 0) override;
     virtual uint8_t getTotalSensors() override;

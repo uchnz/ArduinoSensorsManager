@@ -1,6 +1,6 @@
 #include <OnOffSensorArduino.h>
 
-OnOffSensorArduino::OnOffSensorArduino(const char *name, IIO &io)
+OnOffSensorArduino::OnOffSensorArduino(const char *name, IIOSensor &io)
     : BaseSensor(name, io)
 {
 }

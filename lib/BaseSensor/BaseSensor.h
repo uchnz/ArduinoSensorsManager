@@ -24,7 +24,7 @@ private:
     void createMeasurementsNewArrays();
 
 protected:
-    IIO &_io;
+    IIOSensor &_io;
     ITimer *_timer;
     uint8_t _currentSavingItemInArray;
     double **_measurements2DArray;
@@ -35,7 +35,7 @@ protected:
     void saveAverageMeasurement();
 
 public:
-    BaseSensor(const char *name, IIO &io);
+    BaseSensor(const char *name, IIOSensor &io);
     virtual ~BaseSensor();
 
     bool setName(const char *name);

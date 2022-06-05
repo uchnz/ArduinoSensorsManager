@@ -1,4 +1,3 @@
-
 #include <gtest/gtest.h>
 #include <BaseSensor_test.h>
 
@@ -6,7 +5,7 @@ using ::testing::_;
 using ::testing::AtLeast;
 using ::testing::Return;
 
-TEST_F(BaseSensorTest, test_name)
+TEST_F(BaseSensorTest, test_nameIsSavedCorrectly)
 {
     char name[30];
     MockIO io;

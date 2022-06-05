@@ -1,6 +1,6 @@
 #pragma once
 #include <Arduino.h>
-#include <IIO.h>
+#include <IIOSensor.h>
 
 namespace ioarduino_nm
 {
@@ -8,7 +8,7 @@ namespace ioarduino_nm
     const uint8_t TOTAL_SENSORS_ON_BUS = 1;
 }
 
-class IOArduino : public IIO
+class IOArduino : public IIOSensor
 {
 protected:
     uint8_t _signalPIN;
@@ -20,7 +20,7 @@ public:
 
     bool isInitCompleted();
 
-    // IIO
+    // IIOSensor
     virtual bool init() override;
     virtual double read(uint8_t id = 0) = 0;
     virtual uint8_t getTotalSensors() override;

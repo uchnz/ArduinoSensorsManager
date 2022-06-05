@@ -14,6 +14,10 @@ SensorManager::SensorManager(IMQTT &mqtt)
     // _totalAddresses = 0;
     _totalPortsWithSensors = 0;
     _ISenosorObjectsManagingArray2D = nullptr;
+    _IActuatorObjects = nullptr;
+    _totalActuators = 0;
+    _addressesToReadActuatorsCommands = nullptr;
+
     // _measurementsArray2D = nullptr;
     // _numberOfSensorsOnEachPort = nullptr;
     // _sensorsNamesArray = nullptr;
@@ -28,6 +32,14 @@ SensorManager::~SensorManager()
             delete[] _addressesToSendMeasurementsTo[i];
 
         delete[] _addressesToSendMeasurementsTo;
+    }
+
+    if (_addressesToReadActuatorsCommands)
+    {
+        for (uint8_t i = 0; i < _totalActuators; i++)
+            delete[] _addressesToReadActuatorsCommands[i];
+
+        delete[] _addressesToReadActuatorsCommands;
     }
 
     // if (_measurementsArray2D)
@@ -70,19 +82,36 @@ SensorManager::~SensorManager()
 
 //     return true;
 // }
-bool SensorManager::saveAddresses(const char **addressesArray)
+// bool SensorManager::saveAddresses(const char **addressesArray)
+// {
+//     if (nullptr == addressesArray)
+//         return false;
+
+//     _addressesToSendMeasurementsTo = new char *[_totalPortsWithSensors];
+//     for (uint8_t i = 0; i < _totalPortsWithSensors; i++)
+//     {
+//         uint8_t sizeOfAddressWithEndOfString = 1;
+//         if (nullptr != addressesArray[i])
+//             sizeOfAddressWithEndOfString = strlen(addressesArray[i]) + 1;
+//         _addressesToSendMeasurementsTo[i] = new char[sizeOfAddressWithEndOfString];
+//         memcpy(_addressesToSendMeasurementsTo[i], (sizeOfAddressWithEndOfString > 1) ? addressesArray[i] : "", sizeOfAddressWithEndOfString);
+//     }
+
+//     return true;
+// }
+bool SensorManager::saveAddresses2(const char **addressesArray, char **&destination, uint8_t size)
 {
     if (nullptr == addressesArray)
         return false;
 
-    _addressesToSendMeasurementsTo = new char *[_totalPortsWithSensors];
-    for (uint8_t i = 0; i < _totalPortsWithSensors; i++)
+    destination = new char *[size];
+    for (uint8_t i = 0; i < size; i++)
     {
         uint8_t sizeOfAddressWithEndOfString = 1;
         if (nullptr != addressesArray[i])
             sizeOfAddressWithEndOfString = strlen(addressesArray[i]) + 1;
-        _addressesToSendMeasurementsTo[i] = new char[sizeOfAddressWithEndOfString];
-        memcpy(_addressesToSendMeasurementsTo[i], (sizeOfAddressWithEndOfString > 1) ? addressesArray[i] : "", sizeOfAddressWithEndOfString);
+        destination[i] = new char[sizeOfAddressWithEndOfString];
+        memcpy(destination[i], (sizeOfAddressWithEndOfString > 1) ? addressesArray[i] : "", sizeOfAddressWithEndOfString);
     }
 
     return true;
@@ -171,7 +200,8 @@ bool SensorManager::saveAddresses(const char **addressesArray)
 //     return allNulls;
 // }
 
-bool SensorManager::arraysHaveNulls(ISensor **sensorsArray2D, const char **addressesArray, uint8_t totalOccupiedPINs)
+// bool SensorManager::arraysHaveNulls(ISensor **sensorsArray2D, const char **addressesArray, uint8_t totalOccupiedPINs)
+bool SensorManager::arraysHaveNulls(void **sensorsArray2D, const char **addressesArray, uint8_t totalOccupiedPINs)
 {
     if (!sensorsArray2D || !addressesArray)
         return true;
@@ -202,17 +232,20 @@ bool SensorManager::arraysHaveNulls(ISensor **sensorsArray2D, const char **addre
 //     //     _numberOfSensorsOnEachPort[i] = 0;
 //     // }
 // }
+// bool SensorManager::init2(ISensor **sensorsArray2D, const char **addressesArray, uint8_t totalOccupiedPINs)
 bool SensorManager::init2(ISensor **sensorsArray2D, const char **addressesArray, uint8_t totalOccupiedPINs)
 {
     if (!totalOccupiedPINs)
         return false;
 
-    if (arraysHaveNulls(sensorsArray2D, addressesArray, totalOccupiedPINs))
+    // if (arraysHaveNulls(sensorsArray2D, addressesArray, totalOccupiedPINs))
+    if (arraysHaveNulls((void **)sensorsArray2D, addressesArray, totalOccupiedPINs))
         return false;
 
     _ISenosorObjectsManagingArray2D = sensorsArray2D;
     _totalPortsWithSensors = totalOccupiedPINs;
-    saveAddresses(addressesArray);
+    // saveAddresses(addressesArray);
+    saveAddresses2(addressesArray, _addressesToSendMeasurementsTo, _totalPortsWithSensors);
 
     return true;
 }
@@ -340,8 +373,8 @@ uint16_t SensorManager::makeSystemJSON(char *message, uint16_t len, uint32_t mil
 {
     size_t capacity = JSON_OBJECT_SIZE(3);
     DynamicJsonDocument doc(capacity);
-    doc["ProjectID"] = "VIJ2022";
-    doc["uptime"] = millisSinceStart / 1000;
+    doc["DeviceID"] = "VIJ2022";
+    doc["uptime"] = millisSinceStart;
     doc["sensors"] = _totalPortsWithSensors;
 
     serializeJson(doc, message, len);
@@ -352,6 +385,85 @@ bool SensorManager::sendSystemInfo(uint32_t millisSinceStart)
     char messageToSend[SM_nm::MAX_MESSAGE_SIZE];
     uint16_t len = makeSystemJSON(messageToSend, SM_nm::MAX_MESSAGE_SIZE, millisSinceStart);
     bool result = _clientMQTT.send(messageToSend, "/SystemInfo");
-    // printf("address: /SystemInfo -> message: %s\n", messageToSend);
+    printf("address: /SystemInfo -> message: %s\n", messageToSend);
     return result;
+}
+
+// bool SensorManager::arraysHaveNullsActuators(void **actuatorsArray, const char **addressesArray, uint8_t totalOccupiedPINs)
+// {
+//     if (!actuatorsArray || !addressesArray)
+//         return true;
+
+//     bool hasNull = false;
+//     for (uint8_t i = 0; i < totalOccupiedPINs; i++)
+//     {
+//         if (!actuatorsArray[i])
+//             hasNull = true;
+//         if (!addressesArray[i] || (0 == addressesArray[i][0]))
+//             hasNull = true;
+//     }
+
+//     return hasNull;
+// }
+bool SensorManager::initActuators(IActuator **actuatorsArray, const char **addressesArray, uint8_t totalOccupiedPINs)
+{
+    if (!totalOccupiedPINs)
+        return false;
+
+    if (arraysHaveNulls((void **)actuatorsArray, addressesArray, totalOccupiedPINs))
+        return false;
+
+    _IActuatorObjects = actuatorsArray;
+    _totalActuators = totalOccupiedPINs;
+    saveAddresses2(addressesArray, _addressesToReadActuatorsCommands, _totalActuators);
+
+    for (uint8_t i = 0; i < _totalActuators; i++)
+        _clientMQTT.subscribeToTopic(addressesArray[0]);
+
+    return true;
+}
+
+bool SensorManager::parseCommand(const char *commandJSON, SM_nm::ActuatorCommand &ac)
+{
+    const int capacity = JSON_OBJECT_SIZE(2) + 75;
+    StaticJsonDocument<capacity> doc;
+    DeserializationError error = deserializeJson(doc, commandJSON);
+    if (error)
+        return false;
+
+    uint8_t maxSize = sizeof(ac.name);
+    strncpy(ac.name, doc["name"] | "no name", maxSize);
+    ac.name[maxSize - 1] = 0;
+
+    maxSize = sizeof(ac.command);
+    strncpy(ac.command, doc["action"] | "no action", maxSize);
+    ac.command[maxSize - 1] = 0;
+
+    return true;
+}
+uint8_t SensorManager::getActuatorIDByName(const char *name)
+{
+    char actuatorName[30];
+    for (uint8_t i = 0; i < _totalActuators; i++)
+    {
+        _IActuatorObjects[i]->getName(actuatorName);
+        if (0 == strcmp(name, actuatorName))
+            return i;
+    }
+    return 255;
+}
+bool SensorManager::executeCommand(const char *commandJSON)
+{
+    if (!_IActuatorObjects)
+        return false;
+
+    SM_nm::ActuatorCommand ac;
+    if (!parseCommand(commandJSON, ac))
+        return false;
+
+    uint8_t id = getActuatorIDByName(ac.name);
+    if (255 != id)
+        return _IActuatorObjects[id]->execute(ac.command);
+
+    return false;
 }

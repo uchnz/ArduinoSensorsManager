@@ -1,6 +1,6 @@
 #include <MQ7COArduino.h>
 
-MQ7COArduino::MQ7COArduino(const char *name, IIO &io)
+MQ7COArduino::MQ7COArduino(const char *name, IIOSensor &io)
     : BaseSensor(name, io)
 {
 }

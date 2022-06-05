@@ -10,7 +10,7 @@ protected:
     }
 };
 
-class MockIO : public IIO
+class MockIO : public IIOSensor
 {
 public:
     MOCK_METHOD(bool, init, (), (override));

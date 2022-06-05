@@ -1,5 +1,5 @@
 #pragma once
-#include <IIO.h>
+#include <IIOSensor.h>
 #include <iarduino_Pressure_BMP.h>
 
 namespace bmpio_nm
@@ -11,7 +11,7 @@ namespace bmpio_nm
     const uint8_t TOTAL_SENSORS_ON_BUS = 3;
 }
 
-class BMP280IOArduino : public IIO
+class BMP280IOArduino : public IIOSensor
 {
 private:
     iarduino_Pressure_BMP &_bmp;
@@ -21,7 +21,7 @@ public:
     BMP280IOArduino(iarduino_Pressure_BMP &bmp);
     bool isInitCompleted();
 
-    // IIO
+    // IIOSensor
     virtual bool init() override;
     virtual double read(uint8_t id = 0) override;
     virtual uint8_t getTotalSensors() override;

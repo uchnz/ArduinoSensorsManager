@@ -3,8 +3,8 @@
 #include <SHTIOArduino.h>
 #include <BMP280IOArduino.h>
 #include <IOArduino.h>
-#include <DallasIOArduino.h>
 #include <MQ7COIOArduino.h>
+#include <DallasIOArduino.h>
 #include <OnOffSensorArduino.h>
 #include <MQ7COArduino.h>
 #include <BaseSensorReadings_test.h>
@@ -319,7 +319,7 @@ TEST_F(OnOffSensorArduinoTest, test_digitalRead_returnsAverageValue)
 {
     ArduinoMock *arduinoMock = arduinoMockInstance();
     EXPECT_CALL(*arduinoMock, pinMode(A2, INPUT_PULLUP)).Times(1);
-    DigitalIOArduino io(A2, INPUT);
+    DigitalIOArduino io(A2, INPUT_PULLUP);
     OnOffSensorArduino onoff("mois", io);
     TimerArduino timer(500);
     EXPECT_TRUE(onoff.init(&timer));
@@ -353,7 +353,7 @@ TEST_F(OnOffSensorArduinoTest, test_test_digitalRead_withDifferentTimeIntervals_
 {
     ArduinoMock *arduinoMock = arduinoMockInstance();
     EXPECT_CALL(*arduinoMock, pinMode(A7, INPUT_PULLUP)).Times(1);
-    DigitalIOArduino io(A7, INPUT);
+    DigitalIOArduino io(A7, INPUT_PULLUP);
     OnOffSensorArduino onoff("mois", io);
     TimerArduino timer(100);
     EXPECT_TRUE(onoff.init(&timer));

@@ -1,5 +1,5 @@
 #pragma once
-#include <IIO.h>
+#include <IIOSensor.h>
 #include <DallasTemperature.h>
 
 namespace dallas_nm
@@ -10,7 +10,7 @@ namespace dallas_nm
     const uint8_t TOTAL_SENSORS_ON_BUS = 2;
 }
 
-class DallasIOArduino : public IIO
+class DallasIOArduino : public IIOSensor
 {
 private:
     DallasTemperature &_dallas;

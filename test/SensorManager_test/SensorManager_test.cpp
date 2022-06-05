@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
-#include <SensorManager/SensorManager_test.h>
+#include <SensorManager_test.h>
 
+using ::testing::AtLeast;
 using ::testing::DoAll;
 using ::testing::HasSubstr;
 using ::testing::Return;
@@ -486,7 +487,7 @@ TEST_F(SensorManagerTest, DISABLED_test_sendingJSON_whenSomeArraysAreLonger_fail
 {
     // Can't check for: Out Of Boundary!!
     // Need to refactor code of the function to type safe pointers like string, vector, etc.
-    // But in this project adding STL library to Arduino yeilds to a conflict with MQTT librarary
+    // But in this project adding STL library to Arduino yeilds to a conflict with MQTT library
     // and code doesn't compile.
 
     MockSensor s1, s2;
@@ -630,9 +631,144 @@ TEST_F(SensorManagerTest, test_sendingSystemJSON_SingleSensor_ReturnsTrues)
     ISensor *array[1] = {&s1};
     const char *addresses[] = {"/addr"};
     EXPECT_TRUE(_mgr.init2(array, addresses, 1));
-    char message[] = "{\"ProjectID\":\"VIJ2022\",\"uptime\":1144273,\"sensors\":1}";
+    char message[] = "{\"DeviceID\":\"VIJ2022\",\"uptime\":1144273222,\"sensors\":1}";
 
     EXPECT_CALL(_mqtt, send(HasSubstr(message), HasSubstr("/SystemInfo"))).Times(1).WillOnce(Return(true));
 
     EXPECT_TRUE(_mgr.sendSystemInfo((uint32_t)1144273222));
+}
+
+TEST_F(SensorManagerTest, test_executeActuator_withoutInit_fails_returnFalse)
+{
+    EXPECT_FALSE(_mgr.executeCommand("ON"));
+}
+
+TEST_F(SensorManagerTest, test_executeActuator_whenArraysHaveSomeNulls_fails_returnFalse)
+{
+    MockActuator a1;
+    IActuator *array[2] = {&a1, nullptr};
+    const char *addresses[] = {"/manage/actuator", "m/1"};
+    EXPECT_CALL(_mqtt, subscribeToTopic(_)).Times(0);
+    EXPECT_FALSE(_mgr.initActuators(array, addresses, 2));
+    EXPECT_FALSE(_mgr.executeCommand("ON"));
+
+    MockActuator a2;
+    IActuator *array2[2] = {&a1, &a2};
+    const char *addresses2[] = {nullptr, "m/1"};
+    EXPECT_CALL(_mqtt, subscribeToTopic(_)).Times(0);
+    EXPECT_FALSE(_mgr.initActuators(array2, addresses2, 2));
+    EXPECT_FALSE(_mgr.executeCommand("ON"));
+
+    EXPECT_CALL(_mqtt, subscribeToTopic(_)).Times(0);
+    EXPECT_FALSE(_mgr.initActuators(array, addresses2, 2));
+    EXPECT_FALSE(_mgr.executeCommand("ON"));
+}
+
+TEST_F(SensorManagerTest, test_executeActuator_withNullArrays_fails_returnFalse)
+{
+    MockActuator a1;
+    IActuator *array[1] = {&a1};
+    EXPECT_CALL(_mqtt, subscribeToTopic(_)).Times(0);
+    EXPECT_FALSE(_mgr.initActuators(array, nullptr, 1));
+    EXPECT_FALSE(_mgr.executeCommand("ON"));
+
+    const char *addresses[] = {"m/1"};
+    EXPECT_CALL(_mqtt, subscribeToTopic(_)).Times(0);
+    EXPECT_FALSE(_mgr.initActuators(nullptr, addresses, 1));
+    EXPECT_FALSE(_mgr.executeCommand("ON"));
+
+    EXPECT_CALL(_mqtt, subscribeToTopic(_)).Times(0);
+    EXPECT_FALSE(_mgr.initActuators(nullptr, nullptr, 1));
+    EXPECT_FALSE(_mgr.executeCommand("ON"));
+}
+
+TEST_F(SensorManagerTest, test_executeActuator_withEmptyArrays_fails_returnFalse)
+{
+    IActuator *array[1] = {nullptr};
+    const char *addresses[] = {"/topic"};
+    EXPECT_FALSE(_mgr.initActuators(array, addresses, 1));
+    EXPECT_FALSE(_mgr.executeCommand("ON"));
+
+    MockActuator a1;
+    IActuator *array2[1] = {&a1};
+    const char *addresses2[] = {""};
+    EXPECT_FALSE(_mgr.initActuators(array2, addresses2, 1));
+    EXPECT_FALSE(_mgr.executeCommand("ON"));
+
+    EXPECT_FALSE(_mgr.initActuators(array, addresses2, 1));
+    EXPECT_FALSE(_mgr.executeCommand("ON"));
+
+    EXPECT_FALSE(_mgr.initActuators(array2, addresses, 0));
+    EXPECT_FALSE(_mgr.executeCommand("ON"));
+}
+
+TEST_F(SensorManagerTest, test_executeActuator_SingleActuator_ReturnsTrue)
+{
+    MockActuator a1;
+    IActuator *array[1] = {&a1};
+    const char *addresses[] = {"/manage/actuator"};
+    EXPECT_CALL(_mqtt, subscribeToTopic(_)).Times(1).WillOnce(Return(true));
+    EXPECT_TRUE(_mgr.initActuators(array, addresses, 1));
+
+    char payload[] = "{\"name\":\"pump\",\"action\":\"ON\"}";
+    char actuatorName[] = "pump";
+    EXPECT_CALL(a1, getName(_)).Times(1).WillOnce(DoAll(SetArrayArgument<0>(actuatorName, actuatorName + 5), Return(5)));
+    EXPECT_CALL(a1, execute(_)).Times(1).WillOnce(Return(true));
+    EXPECT_TRUE(_mgr.executeCommand(payload));
+
+    char payload2[] = "{\"name\":\"pump\",\"action\":\"OFF\"}";
+    EXPECT_CALL(a1, getName(_)).Times(1).WillOnce(DoAll(SetArrayArgument<0>(actuatorName, actuatorName + 5), Return(5)));
+    EXPECT_CALL(a1, execute(_)).Times(1).WillOnce(Return(true));
+    EXPECT_TRUE(_mgr.executeCommand(payload2));
+
+    char payload3[] = "{\"name\":\"non exist pump\",\"action\":\"ON\"}";
+    EXPECT_CALL(a1, getName(_)).Times(1).WillOnce(DoAll(SetArrayArgument<0>(actuatorName, actuatorName + 5), Return(5)));
+    EXPECT_CALL(a1, execute(_)).Times(0);
+    EXPECT_FALSE(_mgr.executeCommand(payload3));
+}
+
+TEST_F(SensorManagerTest, test_executeActuator_WrongJSON_ReturnsFalse)
+{
+    MockActuator a1;
+    IActuator *array[1] = {&a1};
+    const char *addresses[] = {"/manage/actuator"};
+    EXPECT_CALL(_mqtt, subscribeToTopic(_)).Times(1).WillOnce(Return(true));
+    EXPECT_TRUE(_mgr.initActuators(array, addresses, 1));
+
+    char payload[] = "{\"name\":\"to big pump name here for buffer overrun\",\"action\":\"ON\"}";
+    char actuatorName[] = "pump";
+    EXPECT_CALL(a1, getName(_)).Times(1).WillOnce(DoAll(SetArrayArgument<0>(actuatorName, actuatorName + 5), Return(5)));
+    EXPECT_CALL(a1, execute(_)).Times(0);
+    EXPECT_FALSE(_mgr.executeCommand(payload));
+
+    char payload2[] = "{\"name\":\"pump\",\"action\":\"wrong action\"}";
+    EXPECT_CALL(a1, getName(_)).Times(1).WillOnce(DoAll(SetArrayArgument<0>(actuatorName, actuatorName + 5), Return(5)));
+    EXPECT_CALL(a1, execute(_)).Times(1).WillOnce(Return(true));
+    EXPECT_TRUE(_mgr.executeCommand(payload2));
+}
+
+TEST_F(SensorManagerTest, test_executeActuator_MultipleActuators_ReturnsTrue)
+{
+    MockActuator a1;
+    MockActuator a2;
+    IActuator *array[2] = {&a1, &a2};
+    const char *addresses[] = {"/manage/actuator", "/manage/2"};
+    EXPECT_CALL(_mqtt, subscribeToTopic(_)).Times(2).WillRepeatedly(Return(true));
+    EXPECT_TRUE(_mgr.initActuators(array, addresses, 2));
+
+    char payloadA1[] = "{\"name\":\"pump\",\"action\":\"ON\"}";
+    char payloadA2[] = "{\"name\":\"p2\",\"action\":\"OFF\"}";
+    char actuator1[] = "pump";
+    char actuator2[] = "p2";
+    EXPECT_CALL(a1, getName(_)).Times(AtLeast(1)).WillRepeatedly(DoAll(SetArrayArgument<0>(actuator1, actuator1 + 5), Return(5)));
+    EXPECT_CALL(a2, getName(_)).Times(1).WillOnce(DoAll(SetArrayArgument<0>(actuator2, actuator2 + 3), Return(3)));
+    EXPECT_CALL(a1, execute(_)).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(a2, execute(_)).Times(1).WillOnce(Return(true));
+    EXPECT_TRUE(_mgr.executeCommand(payloadA1));
+    EXPECT_TRUE(_mgr.executeCommand(payloadA2));
+
+    char payload3[] = "{\"name\":\"non exist pump\",\"action\":\"ON\"}";
+    EXPECT_CALL(a1, getName(_)).Times(AtLeast(1)).WillRepeatedly(DoAll(SetArrayArgument<0>(actuator1, actuator1 + 5), Return(5)));
+    EXPECT_CALL(a2, getName(_)).Times(AtLeast(1)).WillRepeatedly(DoAll(SetArrayArgument<0>(actuator2, actuator2 + 3), Return(3)));
+    EXPECT_FALSE(_mgr.executeCommand(payload3));
 }

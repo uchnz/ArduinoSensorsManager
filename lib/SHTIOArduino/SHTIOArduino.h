@@ -1,5 +1,5 @@
 #pragma once
-#include <IIO.h>
+#include <IIOSensor.h>
 #include <iarduino_I2C_SHT.h>
 
 namespace shtio_nm
@@ -10,7 +10,7 @@ namespace shtio_nm
     const uint8_t TOTAL_SENSORS_ON_BUS = 2;
 }
 
-class SHTIOArduino : public IIO
+class SHTIOArduino : public IIOSensor
 {
 private:
     iarduino_I2C_SHT &_sht;

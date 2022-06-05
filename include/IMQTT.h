@@ -8,4 +8,5 @@ public:
 
     virtual bool send(const char *data, const char *topic) = 0;
     virtual bool receive() = 0;
+    virtual bool subscribeToTopic(const char *) = 0;
 };

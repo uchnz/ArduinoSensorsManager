@@ -18,7 +18,7 @@ bool BaseSensor::saveName(const char *name)
 
     return true;
 }
-BaseSensor::BaseSensor(const char *name, IIO &io)
+BaseSensor::BaseSensor(const char *name, IIOSensor &io)
     : _io(io)
 {
     _currentSavingItemInArray = 0;
