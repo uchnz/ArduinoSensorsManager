@@ -10,6 +10,10 @@ namespace ioactuator_nm
 
 class IOActuator : public IIOActuator
 {
+private:
+    uint8_t _signalPIN;
+    uint8_t _initCompleted;
+
 public:
     IOActuator(uint8_t pin);
 

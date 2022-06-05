@@ -4,27 +4,31 @@
 
 #include <IOActuator.h>
 
+IOActuator::IOActuator(uint8_t pin)
+{
+    _signalPIN = pin;
+    _initCompleted = false;
+}
+
 bool IOActuator::init()
 {
-    // pinMode(_signalPIN, _signalDirection);
-    // _initCompleted = true;
+    pinMode(_signalPIN, OUTPUT);
+    _initCompleted = true;
 
-    // return _initCompleted;
-    return false;
+    return _initCompleted;
 }
 
 bool IOActuator::write(uint8_t value)
 {
-    // pinMode(_signalPIN, _signalDirection);
-    // _initCompleted = true;
+    if (!_initCompleted)
+        return false;
+    if (value > 1)
+        return false;
 
-    // return _initCompleted;
-    return false;
-}
+    if (0 == value)
+        digitalWrite(_signalPIN, LOW);
+    if (1 == value)
+        digitalWrite(_signalPIN, HIGH);
 
-IOActuator::IOActuator(uint8_t pin)
-{
-    // _signalPIN = pin;
-    // _signalDirection = direction;
-    // _initCompleted = false;
+    return true;
 }
