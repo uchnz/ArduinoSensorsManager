@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 
-#include <SensorManager/SensorManager_test.h>
+#include "MockIEth.h"
+#include "../MockSensorManager/MockSensorManager_test.h"
+
 
 using ::testing::_;
 using ::testing::Return;

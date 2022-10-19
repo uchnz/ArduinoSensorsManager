@@ -1,11 +1,12 @@
+#pragma once
+
 #include <gtest/gtest.h>
-
-#include <MockIEth/MockIEth.h>
-#include <MockIMQTT/MockIMQTT.h>
-#include <MockIDallas/MockIDallas.h>
 #include <SensorManager.h>
+#include <MockIEth/MockIEth.h>
+#include <MockIMQTT/MockIMQTT_test.h>
+#include <MockIDallas/MockIDallas.h>
 
-using ::testing::_;
+// using ::testing::_;
 
 class SensorManagerTest : public ::testing::Test
 {

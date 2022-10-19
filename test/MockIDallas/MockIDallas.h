@@ -1,6 +1,8 @@
+#pragma once
+
 #include <gmock/gmock.h>
-//#include <stdint.h>
 #include <IDallas.h>
+
 
 namespace sensor_manager
 {
