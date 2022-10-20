@@ -2,13 +2,11 @@
 
 #include "MockSensorManager_test.h"
 
+// TEST_F(SensorManagerTest, test_one)
+// {
+//     EXPECT_FALSE(false);
 
-TEST_F(SensorManagerTest, test_one)
-{
-    EXPECT_FALSE(false);
-    
-}
-
+// }
 
 TEST_F(SensorManagerTest, test_FillTopicsStringsWithNull_ReturnsFalse)
 {

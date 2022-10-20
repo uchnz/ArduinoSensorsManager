@@ -1,8 +1,10 @@
 #include <gtest/gtest.h>
 
 #include "MockIDallas.h"
-#include "../MockSensorManager/MockSensorManager_test.h"
-
+//#include "../test_MockSensorManager/MockSensorManager_test.h"
+// #include "test_MockSensorManager/MockSensorManager_test.h"
+// #include <test_MockSensorManager/MockSensorManager_test.h>
+#include <test_MockSensorManager/MockSensorManager_test.h>
 
 using ::testing::_;
 using ::testing::Return;

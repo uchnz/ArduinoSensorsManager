@@ -4,5 +4,25 @@
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+    if (RUN_ALL_TESTS())
+    ;
+
+    return 0;
+} 
+
+
+
+class SMT_test : public ::testing::Test
+{
+protected:
+   void SetUp() override
+   {
+   }
+
+};
+
+TEST_F(SMT_test, test_one)
+{
+    EXPECT_FALSE(false);
+    
 }
