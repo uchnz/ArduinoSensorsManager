@@ -1,0 +1,60 @@
+https://gist.github.com/motchy869/22d873415722a1c10bc77d3f761339dc#file-setup-googletest-on-windows-md
+googletest won't compile with mingw, install msys2 instead
+
+
+0. Install Python3
+
+1. msys2 or mingw-w64 - https://www.msys2.org/
+add path to C:\msys64\mingw64\bin
+download and install debugger module: https://packages.msys2.org/package/mingw-w64-x86_64-gdb?repo=mingw64
+pacman -S mingw-w64-x86_64-gdb (run this command in MSYS shell)
+
+2. cmake
+add path to C:\CMake\bin
+
+3. make
+add path to C:\make\bin
+
+cmake -G "MinGW Makefiles"
+make
+
+
+4. Copy header and library files to your environment
+You may have to change Mingw-w64 path in the following instructions, according to your environment.
+
+Copy 2 folders googletest-release-x.x.x/googletest/include/gtest and googletest-release-x.x.x/googletest/include/gmock to C:/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/include/
+Copy gtest library files copy googletest-release-x.x.x/lib/libgtest*.a to C:/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/lib/gtest/
+Copy gmock library files googletest-release-x.x.x/lib/libgmock*.a to C:/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/lib/gmock/
+
+
+-------------------------
+
+Setup GoogleTest on Windows
+1. Setup build tools
+You can skip some of the following steps if you have already installed them.
+
+Install Mingw-w64
+Install Python3
+Install GNU Make (Make for Windows GnuWin32 is sufficient)
+Install CMake
+2. Build GoogleTest
+Download GoogleTest release package, extract it, and go to folder: googletest-release-x.x.x
+
+Run following commands
+
+cmake -G "MinGW Makefiles"
+make
+3. Copy header and library files to your environment
+You may have to change Mingw-w64 path in the following instructions, according to your environment.
+
+Copy 2 folders googletest-release-x.x.x/googletest/include/gtest and googletest-release-x.x.x/googletest/include/gmock to C:/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/include/
+Copy gtest library files copy googletest-release-x.x.x/lib/libgtest*.a to C:/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/lib/gtest/
+Copy gmock library files googletest-release-x.x.x/lib/libgmock*.a to C:/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/lib/gmock/
+4. Usage
+MathLib will help you know how to use GoogleTest.
+
+
+https://medium.com/swlh/google-test-installation-guide-for-c-in-windows-for-visual-studio-code-2b2e66352456
+g++ test_bootstrap.cpp -c
+g++ MockSensorManager_test.cpp -c
+g++ test_bootstrap.o MockSensorManager_test.o -lgtest -lgtest_main -lpthread

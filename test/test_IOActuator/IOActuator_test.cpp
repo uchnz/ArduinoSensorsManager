@@ -44,4 +44,5 @@ TEST_F(IOActuatorTest, test_write_withIncorrectArgument_doesNothing_returnsFalse
 
     EXPECT_CALL(*arduinoMock, digitalWrite(27, LOW)).Times(0);
     EXPECT_FALSE(io.write(7));
+    releaseArduinoMock();
 }

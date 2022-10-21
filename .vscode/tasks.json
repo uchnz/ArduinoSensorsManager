@@ -29,7 +29,7 @@
                 "-e",
                 "native",
                 "-f",
-                "TimerArduino_test"
+                "test_TimerArduino_test"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
