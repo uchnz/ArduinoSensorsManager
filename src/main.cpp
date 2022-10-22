@@ -17,6 +17,15 @@
 // #include "I2CScanner.h"
 // I2CScanner scanner;
 
+// * more text
+//* * some text
+//** more text
+//* some text
+//! remarks
+// ! remarks
+// ? questions
+// TODO some
+
 EthArduino ethernetModule;
 MQTTArduino mqttClientModule;
 

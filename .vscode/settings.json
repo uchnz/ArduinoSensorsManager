@@ -1,4 +1,7 @@
 {
+    "editor.fontFamily": "'Source Code Pro Light'",
+    "editor.lineHeight": 18,
+    "editor.bracketPairColorization.enabled": true,
     "editor.tokenColorCustomizations": {
         "textMateRules": [
             {

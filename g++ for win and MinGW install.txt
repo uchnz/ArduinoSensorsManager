@@ -1,19 +1,25 @@
 https://gist.github.com/motchy869/22d873415722a1c10bc77d3f761339dc#file-setup-googletest-on-windows-md
 googletest won't compile with mingw, install msys2 instead
 
-
 0. Install Python3
 
 1. msys2 or mingw-w64 - https://www.msys2.org/
-add path to C:\msys64\mingw64\bin
+download and install toolchain: pacman -S mingw-w64-x86_64-gdb (run this command in MSYS shell)
+add path to: C:\msys64\mingw64\bin
+add path to: C:\msys64\mingw64\include
+add path to: C:\msys64\mingw64\lib
 download and install debugger module: https://packages.msys2.org/package/mingw-w64-x86_64-gdb?repo=mingw64
-pacman -S mingw-w64-x86_64-gdb (run this command in MSYS shell)
+
+https://metabust.com/guides/set-up-vs-code-for-c-plus-plus
+https://medium.com/swlh/simple-vscode-setup-to-develop-c-7830182ee4d8
 
 2. cmake
 add path to C:\CMake\bin
 
 3. make
 add path to C:\make\bin
+
+
 
 cmake -G "MinGW Makefiles"
 make
