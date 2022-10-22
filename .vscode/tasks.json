@@ -10,7 +10,7 @@
                 "-e",
                 "native",
                 "-f",
-                "PhaseTimerArduino_test"
+                "test_PhaseTimerArduino_test"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -22,7 +22,7 @@
         },
         {
             "type": "shell",
-            "label": "test TimerArduino_test",
+            "label": "TimerArduino_test",
             "command": "pio",
             "args": [
                 "test",
@@ -48,7 +48,7 @@
                 "-e",
                 "native",
                 "-f",
-                "IOArduino_test"
+                "test_IOArduino_test"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -67,7 +67,7 @@
                 "-e",
                 "native",
                 "-f",
-                "BaseSensor_test"
+                "test_BaseSensor_test"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -86,7 +86,7 @@
                 "-e",
                 "native",
                 "-f",
-                "JSON_test"
+                "test_JSON_test"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -105,7 +105,7 @@
                 "-e",
                 "native",
                 "-f",
-                "SensorManager"
+                "test_SensorManager"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"

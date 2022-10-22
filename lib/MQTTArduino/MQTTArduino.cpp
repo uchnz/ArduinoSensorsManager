@@ -56,7 +56,8 @@ bool MQTTArduino::publish(char *topic, char *data)
     return _clientMQTT.publish(topic, data);
 }
 
-void MQTTArduino::subscribeToTopic(const char *topic)
+// void MQTTArduino::subscribeToTopic(const char *topic)
+bool MQTTArduino::subscribeToTopic(const char *topic)
 {
     if (nullptr != topic)
         _clientMQTT.subscribe(topic);

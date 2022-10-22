@@ -20,7 +20,8 @@ public:
     bool connected();
     bool loop();
     bool publish(char *topic, char *data);
-    void subscribeToTopic(const char *topic);
+    // void subscribeToTopic(const char *topic);
+    bool subscribeToTopic(const char *topic);
 
     bool send(const char *data, const char *topic) override;
     bool receive() override;
