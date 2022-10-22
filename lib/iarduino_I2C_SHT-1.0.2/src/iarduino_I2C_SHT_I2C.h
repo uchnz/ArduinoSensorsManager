@@ -80,7 +80,7 @@ public:						  //	Доступные методы и функции:
 		Wire.setClock(speed * 1000L); //	Устанавливаем скорость передачи данных по шине I2C.
 		Wire.begin();				  //	Инициируем работу на шине I2C в качестве мастера.
 #elif defined(iarduino_I2C_HW)		  //
-		//	Если используется аппаратная шина I2C:							//
+	  //	Если используется аппаратная шина I2C:							//
 		pinMode(pin_SDA, INPUT);
 		digitalWrite(pin_SDA, HIGH); //	Определяем вывод pin_SDA как вход и подтягиваем его к Vcc.
 		pinMode(pin_SCL, INPUT);
@@ -92,7 +92,7 @@ public:						  //	Доступные методы и функции:
 		}									  //	Если значение регистра скорости TWBR стало меньше 10 (параметр speed > 400 кГ) то оставляем значение этого регистра равным 10 иначе шина будет работать нестабильно.
 		TWSR &= (~(_BV(TWPS1) | _BV(TWPS0))); //	Определяем значение регистра статуса TWSR: оставляем все его биты не тронутыми, кроме двух битов предделитея TWPS сбрасывая их в 0.
 #elif defined(iarduino_I2C_SW)		  //
-		//	Если используется программная шина I2C:							//
+	  //	Если используется программная шина I2C:							//
 		port_SDA = digitalPinToPort(pin_SDA);	 //	Определяем номер порта для вывода pin_SDA.
 		port_SCL = digitalPinToPort(pin_SCL);	 //	Определяем номер порта для вывода pin_SCL.
 		mask_SDA = digitalPinToBitMask(pin_SDA); //	Определяем маску для вывода pin_SDA. в переменной mask_SDA будет установлен только тот бит который соответствует позиции бита управления выводом pin_SDA.
@@ -164,7 +164,7 @@ public:						  //	Доступные методы и функции:
 		}
 		return i == sum;	 //	Если в буфере для полученных данных есть еще принятые байты, то чистим буфер. Возвращаем true если удалось прочитать sum байт.
 #else						 //
-											  //	Если шина управляется функциями нижнего уровня данного класса:	//
+							 //	Если шина управляется функциями нижнего уровня данного класса:	//
 		uint8_t i = 0;						  //	Предустанавливаем переменную i в значение 0 - это результат записи.
 		if (start())
 		{
@@ -189,14 +189,18 @@ public:						  //	Доступные методы и функции:
 #if defined(iarduino_I2C_HW) //	Проверить корректность чтения каждого байта можно только на аппаратном уровне
 								if (sum)
 								{
-									if (TWSR & 0xF8 != 0x50)
+									// nz: https://stackoverflow.com/questions/21919922/gcc-suggest-parentheses-around-comparison-parentheses-not-able-to-solve-myself
+									// nz: warning: suggest parentheses around comparison in operand of '&' [-Wparentheses] - adding braces
+									if ((TWSR & 0xF8) != 0x50)
 									{
 										i = 0;
 									}
 								} //	Если после чтения очередного байта пакета значение регистра состояния шины I2C Arduino TWSR с маской 0xF8 не равно 0x50 значит произошла ошибка при чтении
 								else
 								{
-									if (TWSR & 0xF8 != 0x58)
+									// nz: https://stackoverflow.com/questions/21919922/gcc-suggest-parentheses-around-comparison-parentheses-not-able-to-solve-myself
+									// nz: warning: suggest parentheses around comparison in operand of '&' [-Wparentheses] - adding braces
+									if ((TWSR & 0xF8) != 0x58)
 									{
 										i = 0;
 									}
@@ -250,14 +254,18 @@ public:						  //	Доступные методы и функции:
 #if defined(iarduino_I2C_HW) //	Проверить корректность чтения каждого байта можно только на аппаратном уровне
 					if (sum)
 					{
-						if (TWSR & 0xF8 != 0x50)
+						// nz: https://stackoverflow.com/questions/21919922/gcc-suggest-parentheses-around-comparison-parentheses-not-able-to-solve-myself
+						// nz: warning: suggest parentheses around comparison in operand of '&' [-Wparentheses] - adding braces
+						if ((TWSR & 0xF8) != 0x50)
 						{
 							i = 0;
 						}
 					} //	Если после чтения очередного байта пакета значение регистра состояния шины I2C Arduino TWSR с маской 0xF8 не равно 0x50 значит произошла ошибка при чтении
 					else
 					{
-						if (TWSR & 0xF8 != 0x58)
+						// nz: https://stackoverflow.com/questions/21919922/gcc-suggest-parentheses-around-comparison-parentheses-not-able-to-solve-myself
+						// nz: warning: suggest parentheses around comparison in operand of '&' [-Wparentheses] - adding braces
+						if ((TWSR & 0xF8) != 0x58)
 						{
 							i = 0;
 						}
@@ -419,7 +427,7 @@ public:						  //	Доступные методы и функции:
 		setSCL(0);			//	Устанавливаем «0» на линии SCL
 		return i;			//	Если счетчик i не дошел до 0 при ожидании «1» на линии SCL, то вернётся true.
 #else						   //
-												 //	Если тип шины I2C не поддерживается или не определён:			//
+							   //	Если тип шины I2C не поддерживается или не определён:			//
 		return false;							 //	Возвращаем false.
 #endif						   //
 	}						   //
@@ -449,7 +457,7 @@ public:						  //	Доступные методы и функции:
 							//	Если используется программная шина I2C:							//
 		return start();		//	Программная реализация состояния RESTART идентична программной реализации состояния START.
 #else						   //
-												 //	Если тип шины I2C не поддерживается или не определён:			//
+							   //	Если тип шины I2C не поддерживается или не определён:			//
 		return false;							 //	Возвращаем false.
 #endif						   //
 	}						   //
@@ -538,7 +546,7 @@ public:						  //	Доступные методы и функции:
 		setSCL(0);	   //	Устанавливаем «0» на линии SCL (Спад тактирубщего импульса)
 		return i;	   //	Если линия SCL была занята или модуль ответил NACK, то вернётся false.
 #else						   //
-												 //	Если тип шины I2C не поддерживается или не определён:			//
+							   //	Если тип шины I2C не поддерживается или не определён:			//
 		return false;							 //	Возвращаем false
 #endif						   //
 	}						   //
@@ -591,7 +599,7 @@ public:						  //	Доступные методы и функции:
 		setSCL(0);	   //	Устанавливаем «0» на линии SCL (Спад тактирубщего импульса)
 		return i;	   //	Если счетчик i не дошел до 0 и не был сброшен в 0 при получении NACK, то вернётся true.
 #else						   //
-												 //	Если тип шины I2C не поддерживается или не определён:			//
+							   //	Если тип шины I2C не поддерживается или не определён:			//
 		return false;							 //	Возвращаем false
 #endif						   //
 	}						   //
@@ -648,7 +656,7 @@ public:						  //	Доступные методы и функции:
 		setSCL(0);		  //	Устанавливаем «0» на линии SCL (Спад тактирубщего импульса)
 		return i ? k : 0; //	Если во время ожидания поднятия логического уровня на линии SCL, cчётчик i не дошел до 0, то функция вернёт байт из переменной k.
 #else							  //
-												 //	Если тип шины I2C не поддерживается или не определён:			//
+								  //	Если тип шины I2C не поддерживается или не определён:			//
 		return 0;								 //	Возвращаем false
 #endif							  //
 	}							  //

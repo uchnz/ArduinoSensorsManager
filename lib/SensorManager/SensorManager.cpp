@@ -360,7 +360,8 @@ bool SensorManager::sendSensorsData()
     for (uint8_t i = 0; i < _totalPortsWithSensors; i++)
     {
         char messageToSend[SM_nm::MAX_MESSAGE_SIZE];
-        uint16_t len = makeJSON2(messageToSend, SM_nm::MAX_MESSAGE_SIZE, i);
+        // uint16_t len = makeJSON2(messageToSend, SM_nm::MAX_MESSAGE_SIZE, i);
+        makeJSON2(messageToSend, SM_nm::MAX_MESSAGE_SIZE, i);
         bool result = _clientMQTT.send(messageToSend, _addressesToSendMeasurementsTo[i]);
         if (!result)
             atLeastOneError = true;
@@ -383,7 +384,8 @@ uint16_t SensorManager::makeSystemJSON(char *message, uint16_t len, uint32_t mil
 bool SensorManager::sendSystemInfo(uint32_t millisSinceStart)
 {
     char messageToSend[SM_nm::MAX_MESSAGE_SIZE];
-    uint16_t len = makeSystemJSON(messageToSend, SM_nm::MAX_MESSAGE_SIZE, millisSinceStart);
+    // uint16_t len = makeSystemJSON(messageToSend, SM_nm::MAX_MESSAGE_SIZE, millisSinceStart);
+    makeSystemJSON(messageToSend, SM_nm::MAX_MESSAGE_SIZE, millisSinceStart);
     bool result = _clientMQTT.send(messageToSend, "/SystemInfo");
     printf("address: /SystemInfo -> message: %s\n", messageToSend);
     return result;
