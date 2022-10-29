@@ -83,10 +83,10 @@ double MultiPortIOArduino::read(uint8_t id)
     if (!isInitCompleted())
         return ioarduino_nm::UNINITIALIZED_SENSOR_VALUE;
 
-    if (id >= _totalSensors)
-        return ioarduino_nm::UNINITIALIZED_SENSOR_VALUE;
+    if (id < _totalSensors)
+        return _ios[id]->read();
 
-    return _ios[id]->read();
+    return ioarduino_nm::UNINITIALIZED_SENSOR_VALUE;
 }
 
 uint8_t MultiPortIOArduino::getTotalSensors()

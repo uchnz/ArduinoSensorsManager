@@ -13,6 +13,7 @@ protected:
 class MockIO : public IIOSensor
 {
 public:
+    MOCK_METHOD(bool, isInitCompleted, (), (override));
     MOCK_METHOD(bool, init, (), (override));
     MOCK_METHOD(double, read, (uint8_t), (override));
     MOCK_METHOD(uint8_t, getTotalSensors, (), (override));

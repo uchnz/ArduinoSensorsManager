@@ -19,9 +19,10 @@ private:
 
 public:
     BMP280IOArduino(iarduino_Pressure_BMP &bmp);
-    bool isInitCompleted();
+    // bool isInitCompleted();
 
     // IIOSensor
+    virtual bool isInitCompleted() override;
     virtual bool init() override;
     virtual double read(uint8_t id = 0) override;
     virtual uint8_t getTotalSensors() override;

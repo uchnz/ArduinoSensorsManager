@@ -18,9 +18,10 @@ private:
 
 public:
     DallasIOArduino(DallasTemperature &dallas);
-    bool isInitCompleted();
+    // bool isInitCompleted();
 
     // IIO
+    virtual bool isInitCompleted() override;
     virtual bool init() override;
     virtual double read(uint8_t id = 0) override;
     virtual uint8_t getTotalSensors() override;

@@ -18,7 +18,8 @@ protected:
 public:
     IOArduino(uint8_t pin, uint8_t direction);
 
-    bool isInitCompleted();
+    // bool isInitCompleted();
+    virtual bool isInitCompleted() override;
 
     // IIOSensor
     virtual bool init() override;
@@ -52,9 +53,10 @@ private:
 public:
     MultiPortIOArduino(IIOSensor **ios, uint8_t num);
 
-    bool isInitCompleted();
+    // bool isInitCompleted();
 
     // IIOSensor
+    virtual bool isInitCompleted() override;
     virtual bool init() override;
     virtual double read(uint8_t id = 0) override;
     virtual uint8_t getTotalSensors() override;
