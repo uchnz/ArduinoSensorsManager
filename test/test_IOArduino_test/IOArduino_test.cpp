@@ -288,3 +288,64 @@ TEST_F(MQ7COIOArduinoTest, test_read_inReadCycle_ReturnsValue)
 
     releaseArduinoMock();
 }
+
+TEST_F(MultiPortTest, test_multiSensor_afterInit_returnsValues)
+{
+    ArduinoMock *arduinoMock = arduinoMockInstance();
+
+    DigitalIOArduino dio1(32, INPUT_PULLUP);
+    EXPECT_CALL(*arduinoMock, pinMode(32, INPUT_PULLUP)).Times(1);
+    AnalogIOArduino aio2(A10, INPUT);
+    EXPECT_CALL(*arduinoMock, pinMode(A10, INPUT)).Times(1);
+    AnalogIOArduino aio3(A11, INPUT);
+    EXPECT_CALL(*arduinoMock, pinMode(A11, INPUT)).Times(1);
+
+    uint8_t numSensors = 3;
+    IIOSensor *ios[numSensors] = {&dio1, &aio2, &aio3};
+
+    MultiPortIOArduino mio(ios, numSensors);
+    EXPECT_TRUE(mio.init());
+
+    EXPECT_CALL(*arduinoMock, digitalRead(32)).Times(1).WillOnce(Return(10));
+    double result = mio.read();
+    EXPECT_EQ(10, result);
+    EXPECT_CALL(*arduinoMock, analogRead(A10)).Times(1).WillOnce(Return(0));
+    result = mio.read(1);
+    EXPECT_EQ(0, result);
+    EXPECT_CALL(*arduinoMock, analogRead(A11)).Times(1).WillOnce(Return(-5));
+    result = mio.read(2);
+    EXPECT_EQ(-5, result);
+    result = mio.read(3);
+    EXPECT_EQ(ioarduino_nm::UNINITIALIZED_SENSOR_VALUE, result);
+    result = mio.read(-2);
+    EXPECT_EQ(ioarduino_nm::UNINITIALIZED_SENSOR_VALUE, result);
+    releaseArduinoMock();
+}
+
+TEST_F(MultiPortTest, test_multiSensor_beforeInit_returnsError)
+{
+    ArduinoMock *arduinoMock = arduinoMockInstance();
+    DigitalIOArduino dio1(32, INPUT_PULLUP);
+    EXPECT_CALL(*arduinoMock, pinMode(32, INPUT_PULLUP)).Times(0);
+    AnalogIOArduino aio2(A10, INPUT);
+    EXPECT_CALL(*arduinoMock, pinMode(A10, INPUT)).Times(0);
+    AnalogIOArduino aio3(A11, INPUT);
+    EXPECT_CALL(*arduinoMock, pinMode(A11, INPUT)).Times(0);
+
+    uint8_t numSensors = 3;
+    IIOSensor *ios[numSensors] = {&dio1, &aio2, &aio3};
+    MultiPortIOArduino mio(ios, numSensors);
+
+    EXPECT_CALL(*arduinoMock, digitalRead(32)).Times(0);
+    double result = mio.read();
+    EXPECT_EQ(ioarduino_nm::UNINITIALIZED_SENSOR_VALUE, result);
+    EXPECT_CALL(*arduinoMock, analogRead(A10)).Times(0);
+    result = mio.read(1);
+    EXPECT_EQ(ioarduino_nm::UNINITIALIZED_SENSOR_VALUE, result);
+    EXPECT_CALL(*arduinoMock, analogRead(A11)).Times(0);
+    result = mio.read(2);
+    EXPECT_EQ(ioarduino_nm::UNINITIALIZED_SENSOR_VALUE, result);
+    result = mio.read(3);
+    EXPECT_EQ(ioarduino_nm::UNINITIALIZED_SENSOR_VALUE, result);
+    releaseArduinoMock();
+}

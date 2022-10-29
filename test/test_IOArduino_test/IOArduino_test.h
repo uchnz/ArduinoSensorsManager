@@ -31,3 +31,11 @@ protected:
     {
     }
 };
+
+class MultiPortTest : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+    }
+};

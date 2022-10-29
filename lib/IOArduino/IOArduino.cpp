@@ -58,3 +58,38 @@ double DigitalIOArduino::read(uint8_t id)
 
     return (double)digitalRead(_signalPIN);
 }
+
+MultiPortIOArduino::MultiPortIOArduino(IIOSensor **ios, uint8_t num)
+{
+    _ios = ios;
+    _totalSensors = num;
+    _initCompleted = false;
+}
+
+bool MultiPortIOArduino::isInitCompleted()
+{
+    return _initCompleted;
+}
+bool MultiPortIOArduino::init()
+{
+    for (uint8_t i = 0; i < _totalSensors; i++)
+        _ios[i]->init();
+
+    _initCompleted = true;
+    return _initCompleted;
+}
+double MultiPortIOArduino::read(uint8_t id)
+{
+    if (!isInitCompleted())
+        return ioarduino_nm::UNINITIALIZED_SENSOR_VALUE;
+
+    if (id >= _totalSensors)
+        return ioarduino_nm::UNINITIALIZED_SENSOR_VALUE;
+
+    return _ios[id]->read();
+}
+
+uint8_t MultiPortIOArduino::getTotalSensors()
+{
+    return _totalSensors;
+}

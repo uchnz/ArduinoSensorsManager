@@ -41,3 +41,21 @@ public:
 
     virtual double read(uint8_t id = 0) override;
 };
+
+class MultiPortIOArduino : public IIOSensor
+{
+private:
+    uint8_t _totalSensors;
+    IIOSensor **_ios;
+    bool _initCompleted;
+
+public:
+    MultiPortIOArduino(IIOSensor **ios, uint8_t num);
+
+    bool isInitCompleted();
+
+    // IIOSensor
+    virtual bool init() override;
+    virtual double read(uint8_t id = 0) override;
+    virtual uint8_t getTotalSensors() override;
+};

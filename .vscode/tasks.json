@@ -3,6 +3,25 @@
     "tasks": [
         {
             "type": "shell",
+            "label": "test MultiLevelArduinoSensor_test",
+            "command": "pio",
+            "args": [
+                "test",
+                "-e",
+                "native",
+                "-f",
+                "test_MultiLevelSensor_test",
+                "-v"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "isDefault": false,
+                "kind": "build"
+            }
+        },        {
+            "type": "shell",
             "label": "test PhaseTimerArduino_test",
             "command": "pio",
             "args": [
@@ -10,7 +29,8 @@
                 "-e",
                 "native",
                 "-f",
-                "test_PhaseTimerArduino_test"
+                "test_PhaseTimerArduino_test",
+                "-v"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -29,7 +49,8 @@
                 "-e",
                 "native",
                 "-f",
-                "test_TimerArduino_test"
+                "test_TimerArduino_test",
+                "-v"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -48,7 +69,8 @@
                 "-e",
                 "native",
                 "-f",
-                "test_IOArduino_test"
+                "test_IOArduino_test",
+                "-v"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -67,7 +89,8 @@
                 "-e",
                 "native",
                 "-f",
-                "test_BaseSensor_test"
+                "test_BaseSensor_test",
+                "-v"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -86,7 +109,8 @@
                 "-e",
                 "native",
                 "-f",
-                "test_JSON_test"
+                "test_JSON_test",
+                "-v"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -105,7 +129,8 @@
                 "-e",
                 "native",
                 "-f",
-                "test_SensorManager"
+                "test_SensorManager",
+                "-v"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
