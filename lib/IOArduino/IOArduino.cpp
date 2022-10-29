@@ -72,8 +72,12 @@ bool MultiPortIOArduino::isInitCompleted()
 }
 bool MultiPortIOArduino::init()
 {
+    if (!_ios)
+        return false;
+
     for (uint8_t i = 0; i < _totalSensors; i++)
-        _ios[i]->init();
+        if (_ios[i])
+            _ios[i]->init();
 
     _initCompleted = true;
     return _initCompleted;
@@ -84,7 +88,8 @@ double MultiPortIOArduino::read(uint8_t id)
         return ioarduino_nm::UNINITIALIZED_SENSOR_VALUE;
 
     if (id < _totalSensors)
-        return _ios[id]->read();
+        if (_ios[id])
+            return _ios[id]->read();
 
     return ioarduino_nm::UNINITIALIZED_SENSOR_VALUE;
 }

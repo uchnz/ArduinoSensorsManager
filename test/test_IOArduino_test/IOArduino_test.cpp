@@ -309,12 +309,15 @@ TEST_F(MultiPortTest, test_multiSensor_afterInit_returnsValues)
     EXPECT_CALL(*arduinoMock, digitalRead(32)).Times(1).WillOnce(Return(10));
     double result = mio.read();
     EXPECT_EQ(10, result);
+
     EXPECT_CALL(*arduinoMock, analogRead(A10)).Times(1).WillOnce(Return(0));
     result = mio.read(1);
     EXPECT_EQ(0, result);
+
     EXPECT_CALL(*arduinoMock, analogRead(A11)).Times(1).WillOnce(Return(-5));
     result = mio.read(2);
     EXPECT_EQ(-5, result);
+
     result = mio.read(3);
     EXPECT_EQ(ioarduino_nm::UNINITIALIZED_SENSOR_VALUE, result);
     result = mio.read(-2);
@@ -339,13 +342,82 @@ TEST_F(MultiPortTest, test_multiSensor_beforeInit_returnsError)
     EXPECT_CALL(*arduinoMock, digitalRead(32)).Times(0);
     double result = mio.read();
     EXPECT_EQ(ioarduino_nm::UNINITIALIZED_SENSOR_VALUE, result);
+
     EXPECT_CALL(*arduinoMock, analogRead(A10)).Times(0);
     result = mio.read(1);
     EXPECT_EQ(ioarduino_nm::UNINITIALIZED_SENSOR_VALUE, result);
+
     EXPECT_CALL(*arduinoMock, analogRead(A11)).Times(0);
     result = mio.read(2);
     EXPECT_EQ(ioarduino_nm::UNINITIALIZED_SENSOR_VALUE, result);
+
     result = mio.read(3);
     EXPECT_EQ(ioarduino_nm::UNINITIALIZED_SENSOR_VALUE, result);
+    releaseArduinoMock();
+}
+
+TEST_F(MultiPortTest, test_multiSensor_returnsNumberOfSensors)
+{
+    DigitalIOArduino dio1(32, INPUT_PULLUP);
+    AnalogIOArduino aio2(A10, INPUT);
+    AnalogIOArduino aio3(A11, INPUT);
+
+    uint8_t numSensors = 5;
+    IIOSensor *ios[numSensors] = {&dio1, &aio2, nullptr, &aio3, nullptr};
+    MultiPortIOArduino mio(ios, numSensors);
+
+    uint8_t result = mio.getTotalSensors();
+    EXPECT_EQ(numSensors, result);
+}
+
+TEST_F(MultiPortTest, test_multiSensor_withZeroSensors_returnsZero)
+{
+    uint8_t numSensors = 0;
+    MultiPortIOArduino mio(nullptr, numSensors);
+
+    uint8_t result = mio.getTotalSensors();
+    EXPECT_EQ(numSensors, result);
+}
+
+TEST_F(MultiPortTest, test_multiSensor_initWithNullArray_failsInit)
+{
+    uint8_t numSensors = 1;
+    MultiPortIOArduino mio(nullptr, numSensors);
+
+    bool result = mio.init();
+    EXPECT_EQ(false, result);
+}
+
+TEST_F(MultiPortTest, test_multiSensor_initWithArray_containingNulls_failsInit)
+{
+    ArduinoMock *arduinoMock = arduinoMockInstance();
+
+    DigitalIOArduino dio1(32, INPUT_PULLUP);
+    EXPECT_CALL(*arduinoMock, pinMode(32, INPUT_PULLUP)).Times(1);
+    AnalogIOArduino aio2(A10, INPUT);
+    EXPECT_CALL(*arduinoMock, pinMode(A10, INPUT)).Times(1);
+    AnalogIOArduino aio3(A11, INPUT);
+    EXPECT_CALL(*arduinoMock, pinMode(A11, INPUT)).Times(1);
+
+    uint8_t numSensors = 4;
+    IIOSensor *ios[numSensors] = {&dio1, nullptr, &aio2, &aio3};
+
+    MultiPortIOArduino mio(ios, numSensors);
+    EXPECT_TRUE(mio.init());
+
+    EXPECT_CALL(*arduinoMock, digitalRead(32)).Times(1).WillOnce(Return(128));
+    double result = mio.read();
+    EXPECT_EQ(128, result);
+
+    result = mio.read(1);
+    EXPECT_EQ(ioarduino_nm::UNINITIALIZED_SENSOR_VALUE, result);
+
+    EXPECT_CALL(*arduinoMock, analogRead(A10)).Times(1).WillOnce(Return(-157));
+    result = mio.read(2);
+    EXPECT_EQ(-157, result);
+
+    EXPECT_CALL(*arduinoMock, analogRead(A11)).Times(1).WillOnce(Return(0));
+    result = mio.read(3);
+    EXPECT_EQ(0, result);
     releaseArduinoMock();
 }
