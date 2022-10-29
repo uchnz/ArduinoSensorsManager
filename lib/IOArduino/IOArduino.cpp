@@ -82,6 +82,7 @@ bool MultiPortIOArduino::init()
     _initCompleted = true;
     return _initCompleted;
 }
+
 double MultiPortIOArduino::read(uint8_t id)
 {
     if (!isInitCompleted())
